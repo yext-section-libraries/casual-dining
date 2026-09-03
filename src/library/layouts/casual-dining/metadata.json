@@ -1,0 +1,11 @@
+{
+  "id": "casual-dining",
+  "displayName": "Casual Dining",
+  "vertical": [
+    "FOOD_AND_DINING"
+  ],
+  "purpose": [
+    "LOCATION"
+  ],
+  "pageSetType": "ENTITY"
+}

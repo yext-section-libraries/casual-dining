@@ -1,0 +1,11 @@
+{
+  "id": "casual-dining-menu-item",
+  "displayName": "Casual Dining (Menu Item)",
+  "vertical": [
+    "FOOD_AND_DINING"
+  ],
+  "purpose": [
+    "CITATION"
+  ],
+  "pageSetType": "ENTITY"
+}
