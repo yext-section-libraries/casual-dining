@@ -1,5 +1,5 @@
 {
   "id": "casual-dining-locator",
   "displayName": "Locator",
-  "pageGroupType": "LOCATOR"
+  "pageSetType": "LOCATOR"
 }
