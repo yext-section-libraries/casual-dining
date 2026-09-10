@@ -12,7 +12,6 @@ import {
   getAnalyticsScopeHash,
   resolveComponentData,
   StyledTextComponent,
-  ThemeOptions,
   useDocument,
   VisibilityWrapper,
   type StyledImageValue,
@@ -23,18 +22,13 @@ import {
   type YextEntityField,
 } from "@yext/visual-editor";
 import { PuckComponent } from "@puckeditor/core";
+import {
+  aspectRatioOptions,
+  CapturedStyleRoot,
+  createRtfField,
+  createTextField,
+} from "../shared/sectionHelpers";
 
-const themeVars: React.CSSProperties = {
-  ["--COLOR-BG" as string]: "var(--palette-tertiary)",
-  ["--COLOR-BG-ACCENT" as string]: "var(--palette-tertiary)",
-  ["--COLOR-TEXT" as string]: "var(--palette-quaternary)",
-  ["--COLOR-BORDER" as string]: "var(--palette-tertiary)",
-  ["--COLOR-ACCENT" as string]: "var(--palette-secondary)",
-  ["--COLOR-ACCENT-HOVER" as string]: "var(--palette-primary)",
-  ["--BTN-PRIMARY-BG" as string]: "var(--palette-primary)",
-  ["--BTN-SECONDARY-TEXT" as string]: "var(--palette-quaternary)",
-  ["--footer-bg" as string]: "var(--palette-quaternary)",
-};
 const capturedStyles = String.raw`:root {
 --content-max: 1440px;
   --outer: 32px;
@@ -359,13 +353,6 @@ max-width: 620px;
 }
 }`;
 
-const RootStyle = ({ children }: { children: React.ReactNode }) => (
-  <div style={themeVars}>
-    <style>{capturedStyles}</style>
-    {children}
-  </div>
-);
-
 type CasualDiningStoryProps = {
   section: {
     backgroundColor: ThemeColor;
@@ -444,7 +431,7 @@ const fields: YextFields<CasualDiningStoryProps> = {
       aspectRatio: {
         label: "Aspect Ratio",
         type: "basicSelector",
-        options: ThemeOptions.ASPECT_RATIO,
+        options: aspectRatioOptions,
       },
       imageConstrain: {
         label: "Image Constrain",
@@ -468,17 +455,11 @@ const fields: YextFields<CasualDiningStoryProps> = {
 };
 
 const defaultContent: StyledRichTextProps = {
-  ...contentConfig.defaultProps,
+  ...contentConfig.defaultProps!,
   data: {
-    text: {
-      field: "",
-      constantValue: {
-        defaultValue:
-          "At [[name]], we believe great burgers start with great ingredients and a sense of place. Nestled in the heart of [[geomodifier]], our [[address.city]] burger restaurant brings together wood-fired flavor, chef-driven comfort food, and the laid-back energy that makes [[address.region]] unforgettable.\n\nWhether you’re grabbing brunch, meeting friends for happy hour after work downtown, or ordering takeout for a night in [[address.city]], [[name]] delivers a distinctly [[address.city]] experience rooted in quality and comfort.",
-        hasLocalizedValue: "true" as const,
-      },
-      constantValueEnabled: true,
-    },
+    text: createRtfField(
+      "At [[name]], we believe great burgers start with great ingredients and a sense of place. Nestled in the heart of [[geomodifier]], our [[address.city]] burger restaurant brings together wood-fired flavor, chef-driven comfort food, and the laid-back energy that makes [[address.region]] unforgettable.\n\nWhether you’re grabbing brunch, meeting friends for happy hour after work downtown, or ordering takeout for a night in [[address.city]], [[name]] delivers a distinctly [[address.city]] experience rooted in quality and comfort.",
+    ),
   },
 };
 
@@ -538,7 +519,7 @@ const CasualDiningStoryComponent: PuckComponent<CasualDiningStoryProps> = (
         liveVisibility={props.section.visibleOnLivePage}
         isEditing={Boolean(props.puck?.isEditing)}
       >
-        <RootStyle>
+        <CapturedStyleRoot styles={capturedStyles}>
           <Background
             as="section"
             background={props.section.backgroundColor}
@@ -625,7 +606,7 @@ const CasualDiningStoryComponent: PuckComponent<CasualDiningStoryProps> = (
               </div>
             </div>
           </Background>
-        </RootStyle>
+        </CapturedStyleRoot>
       </VisibilityWrapper>
     </AnalyticsScopeProvider>
   );
@@ -646,28 +627,15 @@ export const CasualDiningStory: YextComponentConfig<CasualDiningStoryProps> =
       eyebrow: {
         ...eyebrowConfig.defaultProps,
         data: {
-          text: {
-            field: "",
-            constantValue: {
-              defaultValue: "What is [[name]]?",
-              hasLocalizedValue: "true" as const,
-            },
-            constantValueEnabled: true,
-          },
+          text: createTextField("What is [[name]]?"),
         },
       } as StyledPlainTextProps,
       heading: {
         ...headingConfig.defaultProps,
         data: {
-          text: {
-            field: "",
-            constantValue: {
-              defaultValue:
-                "A laid-back [[address.city]] burger spot built on quality, hospitality, and bold flavor.",
-              hasLocalizedValue: "true" as const,
-            },
-            constantValueEnabled: true,
-          },
+          text: createTextField(
+            "A laid-back [[address.city]] burger spot built on quality, hospitality, and bold flavor.",
+          ),
         },
       } as StyledPlainTextProps,
       sectionImage: {

@@ -15,7 +15,6 @@ import {
   getAnalyticsScopeHash,
   getSurfaceColorStyle,
   StyledTextComponent,
-  ThemeOptions,
   useDocument,
   VisibilityWrapper,
   type ComprehensiveCTAValue,
@@ -30,18 +29,12 @@ import {
   type YextEntityField,
   type YextFields,
 } from "@yext/visual-editor";
-
-const themeVars: React.CSSProperties = {
-  ["--COLOR-BG" as string]: "var(--palette-tertiary)",
-  ["--COLOR-BG-ACCENT" as string]: "var(--palette-tertiary)",
-  ["--COLOR-TEXT" as string]: "var(--palette-quaternary)",
-  ["--COLOR-BORDER" as string]: "var(--palette-tertiary)",
-  ["--COLOR-ACCENT" as string]: "var(--palette-secondary)",
-  ["--COLOR-ACCENT-HOVER" as string]: "var(--palette-primary)",
-  ["--BTN-PRIMARY-BG" as string]: "var(--palette-primary)",
-  ["--BTN-SECONDARY-TEXT" as string]: "var(--palette-quaternary)",
-  ["--footer-bg" as string]: "var(--palette-quaternary)",
-};
+import {
+  aspectRatioOptions,
+  CapturedStyleRoot,
+  createRtfField,
+  createTextField,
+} from "../shared/sectionHelpers";
 
 const capturedStyles = String.raw`:root {
 --content-max: 1440px;
@@ -376,13 +369,6 @@ width: auto;
 }
 }`;
 
-const RootStyle = ({ children }: { children: React.ReactNode }) => (
-  <div style={themeVars}>
-    <style>{capturedStyles}</style>
-    {children}
-  </div>
-);
-
 type FeaturedCardImageStyles = {
   aspectRatio: number;
   imageConstrain: "fixed" | "filled";
@@ -496,22 +482,8 @@ const featuredCardsSource = createItemSource<FeaturedCardFields>({
       },
       constantValueEnabled: true,
     },
-    title: {
-      field: "",
-      constantValue: {
-        defaultValue: item.title,
-        hasLocalizedValue: "true" as const,
-      },
-      constantValueEnabled: true,
-    },
-    description: {
-      field: "",
-      constantValue: {
-        defaultValue: getDefaultRTF(item.description),
-        hasLocalizedValue: "true" as const,
-      },
-      constantValueEnabled: true,
-    },
+    title: createTextField(item.title),
+    description: createRtfField(item.description),
   })),
 });
 
@@ -594,7 +566,7 @@ const fields: YextFields<CasualDiningFeaturedFieldProps> = {
               aspectRatio: {
                 label: "Aspect Ratio",
                 type: "basicSelector",
-                options: ThemeOptions.ASPECT_RATIO,
+                options: aspectRatioOptions,
               },
               imageConstrain: {
                 label: "Image Constrain",
@@ -681,7 +653,7 @@ const CasualDiningFeaturedComponent: PuckComponent<
         liveVisibility={props.section.visibleOnLivePage}
         isEditing={isEditing}
       >
-        <RootStyle>
+        <CapturedStyleRoot styles={capturedStyles}>
           <Background
             as="section"
             background={props.section?.backgroundColor}
@@ -838,7 +810,7 @@ const CasualDiningFeaturedComponent: PuckComponent<
               </div>
             </div>
           </Background>
-        </RootStyle>
+        </CapturedStyleRoot>
       </VisibilityWrapper>
     </AnalyticsScopeProvider>
   );
@@ -863,28 +835,15 @@ export const CasualDiningFeatured: YextComponentConfig<CasualDiningFeaturedField
       heading: {
         ...headingConfig.defaultProps,
         data: {
-          text: {
-            field: "",
-            constantValue: {
-              defaultValue: "Featured menu items",
-              hasLocalizedValue: "true" as const,
-            },
-            constantValueEnabled: true,
-          },
+          text: createTextField("Featured menu items"),
         },
       } as StyledPlainTextProps,
       description: {
         ...descriptionConfig.defaultProps,
         data: {
-          text: {
-            field: "",
-            constantValue: {
-              defaultValue:
-                "House favorites for brunch, lunch, happy hour, and late takeout.",
-              hasLocalizedValue: "true" as const,
-            },
-            constantValueEnabled: true,
-          },
+          text: createRtfField(
+            "House favorites for brunch, lunch, happy hour, and late takeout.",
+          ),
         },
       } as StyledRichTextProps,
       sectionCta: {

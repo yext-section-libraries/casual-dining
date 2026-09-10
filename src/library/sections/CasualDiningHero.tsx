@@ -14,7 +14,6 @@ import {
   EntityField,
   Image,
   StyledTextComponent,
-  ThemeOptions,
   getAnalyticsScopeHash,
   getSurfaceColorStyle,
   getThemeColorCssValue,
@@ -30,6 +29,10 @@ import {
   type YextEntityField,
   type YextFields,
 } from "@yext/visual-editor";
+import {
+  aspectRatioOptions,
+  CapturedStyleRoot,
+} from "../shared/sectionHelpers";
 
 const themeVars: React.CSSProperties = {
   ["--COLOR-BG" as string]: "var(--palette-tertiary)",
@@ -260,13 +263,6 @@ body {
 }
 `;
 
-const RootStyle = ({ children }: { children: React.ReactNode }) => (
-  <div style={themeVars}>
-    <style>{capturedStyles}</style>
-    {children}
-  </div>
-);
-
 const geomodifierConfig = createStyledTextConfig({
   kind: "plain",
   label: "Geomodifier",
@@ -355,7 +351,7 @@ const fields: YextFields<CasualDiningNewHeroFieldProps> = {
       aspectRatio: {
         label: "Aspect Ratio",
         type: "basicSelector",
-        options: ThemeOptions.ASPECT_RATIO,
+        options: aspectRatioOptions,
       },
       imageConstrain: {
         label: "Image Constrain",
@@ -603,7 +599,7 @@ const CasualDiningNewHeroComponent: PuckComponent<CasualDiningNewHeroProps> = (
         liveVisibility={props.section.visibleOnLivePage}
         isEditing={isEditing}
       >
-        <RootStyle>
+        <CapturedStyleRoot styles={capturedStyles} style={themeVars}>
           <Background
             as="section"
             background={heroSurfaceBackground}
@@ -740,7 +736,7 @@ const CasualDiningNewHeroComponent: PuckComponent<CasualDiningNewHeroProps> = (
               </div>
             </div>
           </Background>
-        </RootStyle>
+        </CapturedStyleRoot>
       </VisibilityWrapper>
     </AnalyticsScopeProvider>
   );

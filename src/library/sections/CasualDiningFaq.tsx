@@ -23,18 +23,11 @@ import {
   type YextFields,
 } from "@yext/visual-editor";
 import { PuckComponent } from "@puckeditor/core";
-
-const themeVars: React.CSSProperties = {
-  ["--COLOR-BG" as string]: "var(--palette-tertiary)",
-  ["--COLOR-BG-ACCENT" as string]: "var(--palette-tertiary)",
-  ["--COLOR-TEXT" as string]: "var(--palette-quaternary)",
-  ["--COLOR-BORDER" as string]: "var(--palette-tertiary)",
-  ["--COLOR-ACCENT" as string]: "var(--palette-secondary)",
-  ["--COLOR-ACCENT-HOVER" as string]: "var(--palette-primary)",
-  ["--BTN-PRIMARY-BG" as string]: "var(--palette-primary)",
-  ["--BTN-SECONDARY-TEXT" as string]: "var(--palette-quaternary)",
-  ["--footer-bg" as string]: "var(--palette-quaternary)",
-};
+import {
+  CapturedStyleRoot,
+  createRtfField,
+  createTextField,
+} from "../shared/sectionHelpers";
 
 const capturedStyles = String.raw`:root {
 --content-max: 1440px;
@@ -276,13 +269,6 @@ margin: 0;
 }
 }`;
 
-const RootStyle = ({ children }: { children: React.ReactNode }) => (
-  <div style={themeVars}>
-    <style>{capturedStyles}</style>
-    {children}
-  </div>
-);
-
 type FaqItemFields = {
   question: YextEntityField<TranslatableString>;
   answer: YextEntityField<TranslatableRichText>;
@@ -350,22 +336,8 @@ const faqItemsSource = createItemSource<FaqItemFields>({
     },
   },
   defaultValues: faqItems.map((item) => ({
-    question: {
-      field: "",
-      constantValue: {
-        defaultValue: item.question,
-        hasLocalizedValue: "true" as const,
-      },
-      constantValueEnabled: true,
-    },
-    answer: {
-      field: "",
-      constantValue: {
-        defaultValue: getDefaultRTF(item.answer),
-        hasLocalizedValue: "true" as const,
-      },
-      constantValueEnabled: true,
-    },
+    question: createTextField(item.question),
+    answer: createRtfField(item.answer),
   })),
 });
 
@@ -480,7 +452,7 @@ const CasualDiningFaqComponent: PuckComponent<CasualDiningFaqProps> = (
         liveVisibility={props.section.visibleOnLivePage}
         isEditing={Boolean(props.puck?.isEditing)}
       >
-        <RootStyle>
+        <CapturedStyleRoot styles={capturedStyles}>
           <Background
             as="section"
             background={props.section.backgroundColor}
@@ -564,7 +536,7 @@ const CasualDiningFaqComponent: PuckComponent<CasualDiningFaqProps> = (
               </EntityField>
             </div>
           </Background>
-        </RootStyle>
+        </CapturedStyleRoot>
       </VisibilityWrapper>
     </AnalyticsScopeProvider>
   );
@@ -584,14 +556,7 @@ export const CasualDiningFaq: YextComponentConfig<CasualDiningFaqProps> = {
     heading: {
       ...headingConfig.defaultProps,
       data: {
-        text: {
-          field: "",
-          constantValue: {
-            defaultValue: "FAQs about [[geomodifier]] [[name]]",
-            hasLocalizedValue: "true" as const,
-          },
-          constantValueEnabled: true,
-        },
+        text: createTextField("FAQs about [[geomodifier]] [[name]]"),
       },
     } as StyledPlainTextProps,
     faqs: {

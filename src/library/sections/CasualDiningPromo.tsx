@@ -13,7 +13,6 @@ import {
   getThemeColorCssValue,
   resolveComponentData,
   StyledTextComponent,
-  ThemeOptions,
   useDocument,
   VisibilityWrapper,
   type ComprehensiveCTAValue,
@@ -25,6 +24,10 @@ import {
   type YextEntityField,
   type YextFields,
 } from "@yext/visual-editor";
+import {
+  aspectRatioOptions,
+  CapturedStyleRoot,
+} from "../shared/sectionHelpers";
 
 const themeVars: React.CSSProperties = {
   ["--COLOR-BG" as string]: "var(--palette-tertiary)",
@@ -264,13 +267,6 @@ summary::-webkit-details-marker {
 }
 `;
 
-const RootStyle = ({ children }: { children: React.ReactNode }) => (
-  <div style={themeVars}>
-    <style>{capturedStyles}</style>
-    {children}
-  </div>
-);
-
 type CasualDiningPromoProps = {
   section: {
     visibleOnLivePage: boolean;
@@ -356,7 +352,7 @@ const fields: YextFields<CasualDiningPromoProps> = {
       aspectRatio: {
         label: "Aspect Ratio",
         type: "basicSelector",
-        options: ThemeOptions.ASPECT_RATIO,
+        options: aspectRatioOptions,
       },
       imageConstrain: {
         label: "Image Constrain",
@@ -433,7 +429,7 @@ const CasualDiningPromoComponent = (props: RuntimeProps) => {
         liveVisibility={props.section.visibleOnLivePage}
         isEditing={Boolean(props.puck?.isEditing)}
       >
-        <RootStyle>
+        <CapturedStyleRoot styles={capturedStyles} style={themeVars}>
           <Background
             as="section"
             background={promoSurfaceBackground}
@@ -528,7 +524,7 @@ const CasualDiningPromoComponent = (props: RuntimeProps) => {
               </div>
             </Background>
           </Background>
-        </RootStyle>
+        </CapturedStyleRoot>
       </VisibilityWrapper>
     </AnalyticsScopeProvider>
   );

@@ -33,6 +33,11 @@ import {
   type TranslatableString,
 } from "@yext/visual-editor";
 import { PuckComponent } from "@puckeditor/core";
+import {
+  CapturedStyleRoot,
+  createRtfField,
+  createTextField,
+} from "../shared/sectionHelpers";
 
 type AddressFieldProps = {
   subheading: YextEntityField<TranslatableString>;
@@ -69,18 +74,6 @@ type HoursTableFieldProps = {
 type StyledTextListProps = {
   subheading: YextEntityField<TranslatableString>;
   text: YextEntityField<TranslatableString[]>;
-};
-
-const themeVars: React.CSSProperties = {
-  ["--COLOR-BG" as string]: "var(--palette-tertiary)",
-  ["--COLOR-BG-ACCENT" as string]: "var(--palette-tertiary)",
-  ["--COLOR-TEXT" as string]: "var(--palette-quaternary)",
-  ["--COLOR-BORDER" as string]: "var(--palette-tertiary)",
-  ["--COLOR-ACCENT" as string]: "var(--palette-secondary)",
-  ["--COLOR-ACCENT-HOVER" as string]: "var(--palette-primary)",
-  ["--BTN-PRIMARY-BG" as string]: "var(--palette-primary)",
-  ["--BTN-SECONDARY-TEXT" as string]: "var(--palette-quaternary)",
-  ["--footer-bg" as string]: "var(--palette-quaternary)",
 };
 
 const capturedStyles = String.raw`:root {
@@ -374,13 +367,6 @@ grid-template-columns: minmax(0, 1fr);
 }
 }`;
 
-const RootStyle = ({ children }: { children: React.ReactNode }) => (
-  <div style={themeVars}>
-    <style>{capturedStyles}</style>
-    {children}
-  </div>
-);
-
 const headingConfig = createStyledTextConfig({
   kind: "plain",
   label: "Heading",
@@ -455,8 +441,8 @@ type CasualDiningDetailsProps = {
     visibleOnLivePage: boolean;
   };
   heading: StyledPlainTextProps;
-  subheading: StyledPlainTextProps;
-  body: StyledPlainTextProps;
+  subheading: Pick<StyledPlainTextProps, "fontOptions">;
+  body: Pick<StyledPlainTextProps, "fontOptions">;
   introText: StyledRichTextProps;
   address: AddressFieldProps;
   phone: PhoneFieldProps;
@@ -806,7 +792,7 @@ const CasualDiningDetailsComponent: PuckComponent<CasualDiningDetailsProps> = (
         liveVisibility={props.section.visibleOnLivePage}
         isEditing={Boolean(props.puck?.isEditing)}
       >
-        <RootStyle>
+        <CapturedStyleRoot styles={capturedStyles}>
           <Background
             as="section"
             background={props.section.backgroundColor}
@@ -828,9 +814,6 @@ const CasualDiningDetailsComponent: PuckComponent<CasualDiningDetailsProps> = (
                       kind="plain"
                       {...props.heading}
                       tag="h2"
-                      puck={
-                        props.puck?.isEditing ? { isEditing: true } : undefined
-                      }
                     />
                   </EntityField>
                 </div>
@@ -845,9 +828,6 @@ const CasualDiningDetailsComponent: PuckComponent<CasualDiningDetailsProps> = (
                     <StyledTextComponent
                       kind="richText"
                       {...props.introText}
-                      puck={
-                        props.puck?.isEditing ? { isEditing: true } : undefined
-                      }
                     />
                   </EntityField>
                 </div>
@@ -872,11 +852,6 @@ const CasualDiningDetailsComponent: PuckComponent<CasualDiningDetailsProps> = (
                           {...props.subheading}
                           data={{ text: props.address.subheading as any }}
                           tag="strong"
-                          puck={
-                            props.puck?.isEditing
-                              ? { isEditing: true }
-                              : undefined
-                          }
                         />
                       </EntityField>
                       <div className="body-medium" style={bodyTextStyle}>
@@ -926,11 +901,6 @@ const CasualDiningDetailsComponent: PuckComponent<CasualDiningDetailsProps> = (
                           {...props.subheading}
                           data={{ text: props.phone.subheading as any }}
                           tag="strong"
-                          puck={
-                            props.puck?.isEditing
-                              ? { isEditing: true }
-                              : undefined
-                          }
                         />
                       </EntityField>
                       <div className="body-medium">
@@ -961,11 +931,6 @@ const CasualDiningDetailsComponent: PuckComponent<CasualDiningDetailsProps> = (
                                     },
                                   }}
                                   tag="span"
-                                  puck={
-                                    props.puck?.isEditing
-                                      ? { isEditing: true }
-                                      : undefined
-                                  }
                                 />
                               </Link>
                             </EntityField>
@@ -991,11 +956,6 @@ const CasualDiningDetailsComponent: PuckComponent<CasualDiningDetailsProps> = (
                                   },
                                 }}
                                 tag="p"
-                                puck={
-                                  props.puck?.isEditing
-                                    ? { isEditing: true }
-                                    : undefined
-                                }
                               />
                             </EntityField>
                           ),
@@ -1036,11 +996,6 @@ const CasualDiningDetailsComponent: PuckComponent<CasualDiningDetailsProps> = (
                         {...props.subheading}
                         data={{ text: props.hours.subheading as any }}
                         tag="strong"
-                        puck={
-                          props.puck?.isEditing
-                            ? { isEditing: true }
-                            : undefined
-                        }
                       />
                     </EntityField>
                     <div
@@ -1095,9 +1050,6 @@ const CasualDiningDetailsComponent: PuckComponent<CasualDiningDetailsProps> = (
                       {...props.subheading}
                       data={{ text: props.dining.subheading as any }}
                       tag="strong"
-                      puck={
-                        props.puck?.isEditing ? { isEditing: true } : undefined
-                      }
                     />
                   </EntityField>
                   <EntityField
@@ -1136,11 +1088,6 @@ const CasualDiningDetailsComponent: PuckComponent<CasualDiningDetailsProps> = (
                                 },
                               }}
                               tag="span"
-                              puck={
-                                props.puck?.isEditing
-                                  ? { isEditing: true }
-                                  : undefined
-                              }
                             />
                           </li>
                         ))}
@@ -1150,7 +1097,7 @@ const CasualDiningDetailsComponent: PuckComponent<CasualDiningDetailsProps> = (
               </div>
             </div>
           </Background>
-        </RootStyle>
+        </CapturedStyleRoot>
       </VisibilityWrapper>
     </AnalyticsScopeProvider>
   );
@@ -1171,41 +1118,25 @@ export const CasualDiningDetails: YextComponentConfig<CasualDiningDetailsProps> 
       heading: {
         ...headingConfig.defaultProps,
         data: {
-          text: {
-            field: "",
-            constantValue: {
-              defaultValue: "All about this location",
-              hasLocalizedValue: "true" as const,
-            },
-            constantValueEnabled: true,
-          },
+          text: createTextField("All about this location"),
         },
       } as StyledPlainTextProps,
-      subheading: subheadingConfig.defaultProps as StyledPlainTextProps,
-      body: bodyConfig.defaultProps as StyledPlainTextProps,
+      subheading: {
+        fontOptions: subheadingConfig.defaultProps!.fontOptions,
+      },
+      body: {
+        fontOptions: bodyConfig.defaultProps!.fontOptions,
+      },
       introText: {
         ...introTextConfig.defaultProps,
         data: {
-          text: {
-            field: "",
-            constantValue: {
-              defaultValue:
-                "Everything you need before you head to [[name]] - [[geomodifier]].",
-              hasLocalizedValue: "true" as const,
-            },
-            constantValueEnabled: true,
-          },
+          text: createRtfField(
+            "Everything you need before you head to [[name]] - [[geomodifier]].",
+          ),
         },
       } as StyledRichTextProps,
       address: {
-        subheading: {
-          field: "",
-          constantValue: {
-            defaultValue: "Address",
-            hasLocalizedValue: "true" as const,
-          },
-          constantValueEnabled: true,
-        },
+        subheading: createTextField("Address"),
         address: {
           field: "address",
           constantValue: {
@@ -1245,14 +1176,7 @@ export const CasualDiningDetails: YextComponentConfig<CasualDiningDetailsProps> 
         showCountry: false,
       },
       phone: {
-        subheading: {
-          field: "",
-          constantValue: {
-            defaultValue: "Phone",
-            hasLocalizedValue: "true" as const,
-          },
-          constantValueEnabled: true,
-        },
+        subheading: createTextField("Phone"),
         items: [
           {
             number: {
@@ -1290,14 +1214,7 @@ export const CasualDiningDetails: YextComponentConfig<CasualDiningDetailsProps> 
         styles: defaultLinkStyles,
       },
       hours: {
-        subheading: {
-          field: "",
-          constantValue: {
-            defaultValue: "Hours",
-            hasLocalizedValue: "true" as const,
-          },
-          constantValueEnabled: true,
-        },
+        subheading: createTextField("Hours"),
         data: {
           hours: {
             field: "hours",
@@ -1313,14 +1230,7 @@ export const CasualDiningDetails: YextComponentConfig<CasualDiningDetailsProps> 
         },
       },
       dining: {
-        subheading: {
-          field: "",
-          constantValue: {
-            defaultValue: "Dining",
-            hasLocalizedValue: "true" as const,
-          },
-          constantValueEnabled: true,
-        },
+        subheading: createTextField("Dining"),
         text: {
           field: "",
           constantValue: [

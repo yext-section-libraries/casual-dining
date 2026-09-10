@@ -19,18 +19,10 @@ import {
   type YextComponentConfig,
   type YextFields,
 } from "@yext/visual-editor";
-
-const themeVars: React.CSSProperties = {
-  ["--COLOR-BG" as string]: "var(--palette-tertiary)",
-  ["--COLOR-BG-ACCENT" as string]: "var(--palette-tertiary)",
-  ["--COLOR-TEXT" as string]: "var(--palette-quaternary)",
-  ["--COLOR-BORDER" as string]: "var(--palette-tertiary)",
-  ["--COLOR-ACCENT" as string]: "var(--palette-secondary)",
-  ["--COLOR-ACCENT-HOVER" as string]: "var(--palette-primary)",
-  ["--BTN-PRIMARY-BG" as string]: "var(--palette-primary)",
-  ["--BTN-SECONDARY-TEXT" as string]: "var(--palette-quaternary)",
-  ["--footer-bg" as string]: "var(--palette-quaternary)",
-};
+import {
+  CapturedStyleRoot,
+  createTextField,
+} from "../shared/sectionHelpers";
 
 const capturedStyles = String.raw`:root {
 --content-max: 1440px;
@@ -332,13 +324,6 @@ grid-template-columns: 1fr;
 }
 }`;
 
-const RootStyle = ({ children }: { children: React.ReactNode }) => (
-  <div style={themeVars}>
-    <style>{capturedStyles}</style>
-    {children}
-  </div>
-);
-
 type ReviewComment = {
   content?: string;
   commentDate?: string;
@@ -588,41 +573,27 @@ const defaultProps = {
   heading: {
     ...(headingConfig.defaultProps as StyledPlainTextProps),
     data: {
-      text: {
-        field: "",
-        constantValue: {
-          defaultValue: "Reviews",
-          hasLocalizedValue: "true" as const,
-        },
-        constantValueEnabled: true,
-      },
+      text: createTextField("Reviews"),
     },
   },
   summary: {
-    fontOptions: summaryTextConfig.defaultProps.fontOptions,
+    fontOptions: summaryTextConfig.defaultProps!.fontOptions,
     rating: {
-      fontOptions: summaryRatingConfig.defaultProps.fontOptions,
+      fontOptions: summaryRatingConfig.defaultProps!.fontOptions,
     },
   },
   subheading: {
     ...(subheadingConfig.defaultProps as StyledPlainTextProps),
     data: {
-      text: {
-        field: "",
-        constantValue: {
-          defaultValue: "Recent Reviews:",
-          hasLocalizedValue: "true" as const,
-        },
-        constantValueEnabled: true,
-      },
+      text: createTextField("Recent Reviews:"),
     },
   },
   cardStyling: {
     header: {
-      fontOptions: cardHeaderConfig.defaultProps.fontOptions,
+      fontOptions: cardHeaderConfig.defaultProps!.fontOptions,
     },
     content: {
-      fontOptions: cardContentConfig.defaultProps.fontOptions,
+      fontOptions: cardContentConfig.defaultProps!.fontOptions,
     },
   },
   content: {
@@ -701,7 +672,7 @@ const CasualDiningReviewsComponent: PuckComponent<CasualDiningReviewsProps> = (
         liveVisibility={props.section.visibleOnLivePage}
         isEditing={Boolean(props.puck?.isEditing)}
       >
-        <RootStyle>
+        <CapturedStyleRoot styles={capturedStyles}>
           <Background
             as="section"
             background={props.section.backgroundColor}
@@ -723,7 +694,6 @@ const CasualDiningReviewsComponent: PuckComponent<CasualDiningReviewsProps> = (
                       kind="plain"
                       {...props.heading}
                       tag="h2"
-                      puck={isEditing ? { isEditing: true } : undefined}
                     />
                   </EntityField>
                 </div>
@@ -737,16 +707,9 @@ const CasualDiningReviewsComponent: PuckComponent<CasualDiningReviewsProps> = (
                         kind="plain"
                         fontOptions={props.summary.rating.fontOptions}
                         data={{
-                          text: {
-                            field: "",
-                            constantValue: {
-                              defaultValue: displayedAverageRating,
-                            },
-                            constantValueEnabled: true,
-                          },
+                          text: createTextField(displayedAverageRating),
                         }}
                         tag="p"
-                        puck={isEditing ? { isEditing: true } : undefined}
                       />
                     </div>
                     <div
@@ -770,16 +733,9 @@ const CasualDiningReviewsComponent: PuckComponent<CasualDiningReviewsProps> = (
                             kind="plain"
                             fontOptions={props.summary.fontOptions}
                             data={{
-                              text: {
-                                field: "",
-                                constantValue: {
-                                  defaultValue: displayedReviewCountLabel,
-                                },
-                                constantValueEnabled: true,
-                              },
+                              text: createTextField(displayedReviewCountLabel),
                             }}
                             tag="p"
-                            puck={isEditing ? { isEditing: true } : undefined}
                           />
                         </div>
                       </>
@@ -798,7 +754,6 @@ const CasualDiningReviewsComponent: PuckComponent<CasualDiningReviewsProps> = (
                       kind="plain"
                       {...props.subheading}
                       tag="p"
-                      puck={isEditing ? { isEditing: true } : undefined}
                     />
                   </EntityField>
                 </div>
@@ -822,16 +777,11 @@ const CasualDiningReviewsComponent: PuckComponent<CasualDiningReviewsProps> = (
                                   kind="plain"
                                   fontOptions={props.cardStyling.header.fontOptions}
                                   data={{
-                                    text: {
-                                      field: "",
-                                      constantValue: {
-                                        defaultValue: review.authorName ?? "",
-                                      },
-                                      constantValueEnabled: true,
-                                    },
+                                    text: createTextField(
+                                      review.authorName ?? "",
+                                    ),
                                   }}
                                   tag="div"
-                                  puck={isEditing ? { isEditing: true } : undefined}
                                 />
                               </div>
                               {review.rating != null ? (
@@ -849,16 +799,9 @@ const CasualDiningReviewsComponent: PuckComponent<CasualDiningReviewsProps> = (
                               kind="plain"
                               fontOptions={props.cardStyling.content.fontOptions}
                               data={{
-                                text: {
-                                  field: "",
-                                  constantValue: {
-                                    defaultValue: review.content ?? "",
-                                  },
-                                  constantValueEnabled: true,
-                                },
+                                text: createTextField(review.content ?? ""),
                               }}
                               tag="p"
-                              puck={isEditing ? { isEditing: true } : undefined}
                             />
                           </blockquote>
                           {review.comments?.[0]?.content ? (
@@ -867,16 +810,11 @@ const CasualDiningReviewsComponent: PuckComponent<CasualDiningReviewsProps> = (
                                 kind="plain"
                                 fontOptions={props.cardStyling.content.fontOptions}
                                 data={{
-                                  text: {
-                                    field: "",
-                                    constantValue: {
-                                      defaultValue: review.comments[0].content,
-                                    },
-                                    constantValueEnabled: true,
-                                  },
+                                  text: createTextField(
+                                    review.comments[0].content,
+                                  ),
                                 }}
                                 tag="p"
-                                puck={isEditing ? { isEditing: true } : undefined}
                               />
                             </div>
                           ) : null}
@@ -888,7 +826,7 @@ const CasualDiningReviewsComponent: PuckComponent<CasualDiningReviewsProps> = (
               </div>
             </div>
           </Background>
-        </RootStyle>
+        </CapturedStyleRoot>
       </VisibilityWrapper>
     </AnalyticsScopeProvider>
   );

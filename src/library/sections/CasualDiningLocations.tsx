@@ -30,18 +30,7 @@ import {
   mergeMeta,
   useTemplateProps,
 } from "@yext/visual-editor";
-
-const themeVars: React.CSSProperties = {
-  ["--COLOR-BG" as string]: "var(--palette-tertiary)",
-  ["--COLOR-BG-ACCENT" as string]: "var(--palette-tertiary)",
-  ["--COLOR-TEXT" as string]: "var(--palette-quaternary)",
-  ["--COLOR-BORDER" as string]: "var(--palette-tertiary)",
-  ["--COLOR-ACCENT" as string]: "var(--palette-secondary)",
-  ["--COLOR-ACCENT-HOVER" as string]: "var(--palette-primary)",
-  ["--BTN-PRIMARY-BG" as string]: "var(--palette-primary)",
-  ["--BTN-SECONDARY-TEXT" as string]: "var(--palette-quaternary)",
-  ["--footer-bg" as string]: "var(--palette-quaternary)",
-};
+import { CapturedStyleRoot } from "../shared/sectionHelpers";
 
 const capturedStyles = String.raw`:root {
 --content-max: 1440px;
@@ -327,13 +316,6 @@ margin-top: 18px;
 }
 }`;
 
-const RootStyle = ({ children }: { children: React.ReactNode }) => (
-  <div style={themeVars}>
-    <style>{capturedStyles}</style>
-    {children}
-  </div>
-);
-
 const getCoordinatePair = (coordinate?: {
   latitude?: number;
   longitude?: number;
@@ -590,7 +572,7 @@ const fields: YextFields<CasualDiningLocationsFieldProps> = {
   },
 };
 
-const defaultProps = {
+const defaultProps: CasualDiningLocationsFieldProps = {
   section: {
     backgroundColor: {
       selectedColor: "palette-secondary",
@@ -707,7 +689,7 @@ const CasualDiningLocationsComponent: PuckComponent<
         liveVisibility={props.section.visibleOnLivePage}
         isEditing={isEditing}
       >
-        <RootStyle>
+        <CapturedStyleRoot styles={capturedStyles}>
           <Background
             as="section"
             background={props.section.backgroundColor}
@@ -837,6 +819,7 @@ const CasualDiningLocationsComponent: PuckComponent<
                               color={props.cardStyles.cta.color}
                               className="core-info__link location-card__cta-link"
                               alwaysHideCaret
+                              normalizeLink={false}
                             />
                           </Background>
                         );
@@ -853,7 +836,7 @@ const CasualDiningLocationsComponent: PuckComponent<
           ) : (
             <></>
           )}
-        </RootStyle>
+        </CapturedStyleRoot>
       </VisibilityWrapper>
     </AnalyticsScopeProvider>
   );

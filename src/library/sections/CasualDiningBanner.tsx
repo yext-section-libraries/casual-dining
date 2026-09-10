@@ -1,6 +1,5 @@
 import type { SectionConfig } from "@yext/visual-editor";
 
-import { isValidElement } from "react";
 import { PuckComponent } from "@puckeditor/core";
 import { CircleSlash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -10,6 +9,7 @@ import {
   MaybeRTF,
   PageSection,
   type StyledTextValue,
+  type RichText,
   type ThemeColor,
   type TranslatableRichText,
   VisibilityWrapper,
@@ -17,12 +17,13 @@ import {
   type YextEntityField,
   type YextFields,
   backgroundColors,
-  getDefaultRTF,
-  resolveComponentData,
   resolveYextEntityField,
-  toPuckFields,
   useDocument,
 } from "@yext/visual-editor";
+import {
+  createRtfField,
+  defaultTextStyles,
+} from "../shared/sectionHelpers";
 
 type CasualDiningBannerProps = {
   data: {
@@ -161,12 +162,11 @@ const CasualDiningBannerComponent: PuckComponent<CasualDiningBannerProps> = ({
     ...data.styles,
     color: data.fontColor ?? section.backgroundColor.contrastingColor,
   };
-  const resolvedText = resolveComponentData(
+  const resolvedText = resolveYextEntityField(
+    streamDocument,
     data.text,
     i18n.language,
-    streamDocument,
-    { richTextStyleOverrides },
-  );
+  ) as string | RichText | undefined;
 
   if (!resolvedText) {
     return <></>;
@@ -189,14 +189,10 @@ const CasualDiningBannerComponent: PuckComponent<CasualDiningBannerProps> = ({
         displayName="Banner Text"
         fieldId={data.text.field}
       >
-        {isValidElement(resolvedText) ? (
-          resolvedText
-        ) : typeof resolvedText === "string" ? (
-          <MaybeRTF
-            data={resolvedText}
-            richTextStyleOverrides={richTextStyleOverrides}
-          />
-        ) : null}
+        <MaybeRTF
+          data={resolvedText}
+          richTextStyleOverrides={richTextStyleOverrides}
+        />
       </EntityField>
     </PageSection>
   );
@@ -207,23 +203,11 @@ const CasualDiningBannerComponent: PuckComponent<CasualDiningBannerProps> = ({
  */
 export const CasualDiningBanner: YextComponentConfig<CasualDiningBannerProps> = {
   label: "Banner",
-  fields: toPuckFields(CasualDiningBannerFields),
+  fields: CasualDiningBannerFields,
   defaultProps: {
     data: {
-      text: {
-        field: "",
-        constantValue: {
-          defaultValue: getDefaultRTF("Banner Text"),
-        },
-        constantValueEnabled: true,
-      },
-      styles: {
-        fontFamily: "default",
-        fontSize: "default",
-        fontWeight: "default",
-        fontStyle: "default",
-        textTransform: "default",
-      },
+      text: createRtfField("Banner Text"),
+      styles: defaultTextStyles,
     },
     styles: {
       textAlignment: "center",

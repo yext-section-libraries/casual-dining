@@ -17,7 +17,6 @@ import {
   EntityField,
   Image,
   type StreamDocument,
-  type StyledButtonValue,
   type StyledImageValue,
   type StyledLinkValue,
   type ThemeColor,
@@ -33,9 +32,13 @@ import {
   normalizeLink,
   normalizeThemeColorToken,
   resolveComponentData,
-  ThemeOptions,
   useDocument,
 } from "@yext/visual-editor";
+import {
+  aspectRatioOptions,
+  defaultButtonStyles,
+  hasImageSource,
+} from "../shared/sectionHelpers";
 
 type SharedHeaderVariant =
   | "centerLogoSplitNav"
@@ -115,16 +118,6 @@ const defaultLinkStyles: StyledLinkValue = {
   textTransform: "default",
   letterSpacing: "default",
   includeCaret: "default",
-};
-
-const defaultButtonStyles: StyledButtonValue = {
-  fontFamily: "default",
-  fontSize: "default",
-  fontWeight: "default",
-  fontStyle: "default",
-  textTransform: "default",
-  letterSpacing: "default",
-  borderRadius: "default",
 };
 
 const defaultImageStyles: StyledImageValue = {
@@ -214,31 +207,6 @@ const normalizeResolvedLink = ({
   }
 
   return normalizeLink(link, linkType);
-};
-
-const hasImageSource = (
-  image: ImageType | ComplexImageType | TranslatableAssetImage | undefined,
-): boolean => {
-  if (!image || typeof image !== "object") {
-    return false;
-  }
-
-  if ("url" in image && typeof image.url === "string" && image.url.trim()) {
-    return true;
-  }
-
-  if (
-    "image" in image &&
-    image.image &&
-    typeof image.image === "object" &&
-    "url" in image.image &&
-    typeof image.image.url === "string" &&
-    image.image.url.trim()
-  ) {
-    return true;
-  }
-
-  return false;
 };
 
 const SharedHeaderDefaultUtilityIcon = () => (
@@ -390,7 +358,7 @@ const CasualDiningHeaderFields: YextFields<CasualDiningHeaderProps> = {
               aspectRatio: {
                 label: "Aspect Ratio",
                 type: "basicSelector",
-                options: ThemeOptions.ASPECT_RATIO,
+                options: aspectRatioOptions,
               },
               imageConstrain: {
                 label: "Image Constrain",
@@ -530,7 +498,7 @@ const CasualDiningHeaderFields: YextFields<CasualDiningHeaderProps> = {
       aspectRatio: {
         label: "Aspect Ratio",
         type: "basicSelector",
-        options: ThemeOptions.ASPECT_RATIO,
+        options: aspectRatioOptions,
       },
       imageConstrain: {
         label: "Image Constrain",

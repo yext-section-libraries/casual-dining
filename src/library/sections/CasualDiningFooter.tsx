@@ -13,7 +13,6 @@ import {
   getSurfaceColorStyle,
   resolveComponentData,
   StyledTextComponent,
-  ThemeOptions,
   useDocument,
   VisibilityWrapper,
   type StyledImageValue,
@@ -26,6 +25,10 @@ import {
   type YextComponentConfig,
   type YextFields,
 } from "@yext/visual-editor";
+import {
+  aspectRatioOptions,
+  CapturedStyleRoot,
+} from "../shared/sectionHelpers";
 
 export type HoursIntervalData = {
   start?: string;
@@ -76,18 +79,6 @@ export type LocationAddressField = {
   customCity: string;
   customState: string;
   customZipCode: string;
-};
-
-const themeVars: React.CSSProperties = {
-  ["--COLOR-BG" as string]: "var(--palette-tertiary)",
-  ["--COLOR-BG-ACCENT" as string]: "var(--palette-tertiary)",
-  ["--COLOR-TEXT" as string]: "var(--palette-quaternary)",
-  ["--COLOR-BORDER" as string]: "var(--palette-tertiary)",
-  ["--COLOR-ACCENT" as string]: "var(--palette-secondary)",
-  ["--COLOR-ACCENT-HOVER" as string]: "var(--palette-primary)",
-  ["--BTN-PRIMARY-BG" as string]: "var(--palette-primary)",
-  ["--BTN-SECONDARY-TEXT" as string]: "var(--palette-quaternary)",
-  ["--footer-bg" as string]: "var(--palette-quaternary)",
 };
 
 const capturedStyles = String.raw`:root {
@@ -395,13 +386,6 @@ margin-left: auto;
 }
 }`;
 
-const RootStyle = ({ children }: { children: React.ReactNode }) => (
-  <div style={themeVars}>
-    <style>{capturedStyles}</style>
-    {children}
-  </div>
-);
-
 const brandTextConfig = createStyledTextConfig({
   kind: "plain",
   label: "Text",
@@ -602,7 +586,7 @@ const fields: YextFields<CasualDiningFooterProps> = {
           aspectRatio: {
             label: "Aspect Ratio",
             type: "basicSelector",
-            options: ThemeOptions.ASPECT_RATIO,
+            options: aspectRatioOptions,
           },
           imageConstrain: {
             label: "Image Constrain",
@@ -1057,7 +1041,7 @@ const CasualDiningFooterComponent = (props: CasualDiningFooterProps) => {
         liveVisibility={props.section.visibleOnLivePage}
         isEditing={isEditing}
       >
-        <RootStyle>
+        <CapturedStyleRoot styles={capturedStyles}>
           <Background
             as="footer"
             background={props.section?.backgroundColor}
@@ -1117,11 +1101,6 @@ const CasualDiningFooterComponent = (props: CasualDiningFooterProps) => {
                           kind="plain"
                           {...props.brand.text}
                           tag="h3"
-                          puck={
-                            props.puck?.isEditing
-                              ? { isEditing: true }
-                              : undefined
-                          }
                         />
                       </EntityField>
                     </div>
@@ -1137,11 +1116,6 @@ const CasualDiningFooterComponent = (props: CasualDiningFooterProps) => {
                           <StyledTextComponent
                             kind="richText"
                             {...props.description}
-                            puck={
-                              props.puck?.isEditing
-                                ? { isEditing: true }
-                                : undefined
-                            }
                           />
                         </EntityField>
                       </div>
@@ -1457,7 +1431,7 @@ const CasualDiningFooterComponent = (props: CasualDiningFooterProps) => {
               </div>
             </section>
           </Background>
-        </RootStyle>
+        </CapturedStyleRoot>
       </VisibilityWrapper>
     </AnalyticsScopeProvider>
   );
