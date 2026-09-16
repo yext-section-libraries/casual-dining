@@ -1,4 +1,5 @@
 import type { SectionConfig } from "@yext/visual-editor";
+import { msg } from "@yext/visual-editor";
 
 import * as React from "react";
 import { AnalyticsScopeProvider } from "@yext/pages-components";
@@ -379,37 +380,37 @@ type CasualDiningReviewsProps = {
 
 const headingConfig = createStyledTextConfig({
   kind: "plain",
-  label: "Heading",
+  label: msg("fields.heading", "Heading"),
   includeColor: true,
 });
 
 const subheadingConfig = createStyledTextConfig({
   kind: "plain",
-  label: "Subheading",
+  label: msg("fields.subheading", "Subheading"),
   includeColor: true,
 });
 
 const summaryTextConfig = createStyledTextConfig({
   kind: "plain",
-  label: "Summary Text",
+  label: msg("fields.summaryText", "Summary Text"),
   includeColor: true,
 });
 
 const summaryRatingConfig = createStyledTextConfig({
   kind: "plain",
-  label: "Summary Rating",
+  label: msg("fields.summaryRating", "Summary Rating"),
   includeColor: true,
 });
 
 const cardHeaderConfig = createStyledTextConfig({
   kind: "plain",
-  label: "Card Header",
+  label: msg("fields.cardHeader", "Card Header"),
   includeColor: true,
 });
 
 const cardContentConfig = createStyledTextConfig({
   kind: "plain",
-  label: "Card Content",
+  label: msg("fields.cardContent", "Card Content"),
   includeColor: true,
 });
 
@@ -449,109 +450,109 @@ const formatReviewCountLabel = (value: unknown): string => {
 
 const fields: YextFields<CasualDiningReviewsProps> = {
   section: {
-    label: "Section",
+    label: msg("fields.section", "Section"),
     type: "object",
     objectFields: {
       visibleOnLivePage: {
-        label: "Visible on Live Page",
+        label: msg("fields.visibleOnLivePage", "Visible on Live Page"),
         type: "radio",
         options: [
-          { label: "Yes", value: true },
-          { label: "No", value: false },
+          { label: msg("fields.options.yes", "Yes"), value: true },
+          { label: msg("fields.options.no", "No"), value: false },
         ],
       },
       backgroundColor: {
-        label: "Background Color",
+        label: msg("fields.backgroundColor", "Background Color"),
         type: "basicSelector",
         options: "BACKGROUND_COLOR",
       },
       cardBackgroundColor: {
-        label: "Card Background Color",
+        label: msg("fields.cardBackgroundColor", "Card Background Color"),
         type: "basicSelector",
         options: "BACKGROUND_COLOR",
       },
     },
   },
   heading: {
-    label: "Heading",
+    label: msg("fields.heading", "Heading"),
     type: "object",
     objectFields: headingConfig.fields!,
   },
   summary: {
-    label: "Summary Styling",
+    label: msg("fields.summaryStyling", "Summary Styling"),
     type: "object",
     objectFields: {
       rating: {
-        label: "Rating",
+        label: msg("fields.rating", "Rating"),
         type: "object",
         objectFields: {
           fontOptions: {
             ...summaryRatingConfig.fields!.fontOptions,
-            label: "Font Options",
+            label: msg("fields.fontOptions", "Font Options"),
           },
         },
       },
       starColor: {
-        label: "Star Color",
+        label: msg("fields.starColor", "Star Color"),
         type: "basicSelector",
         options: "SITE_COLOR",
       },
       fontOptions: {
         ...summaryTextConfig.fields!.fontOptions,
-        label: "Review Count Styling",
+        label: msg("fields.reviewCountStyling", "Review Count Styling"),
       },
     },
   },
   subheading: {
-    label: "Subheading",
+    label: msg("fields.subheading", "Subheading"),
     type: "object",
     objectFields: subheadingConfig.fields!,
   },
   cardStyling: {
-    label: "Card Styles",
+    label: msg("fields.cardStyles", "Card Styles"),
     type: "object",
     objectFields: {
       header: {
-        label: "Header",
+        label: msg("fields.header", "Header"),
         type: "object",
         objectFields: {
           fontOptions: {
             ...cardHeaderConfig.fields!.fontOptions,
-            label: "Font Options",
+            label: msg("fields.fontOptions", "Font Options"),
           },
         },
       },
       content: {
-        label: "Content",
+        label: msg("fields.content", "Content"),
         type: "object",
         objectFields: {
           fontOptions: {
             ...cardContentConfig.fields!.fontOptions,
-            label: "Font Options",
+            label: msg("fields.fontOptions", "Font Options"),
           },
         },
       },
       starColor: {
-        label: "Star Color",
+        label: msg("fields.starColor", "Star Color"),
         type: "basicSelector",
         options: "SITE_COLOR",
       },
     },
   },
   content: {
-    label: "Reviews Content",
+    label: msg("fields.reviewsContent", "Reviews Content"),
     type: "object",
     objectFields: {
       showReviewCount: {
-        label: "Show Review Count",
+        label: msg("fields.showReviewCount", "Show Review Count"),
         type: "radio",
         options: [
-          { label: "Yes", value: true },
-          { label: "No", value: false },
+          { label: msg("fields.options.yes", "Yes"), value: true },
+          { label: msg("fields.options.no", "No"), value: false },
         ],
       },
       maxReviews: {
-        label: "Max Reviews",
+        label: msg("fields.maxReviews", "Max Reviews"),
         type: "number",
       },
     },
@@ -834,7 +835,7 @@ const CasualDiningReviewsComponent: PuckComponent<CasualDiningReviewsProps> = (
 
 export const CasualDiningReviews: YextComponentConfig<CasualDiningReviewsProps> =
   {
-    label: "Reviews",
+    label: msg("components.reviews", "Reviews"),
     fields,
     defaultProps,
     render: (props) => <CasualDiningReviewsComponent {...props} />,

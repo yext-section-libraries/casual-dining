@@ -1,4 +1,5 @@
 import type { SectionConfig } from "@yext/visual-editor";
+import { msg } from "@yext/visual-editor";
 
 import * as React from "react";
 import {
@@ -8,8 +9,10 @@ import {
   Link,
   type AddressType,
   type DayOfWeekNames,
+  type HoursTableIntervalTranslations,
   type HoursType,
 } from "@yext/pages-components";
+import { useTranslation } from "react-i18next";
 import { parsePhoneNumber } from "awesome-phonenumber";
 import {
   Background,
@@ -369,25 +372,25 @@ grid-template-columns: minmax(0, 1fr);
 
 const headingConfig = createStyledTextConfig({
   kind: "plain",
-  label: "Heading",
+  label: msg("fields.heading", "Heading"),
   includeColor: true,
 });
 
 const subheadingConfig = createStyledTextConfig({
   kind: "plain",
-  label: "Subheading",
+  label: msg("fields.subheading", "Subheading"),
   includeColor: true,
 });
 
 const bodyConfig = createStyledTextConfig({
   kind: "plain",
-  label: "Body",
+  label: msg("fields.body", "Body"),
   includeColor: true,
 });
 
 const introTextConfig = createStyledTextConfig({
   kind: "richText",
-  label: "Intro Text",
+  label: msg("fields.introText", "Intro Text"),
   includeColor: true,
 });
 
@@ -453,61 +456,61 @@ type CasualDiningDetailsProps = {
 
 const fields: YextFields<CasualDiningDetailsProps> = {
   section: {
-    label: "Section",
+    label: msg("fields.section", "Section"),
     type: "object",
     objectFields: {
       visibleOnLivePage: {
-        label: "Visible on Live Page",
+        label: msg("fields.visibleOnLivePage", "Visible on Live Page"),
         type: "radio",
         options: [
-          { label: "Yes", value: true },
-          { label: "No", value: false },
+          { label: msg("fields.options.yes", "Yes"), value: true },
+          { label: msg("fields.options.no", "No"), value: false },
         ],
       },
       backgroundColor: {
-        label: "Background Color",
+        label: msg("fields.backgroundColor", "Background Color"),
         type: "basicSelector",
         options: "BACKGROUND_COLOR",
       },
     },
   },
   heading: {
-    label: "Heading",
+    label: msg("fields.heading", "Heading"),
     type: "object",
     objectFields: headingConfig.fields!,
   },
   subheading: {
-    label: "Subheading",
+    label: msg("fields.subheading", "Subheading"),
     type: "object",
     objectFields: {
       fontOptions: subheadingConfig.fields!.fontOptions,
     },
   },
   body: {
-    label: "Body",
+    label: msg("fields.body", "Body"),
     type: "object",
     objectFields: {
       fontOptions: bodyConfig.fields!.fontOptions,
     },
   },
   introText: {
-    label: "Intro Text",
+    label: msg("fields.introText", "Intro Text"),
     type: "object",
     objectFields: introTextConfig.fields!,
   },
   address: {
-    label: "Address",
+    label: msg("fields.address", "Address"),
     type: "object",
     objectFields: {
       subheading: {
-        label: "Address Subheading",
+        label: msg("fields.addressSubheading", "Address Subheading"),
         type: "entityField",
         filter: {
           types: ["type.string"],
         },
       },
       address: {
-        label: "Address",
+        label: msg("fields.address", "Address"),
         type: "entityField",
         filter: {
           types: ["type.address"],
@@ -515,44 +518,44 @@ const fields: YextFields<CasualDiningDetailsProps> = {
         disableConstantValueToggle: true,
       },
       directionsLink: {
-        label: "Directions Link",
+        label: msg("fields.directionsLink", "Directions Link"),
         type: "comprehensiveCTA",
       },
       showRegion: {
-        label: "Show Region",
+        label: msg("fields.showRegion", "Show Region"),
         type: "radio",
         options: [
-          { label: "Yes", value: true },
-          { label: "No", value: false },
+          { label: msg("fields.options.yes", "Yes"), value: true },
+          { label: msg("fields.options.no", "No"), value: false },
         ],
       },
       showCountry: {
-        label: "Show Country",
+        label: msg("fields.showCountry", "Show Country"),
         type: "radio",
         options: [
-          { label: "Yes", value: true },
-          { label: "No", value: false },
+          { label: msg("fields.options.yes", "Yes"), value: true },
+          { label: msg("fields.options.no", "No"), value: false },
         ],
       },
     },
   },
   phone: {
-    label: "Phone",
+    label: msg("fields.phone", "Phone"),
     type: "object",
     objectFields: {
       subheading: {
-        label: "Phone Subheading",
+        label: msg("fields.phoneSubheading", "Phone Subheading"),
         type: "entityField",
         filter: {
           types: ["type.string"],
         },
       },
       items: {
-        label: "Items",
+        label: msg("fields.items", "Items"),
         type: "array",
         arrayFields: {
           number: {
-            label: "Number",
+            label: msg("fields.number", "Number"),
             type: "entityField",
             filter: {
               types: ["type.phone"],
@@ -570,44 +573,44 @@ const fields: YextFields<CasualDiningDetailsProps> = {
           `Phone ${(index ?? 0) + 1}`,
       },
       phoneFormat: {
-        label: "Phone Format",
+        label: msg("fields.phoneFormat", "Phone Format"),
         type: "radio",
         options: [
-          { label: "Domestic", value: "domestic" },
-          { label: "International", value: "international" },
+          { label: msg("fields.options.domestic", "Domestic"), value: "domestic" },
+          { label: msg("fields.options.international", "International"), value: "international" },
         ],
       },
       includeHyperlink: {
-        label: "Include Hyperlink",
+        label: msg("fields.includeHyperlink", "Include Hyperlink"),
         type: "radio",
         options: [
-          { label: "Yes", value: true },
-          { label: "No", value: false },
+          { label: msg("fields.options.yes", "Yes"), value: true },
+          { label: msg("fields.options.no", "No"), value: false },
         ],
       },
     },
   },
   websiteLink: {
-    label: "Website Link",
+    label: msg("fields.websiteLink", "Website Link"),
     type: "comprehensiveCTA",
   },
   hours: {
-    label: "Hours",
+    label: msg("fields.hours", "Hours"),
     type: "object",
     objectFields: {
       subheading: {
-        label: "Hours Subheading",
+        label: msg("fields.hoursSubheading", "Hours Subheading"),
         type: "entityField",
         filter: {
           types: ["type.string"],
         },
       },
       data: {
-        label: "Data",
+        label: msg("fields.data", "Data"),
         type: "object",
         objectFields: {
           hours: {
-            label: "Hours",
+            label: msg("fields.hours", "Hours"),
             type: "entityField",
             filter: {
               types: ["type.hours"],
@@ -617,46 +620,46 @@ const fields: YextFields<CasualDiningDetailsProps> = {
         },
       },
       settings: {
-        label: "Settings",
+        label: msg("fields.settings", "Settings"),
         type: "object",
         objectFields: {
           startOfWeek: {
-            label: "Start Of Week",
+            label: msg("fields.startOfWeek", "Start Of Week"),
             type: "select",
             options: [
-              { label: "Monday", value: "monday" },
-              { label: "Tuesday", value: "tuesday" },
-              { label: "Wednesday", value: "wednesday" },
-              { label: "Thursday", value: "thursday" },
-              { label: "Friday", value: "friday" },
-              { label: "Saturday", value: "saturday" },
-              { label: "Sunday", value: "sunday" },
-              { label: "Today", value: "today" },
+              { label: msg("fields.options.monday", "Monday"), value: "monday" },
+              { label: msg("fields.options.tuesday", "Tuesday"), value: "tuesday" },
+              { label: msg("fields.options.wednesday", "Wednesday"), value: "wednesday" },
+              { label: msg("fields.options.thursday", "Thursday"), value: "thursday" },
+              { label: msg("fields.options.friday", "Friday"), value: "friday" },
+              { label: msg("fields.options.saturday", "Saturday"), value: "saturday" },
+              { label: msg("fields.options.sunday", "Sunday"), value: "sunday" },
+              { label: msg("fields.options.today", "Today"), value: "today" },
             ],
           },
           collapseDays: {
-            label: "Collapse Days",
+            label: msg("fields.collapseDays", "Collapse Days"),
             type: "radio",
             options: [
-              { label: "Yes", value: true },
-              { label: "No", value: false },
+              { label: msg("fields.options.yes", "Yes"), value: true },
+              { label: msg("fields.options.no", "No"), value: false },
             ],
           },
           showAdditionalHoursText: {
-            label: "Show Additional Hours Text",
+            label: msg("fields.options.showAdditionalHoursText", "Show Additional Hours Text"),
             type: "radio",
             options: [
-              { label: "Yes", value: true },
-              { label: "No", value: false },
+              { label: msg("fields.options.yes", "Yes"), value: true },
+              { label: msg("fields.options.no", "No"), value: false },
             ],
           },
           alignment: {
-            label: "Alignment",
+            label: msg("fields.alignment", "Alignment"),
             type: "select",
             options: [
-              { label: "Start", value: "items-start" },
-              { label: "Center", value: "items-center" },
-              { label: "End", value: "items-end" },
+              { label: msg("fields.options.start", "Start"), value: "items-start" },
+              { label: msg("fields.options.center", "Center"), value: "items-center" },
+              { label: msg("fields.options.end", "End"), value: "items-end" },
             ],
           },
         },
@@ -664,18 +667,18 @@ const fields: YextFields<CasualDiningDetailsProps> = {
     },
   },
   dining: {
-    label: "Dining Details",
+    label: msg("fields.diningDetails", "Dining Details"),
     type: "object",
     objectFields: {
       subheading: {
-        label: "Services Subheading",
+        label: msg("fields.servicesSubheading", "Services Subheading"),
         type: "entityField",
         filter: {
           types: ["type.string"],
         },
       },
       text: {
-        label: "Text List",
+        label: msg("fields.textList", "Text List"),
         type: "entityField",
         filter: {
           types: ["type.string"],
@@ -689,6 +692,25 @@ const fields: YextFields<CasualDiningDetailsProps> = {
 const CasualDiningDetailsComponent: PuckComponent<CasualDiningDetailsProps> = (
   props,
 ) => {
+  const { t, i18n } = useTranslation();
+  const dayOfWeekNames = React.useMemo<DayOfWeekNames>(() => {
+    const formatter = new Intl.DateTimeFormat(i18n.language, {
+      timeZone: "UTC",
+      weekday: "long",
+    });
+    const formatWeekday = (day: number) =>
+      formatter.format(new Date(Date.UTC(2024, 0, day)));
+
+    return {
+      sunday: formatWeekday(7),
+      monday: formatWeekday(8),
+      tuesday: formatWeekday(9),
+      wednesday: formatWeekday(10),
+      thursday: formatWeekday(11),
+      friday: formatWeekday(12),
+      saturday: formatWeekday(13),
+    };
+  }, [i18n.language]);
   const streamDocument = useDocument<{
     locale?: string;
     comingSoon?: boolean;
@@ -716,6 +738,12 @@ const CasualDiningDetailsComponent: PuckComponent<CasualDiningDetailsProps> = (
     streamDocument,
   );
   const additionalHoursText = streamDocument?.additionalHoursText?.trim();
+  const intervalTranslations: HoursTableIntervalTranslations = {
+    isClosed: t("closed", "Closed"),
+    open24Hours: t("open24Hours", "Open 24 Hours"),
+    reopenDate: t("reopenDate", "Reopen Date"),
+    timeFormatLocale: i18n.language,
+  };
   const bodyTextStyle = {
     color: getThemeColorCssValue(props.body.fontOptions.color) ?? sectionTextColor,
     fontFamily:
@@ -1020,9 +1048,11 @@ const CasualDiningDetailsComponent: PuckComponent<CasualDiningDetailsProps> = (
                           className="hours-table"
                           hours={resolvedHours}
                           comingSoon={streamDocument?.comingSoon}
+                          dayOfWeekNames={dayOfWeekNames}
                           startOfWeek={props.hours.settings.startOfWeek}
                           collapseDays={props.hours.settings.collapseDays}
                           timeOptions={{ hour12: true }}
+                          intervalTranslations={intervalTranslations}
                         />
                       </EntityField>
                       {additionalHoursText &&
@@ -1105,7 +1135,7 @@ const CasualDiningDetailsComponent: PuckComponent<CasualDiningDetailsProps> = (
 
 export const CasualDiningDetails: YextComponentConfig<CasualDiningDetailsProps> =
   {
-    label: "Details",
+    label: msg("components.details", "Details"),
     fields,
     defaultProps: {
       section: {
