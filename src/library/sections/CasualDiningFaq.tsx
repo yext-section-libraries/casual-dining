@@ -1,4 +1,5 @@
 import type { SectionConfig } from "@yext/visual-editor";
+import { msg } from "@yext/visual-editor";
 
 import * as React from "react";
 import { AnalyticsScopeProvider } from "@yext/pages-components";
@@ -318,17 +319,17 @@ const faqItems = [
 ];
 
 const faqItemsSource = createItemSource<FaqItemFields>({
-  label: "FAQ Items",
+  label: msg("fields.faqItems", "FAQ Items"),
   mappingFields: {
     question: {
-      label: "Question",
+      label: msg("fields.question", "Question"),
       type: "entityField",
       filter: {
         types: ["type.string"],
       },
     },
     answer: {
-      label: "Answer",
+      label: msg("fields.answer", "Answer"),
       type: "entityField",
       filter: {
         types: ["type.rich_text_v2"],
@@ -360,65 +361,65 @@ type CasualDiningFaqProps = {
 
 const headingConfig = createStyledTextConfig({
   kind: "plain",
-  label: "Heading",
+  label: msg("fields.heading", "Heading"),
   includeColor: true,
 });
 
 const questionConfig = createStyledTextConfig({
   kind: "plain",
-  label: "Question",
+  label: msg("fields.question", "Question"),
   includeColor: true,
 });
 
 const answerConfig = createStyledTextConfig({
   kind: "richText",
-  label: "Answer",
+  label: msg("fields.answer", "Answer"),
   includeColor: true,
 });
 
 const fields: YextFields<CasualDiningFaqProps> = {
   section: {
-    label: "Section",
+    label: msg("fields.section", "Section"),
     type: "object",
     objectFields: {
       visibleOnLivePage: {
-        label: "Visible on Live Page",
+        label: msg("fields.visibleOnLivePage", "Visible on Live Page"),
         type: "radio",
         options: [
-          { label: "Yes", value: true },
-          { label: "No", value: false },
+          { label: msg("fields.options.yes", "Yes"), value: true },
+          { label: msg("fields.options.no", "No"), value: false },
         ],
       },
       backgroundColor: {
-        label: "Background Color",
+        label: msg("fields.backgroundColor", "Background Color"),
         type: "basicSelector",
         options: "BACKGROUND_COLOR",
       },
     },
   },
   heading: {
-    label: "Heading",
+    label: msg("fields.heading", "Heading"),
     type: "object",
     objectFields: headingConfig.fields!,
   },
   faqs: {
-    label: "FAQ Items",
+    label: msg("fields.faqItems", "FAQ Items"),
     type: "object",
     objectFields: {
       data: faqItemsSource.field,
       styles: {
-        label: "Shared Styles",
+        label: msg("fields.sharedStyles", "Shared Styles"),
         type: "object",
         objectFields: {
           question: {
-            label: "Question",
+            label: msg("fields.question", "Question"),
             type: "object",
             objectFields: {
               fontOptions: questionConfig.fields!.fontOptions,
             },
           },
           answer: {
-            label: "Answer",
+            label: msg("fields.answer", "Answer"),
             type: "object",
             objectFields: {
               fontOptions: answerConfig.fields!.fontOptions,
@@ -543,7 +544,7 @@ const CasualDiningFaqComponent: PuckComponent<CasualDiningFaqProps> = (
 };
 
 export const CasualDiningFaq: YextComponentConfig<CasualDiningFaqProps> = {
-  label: "FAQ",
+  label: msg("components.faq", "FAQ"),
   fields,
   defaultProps: {
     section: {

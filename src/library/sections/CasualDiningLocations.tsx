@@ -1,8 +1,10 @@
 import type { SectionConfig } from "@yext/visual-editor";
+import { msg } from "@yext/visual-editor";
 
 import * as React from "react";
 import { Address, AnalyticsScopeProvider } from "@yext/pages-components";
 import { type PuckComponent } from "@puckeditor/core";
+import { useTranslation } from "react-i18next";
 import {
   Background,
   Body,
@@ -424,59 +426,59 @@ type CasualDiningLocationsFieldProps = Omit<
 
 const fields: YextFields<CasualDiningLocationsFieldProps> = {
   section: {
-    label: "Section",
+    label: msg("fields.section", "Section"),
     type: "object",
     objectFields: {
       visibleOnLivePage: {
-        label: "Visible on Live Page",
+        label: msg("fields.visibleOnLivePage", "Visible on Live Page"),
         type: "radio",
         options: [
-          { label: "Yes", value: true },
-          { label: "No", value: false },
+          { label: msg("fields.options.yes", "Yes"), value: true },
+          { label: msg("fields.options.no", "No"), value: false },
         ],
       },
       backgroundColor: {
-        label: "Background Color",
+        label: msg("fields.backgroundColor", "Background Color"),
         type: "basicSelector",
         options: "BACKGROUND_COLOR",
       },
       cardBackgroundColor: {
-        label: "Card Background Color",
+        label: msg("fields.cardBackgroundColor", "Card Background Color"),
         type: "basicSelector",
         options: "BACKGROUND_COLOR",
       },
     },
   },
   map: {
-    label: "Map",
+    label: msg("fields.map", "Map"),
     type: "object",
     objectFields: {
       limit: {
-        label: "Limit",
+        label: msg("fields.limit", "Limit"),
         type: "number",
         min: 1,
         max: 25,
       },
       radius: {
-        label: "Radius",
+        label: msg("fields.radius", "Radius"),
         type: "number",
         min: 1,
         max: 1000,
       },
       coordinate: {
-        label: "Coordinates",
+        label: msg("fields.coordinates", "Coordinates"),
         type: "entityField",
         filter: {
           types: ["type.coordinate"],
         },
       },
       mapStyle: {
-        label: "Mapbox Map Style",
+        label: msg("fields.mapboxMapStyle", "Mapbox Map Style"),
         type: "select",
         options: mapboxStaticMapStyleOptions,
       },
       zoom: {
-        label: "Zoom",
+        label: msg("fields.zoom", "Zoom"),
         type: "number",
         min: 0,
         max: 22,
@@ -484,27 +486,27 @@ const fields: YextFields<CasualDiningLocationsFieldProps> = {
     },
   },
   heading: {
-    label: "Heading",
+    label: msg("fields.heading", "Heading"),
     type: "object",
     objectFields: {
       text: {
-        label: "Text",
+        label: msg("fields.text", "Text"),
         type: "entityField",
         filter: {
           types: ["type.string"],
         },
       },
       styles: {
-        label: "Text Styles",
+        label: msg("fields.textStyles", "Text Styles"),
         type: "object",
         objectFields: {
           level: {
-            label: "Heading Level",
+            label: msg("fields.headingLevel", "Heading Level"),
             type: "basicSelector",
             options: "HEADING_LEVEL",
           },
           color: {
-            label: "Font Color",
+            label: msg("fields.fontColor", "Font Color"),
             type: "basicSelector",
             options: "SITE_COLOR",
           },
@@ -513,56 +515,56 @@ const fields: YextFields<CasualDiningLocationsFieldProps> = {
     },
   },
   cardStyles: {
-    label: "Card Styles",
+    label: msg("fields.cardStyles", "Card Styles"),
     type: "object",
     objectFields: {
       header: {
-        label: "Header",
+        label: msg("fields.header", "Header"),
         type: "object",
         objectFields: {
           level: {
-            label: "Heading Level",
+            label: msg("fields.headingLevel", "Heading Level"),
             type: "basicSelector",
             options: "HEADING_LEVEL",
           },
           color: {
-            label: "Font Color",
+            label: msg("fields.fontColor", "Font Color"),
             type: "basicSelector",
             options: "SITE_COLOR",
           },
         },
       },
       body: {
-        label: "Body Text",
+        label: msg("fields.bodyText", "Body Text"),
         type: "object",
         objectFields: {
           variant: {
-            label: "Text Size",
+            label: msg("fields.textSize", "Text Size"),
             type: "radio",
             options: ThemeOptions.BODY_VARIANT,
           },
           color: {
-            label: "Font Color",
+            label: msg("fields.fontColor", "Font Color"),
             type: "basicSelector",
             options: "SITE_COLOR",
           },
         },
       },
       cta: {
-        label: "Get Directions",
+        label: msg("fields.getDirections", "Get Directions"),
         type: "object",
         objectFields: {
           variant: {
-            label: "Variant",
+            label: msg("fields.variant", "Variant"),
             type: "radio",
             options: [
-              { label: "Link", value: "link" },
-              { label: "Outline", value: "secondary" },
-              { label: "Solid", value: "primary" },
+              { label: msg("fields.options.link", "Link"), value: "link" },
+              { label: msg("fields.options.outline", "Outline"), value: "secondary" },
+              { label: msg("fields.options.solid", "Solid"), value: "primary" },
             ],
           },
           color: {
-            label: "Font Color",
+            label: msg("fields.fontColor", "Font Color"),
             type: "basicSelector",
             options: "SITE_COLOR",
           },
@@ -624,6 +626,7 @@ const defaultProps: CasualDiningLocationsFieldProps = {
 const CasualDiningLocationsComponent: PuckComponent<
   CasualDiningLocationsProps
 > = (props) => {
+  const { t } = useTranslation();
   const { relativePrefixToRoot } = useTemplateProps();
   const streamDocument = useDocument<{
     locale?: string;
@@ -828,7 +831,10 @@ const CasualDiningLocationsComponent: PuckComponent<
                   </>
                 ) : (
                   <p className="locations-empty-state">
-                    No nearby locations are available yet.
+                    {t(
+                      "noNearbyLocationsAvailableYet",
+                      "No nearby locations are available yet.",
+                    )}
                   </p>
                 )}
               </div>
@@ -844,7 +850,7 @@ const CasualDiningLocationsComponent: PuckComponent<
 
 export const CasualDiningLocations: YextComponentConfig<CasualDiningLocationsFieldProps> =
   {
-    label: "Locations",
+    label: msg("components.locations", "Locations"),
     fields,
     defaultProps,
     render: (props) => <CasualDiningLocationsComponent {...props} />,

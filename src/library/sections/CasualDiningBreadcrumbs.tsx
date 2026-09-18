@@ -1,4 +1,5 @@
 import type { SectionConfig } from "@yext/visual-editor";
+import { msg } from "@yext/visual-editor";
 
 import * as React from "react";
 import { type PuckComponent } from "@puckeditor/core";
@@ -7,6 +8,7 @@ import {
   Background,
   getSurfaceColorStyle,
   getThemeColorCssValue,
+  pt,
   resolveBreadcrumbs,
   useDocument,
   useTemplateProps,
@@ -31,42 +33,42 @@ type CasualDiningBreadcrumbsProps = {
 
 const fields: YextFields<CasualDiningBreadcrumbsProps> = {
   section: {
-    label: "Section",
+    label: msg("fields.section", "Section"),
     type: "object",
     objectFields: {
       visibleOnLivePage: {
-        label: "Visible on Live Page",
+        label: msg("fields.visibleOnLivePage", "Visible on Live Page"),
         type: "radio",
         options: [
-          { label: "Yes", value: true },
-          { label: "No", value: false },
+          { label: msg("fields.options.yes", "Yes"), value: true },
+          { label: msg("fields.options.no", "No"), value: false },
         ],
       },
       backgroundColor: {
-        label: "Background Color",
+        label: msg("fields.backgroundColor", "Background Color"),
         type: "basicSelector",
         options: "BACKGROUND_COLOR",
       },
     },
   },
   includeCurrentLocation: {
-    label: "Include Current Location",
+    label: msg("fields.includeCurrentLocation", "Include Current Location"),
     type: "radio",
     options: [
-      { label: "Yes", value: true },
-      { label: "No", value: false },
+      { label: msg("fields.options.yes", "Yes"), value: true },
+      { label: msg("fields.options.no", "No"), value: false },
     ],
   },
   breadcrumbLinks: {
-    label: "Breadcrumb Links",
+    label: msg("fields.breadcrumbLinks", "Breadcrumb Links"),
     type: "object",
     objectFields: {
       styles: {
-        label: "Text Styles",
+        label: msg("fields.textStyles", "Text Styles"),
         type: "styledText",
       },
       fontColor: {
-        label: "Font Color",
+        label: msg("fields.fontColor", "Font Color"),
         type: "basicSelector",
         options: "SITE_COLOR",
       },
@@ -122,8 +124,10 @@ const CasualDiningBreadcrumbsComponent: PuckComponent<
           padding: "18px 24px",
         }}
       >
-        No breadcrumbs available (section will be hidden on live page). Create a
-        directory to enable breadcrumbs.
+        {pt(
+          "noBreadcrumbsAvailable",
+          "No breadcrumbs available (section will be hidden on live page). Create a directory to enable breadcrumbs.",
+        )}
       </p>
     ) : (
       <></>
@@ -183,7 +187,7 @@ const CasualDiningBreadcrumbsComponent: PuckComponent<
 
 export const CasualDiningBreadcrumbs: YextComponentConfig<CasualDiningBreadcrumbsProps> =
   {
-    label: "Breadcrumbs",
+    label: msg("components.breadcrumbs", "Breadcrumbs"),
     fields,
     defaultProps: {
       section: {

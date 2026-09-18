@@ -1,4 +1,5 @@
 import type { SectionConfig } from "@yext/visual-editor";
+import { msg } from "@yext/visual-editor";
 
 import * as React from "react";
 import { AnalyticsScopeProvider } from "@yext/pages-components";
@@ -293,13 +294,13 @@ type RuntimeProps = CasualDiningPromoProps & {
 
 const titleConfig = createStyledTextConfig({
   kind: "plain",
-  label: "Title",
+  label: msg("fields.title", "Title"),
   includeColor: true,
 });
 
 const descriptionConfig = createStyledTextConfig({
   kind: "richText",
-  label: "Description",
+  label: msg("fields.description", "Description"),
   includeColor: true,
 });
 
@@ -310,70 +311,70 @@ const defaultOverlayColor: ThemeColor = {
 
 const fields: YextFields<CasualDiningPromoProps> = {
   section: {
-    label: "Section",
+    label: msg("fields.section", "Section"),
     type: "object",
     objectFields: {
       visibleOnLivePage: {
-        label: "Visible on Live Page",
+        label: msg("fields.visibleOnLivePage", "Visible on Live Page"),
         type: "radio",
         options: [
-          { label: "Yes", value: true },
-          { label: "No", value: false },
+          { label: msg("fields.options.yes", "Yes"), value: true },
+          { label: msg("fields.options.no", "No"), value: false },
         ],
       },
       overlayColor: {
-        label: "Overlay Color",
+        label: msg("fields.overlayColor", "Overlay Color"),
         type: "basicSelector",
         options: "BACKGROUND_COLOR",
       },
     },
   },
   title: {
-    label: "Title",
+    label: msg("fields.title", "Title"),
     type: "object",
     objectFields: titleConfig.fields!,
   },
   description: {
-    label: "Description",
+    label: msg("fields.description", "Description"),
     type: "object",
     objectFields: descriptionConfig.fields!,
   },
   image: {
-    label: "Image",
+    label: msg("fields.image", "Image"),
     type: "object",
     objectFields: {
       image: {
         type: "entityField",
-        label: "Image",
+        label: msg("fields.image", "Image"),
         filter: {
           types: ["type.image"],
         },
       },
       aspectRatio: {
-        label: "Aspect Ratio",
+        label: msg("fields.options.aspectRatio", "Aspect Ratio"),
         type: "basicSelector",
         options: aspectRatioOptions,
       },
       imageConstrain: {
-        label: "Image Constrain",
+        label: msg("fields.imageConstrain", "Image Constrain"),
         type: "select",
         options: [
-          { label: "Fixed", value: "fixed" },
-          { label: "Filled", value: "filled" },
+          { label: msg("fields.options.fixed", "Fixed"), value: "fixed" },
+          { label: msg("fields.options.filled", "Filled"), value: "filled" },
         ],
       },
       styles: {
-        label: "Image Styles",
+        label: msg("fields.imageStyles", "Image Styles"),
         type: "styledImage",
       },
     },
   },
   primaryCta: {
-    label: "Primary CTA",
+    label: msg("fields.primaryCTA", "Primary CTA"),
     type: "comprehensiveCTA",
   },
   secondaryCta: {
-    label: "Secondary CTA",
+    label: msg("fields.secondaryCTA", "Secondary CTA"),
     type: "comprehensiveCTA",
   },
 };
@@ -532,7 +533,7 @@ const CasualDiningPromoComponent = (props: RuntimeProps) => {
 
 export const CasualDiningPromo: YextComponentConfig<CasualDiningPromoProps> =
   {
-    label: "Promo",
+    label: msg("components.promo", "Promo"),
     fields,
     defaultProps: {
       section: {

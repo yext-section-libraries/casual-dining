@@ -1,4 +1,5 @@
 import type { SectionConfig } from "@yext/visual-editor";
+import { msg } from "@yext/visual-editor";
 
 import * as React from "react";
 import {
@@ -265,19 +266,19 @@ body {
 
 const geomodifierConfig = createStyledTextConfig({
   kind: "plain",
-  label: "Geomodifier",
+  label: msg("fields.geomodifier", "Geomodifier"),
   includeColor: true,
 });
 
 const headingConfig = createStyledTextConfig({
   kind: "plain",
-  label: "Heading",
+  label: msg("fields.heading", "Heading"),
   includeColor: true,
 });
 
 const descriptionConfig = createStyledTextConfig({
   kind: "richText",
-  label: "Description",
+  label: msg("fields.description", "Description"),
   includeColor: true,
 });
 
@@ -319,71 +320,71 @@ type CasualDiningNewHeroFieldProps = Omit<
 
 const fields: YextFields<CasualDiningNewHeroFieldProps> = {
   section: {
-    label: "Section",
+    label: msg("fields.section", "Section"),
     type: "object",
     objectFields: {
       visibleOnLivePage: {
-        label: "Visible on Live Page",
+        label: msg("fields.visibleOnLivePage", "Visible on Live Page"),
         type: "radio",
         options: [
-          { label: "Yes", value: true },
-          { label: "No", value: false },
+          { label: msg("fields.options.yes", "Yes"), value: true },
+          { label: msg("fields.options.no", "No"), value: false },
         ],
       },
       overlayColor: {
-        label: "Overlay Color",
+        label: msg("fields.overlayColor", "Overlay Color"),
         type: "basicSelector",
         options: "BACKGROUND_COLOR",
       },
     },
   },
   background: {
-    label: "Background Image",
+    label: msg("fields.backgroundImage", "Background Image"),
     type: "object",
     objectFields: {
       image: {
         type: "entityField",
-        label: "Image",
+        label: msg("fields.image", "Image"),
         filter: {
           types: ["type.image"],
         },
       },
       aspectRatio: {
-        label: "Aspect Ratio",
+        label: msg("fields.options.aspectRatio", "Aspect Ratio"),
         type: "basicSelector",
         options: aspectRatioOptions,
       },
       imageConstrain: {
-        label: "Image Constrain",
+        label: msg("fields.imageConstrain", "Image Constrain"),
         type: "select",
         options: [
-          { label: "Fixed", value: "fixed" },
-          { label: "Filled", value: "filled" },
+          { label: msg("fields.options.fixed", "Fixed"), value: "fixed" },
+          { label: msg("fields.options.filled", "Filled"), value: "filled" },
         ],
       },
     },
   },
   geomodifier: {
-    label: "Geomodifier",
+    label: msg("fields.geomodifier", "Geomodifier"),
     type: "object",
     objectFields: geomodifierConfig.fields!,
   },
   heading: {
-    label: "Heading",
+    label: msg("fields.heading", "Heading"),
     type: "object",
     objectFields: headingConfig.fields!,
   },
   description: {
-    label: "Description",
+    label: msg("fields.description", "Description"),
     type: "object",
     objectFields: descriptionConfig.fields!,
   },
   ctas: {
-    label: "Calls to Action",
+    label: msg("fields.callsToAction", "Calls to Action"),
     type: "array",
     arrayFields: {
       item: {
-        label: "CTA",
+        label: msg("fields.cta", "CTA"),
         type: "comprehensiveCTA",
       },
     },
@@ -744,7 +745,7 @@ const CasualDiningNewHeroComponent: PuckComponent<CasualDiningNewHeroProps> = (
 
 export const CasualDiningHero: YextComponentConfig<CasualDiningNewHeroFieldProps> =
   {
-    label: "Hero",
+    label: msg("components.hero", "Hero"),
     fields,
     defaultProps: {
       section: {

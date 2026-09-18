@@ -1,4 +1,5 @@
 import type { SectionConfig } from "@yext/visual-editor";
+import { msg } from "@yext/visual-editor";
 
 import * as React from "react";
 import { AnalyticsScopeProvider } from "@yext/pages-components";
@@ -388,13 +389,13 @@ margin-left: auto;
 
 const brandTextConfig = createStyledTextConfig({
   kind: "plain",
-  label: "Text",
+  label: msg("fields.text", "Text"),
   includeColor: true,
 });
 
 const descriptionConfig = createStyledTextConfig({
   kind: "richText",
-  label: "Description",
+  label: msg("fields.description", "Description"),
   includeColor: true,
 });
 
@@ -540,64 +541,64 @@ const createFooterLinkItems = (links: Array<{ label: string; href: string }>) =>
 
 const fields: YextFields<CasualDiningFooterProps> = {
   section: {
-    label: "Section",
+    label: msg("fields.section", "Section"),
     type: "object",
     objectFields: {
       visibleOnLivePage: {
-        label: "Visible on Live Page",
+        label: msg("fields.visibleOnLivePage", "Visible on Live Page"),
         type: "radio",
         options: [
-          { label: "Yes", value: true },
-          { label: "No", value: false },
+          { label: msg("fields.options.yes", "Yes"), value: true },
+          { label: msg("fields.options.no", "No"), value: false },
         ],
       },
       backgroundColor: {
-        label: "Background Color",
+        label: msg("fields.backgroundColor", "Background Color"),
         type: "basicSelector",
         options: "BACKGROUND_COLOR",
       },
       footerBackgroundColor: {
-        label: "Footer Background Color",
+        label: msg("fields.footerBackgroundColor", "Footer Background Color"),
         type: "basicSelector",
         options: "BACKGROUND_COLOR",
       },
     },
   },
   brand: {
-    label: "Brand",
+    label: msg("fields.brand", "Brand"),
     type: "object",
     objectFields: {
       text: {
-        label: "Text",
+        label: msg("fields.text", "Text"),
         type: "object",
         objectFields: brandTextConfig.fields!,
       },
       image: {
-        label: "Image",
+        label: msg("fields.image", "Image"),
         type: "object",
         objectFields: {
           image: {
             type: "entityField",
-            label: "Image",
+            label: msg("fields.image", "Image"),
             filter: {
               types: ["type.image"],
             },
           },
           aspectRatio: {
-            label: "Aspect Ratio",
+            label: msg("fields.options.aspectRatio", "Aspect Ratio"),
             type: "basicSelector",
             options: aspectRatioOptions,
           },
           imageConstrain: {
-            label: "Image Constrain",
+            label: msg("fields.imageConstrain", "Image Constrain"),
             type: "select",
             options: [
-              { label: "Fixed", value: "fixed" },
-              { label: "Filled", value: "filled" },
+              { label: msg("fields.options.fixed", "Fixed"), value: "fixed" },
+              { label: msg("fields.options.filled", "Filled"), value: "filled" },
             ],
           },
           styles: {
-            label: "Image Styles",
+            label: msg("fields.imageStyles", "Image Styles"),
             type: "styledImage",
           },
         },
@@ -605,34 +606,34 @@ const fields: YextFields<CasualDiningFooterProps> = {
     },
   },
   description: {
-    label: "Description",
+    label: msg("fields.description", "Description"),
     type: "object",
     objectFields: descriptionConfig.fields!,
   },
   socialLinks: {
-    label: "Social Links",
+    label: msg("fields.socialLinks", "Social Links"),
     type: "array",
     arrayFields: {
       item: {
-        label: "Item",
+        label: msg("fields.item", "Item"),
         type: "object",
         objectFields: {
           label: {
-            label: "Label",
+            label: msg("fields.label", "Label"),
             type: "entityField",
             filter: {
               types: ["type.string"],
             },
           },
           href: {
-            label: "Link",
+            label: msg("fields.link", "Link"),
             type: "entityField",
             filter: {
               types: ["type.string"],
             },
           },
           icon: {
-            label: "Icon",
+            label: msg("fields.icon", "Icon"),
             type: "entityField",
             filter: {
               types: ["type.image"],
@@ -675,11 +676,11 @@ const fields: YextFields<CasualDiningFooterProps> = {
       `Social Link ${(index ?? 0) + 1}`,
   },
   appBadges: {
-    label: "App Badges",
+    label: msg("fields.appBadges", "App Badges"),
     type: "array",
     arrayFields: {
       cta: {
-        label: "CTA",
+        label: msg("fields.cta", "CTA"),
         type: "comprehensiveCTA",
       },
     },
@@ -709,11 +710,11 @@ const fields: YextFields<CasualDiningFooterProps> = {
     getItemSummary: (_item, index) => `CTA ${(index ?? 0) + 1}`,
   },
   footerLinks: {
-    label: "Column Links",
+    label: msg("fields.columnLinks", "Column Links"),
     type: "object",
     objectFields: {
       columns: {
-        label: "Columns",
+        label: msg("fields.columns", "Columns"),
         type: "array",
         defaultItemProps: {
           label: {
@@ -728,14 +729,14 @@ const fields: YextFields<CasualDiningFooterProps> = {
         },
         arrayFields: {
           label: {
-            label: "Column Label",
+            label: msg("fields.columnLabel", "Column Label"),
             type: "entityField",
             filter: {
               types: ["type.string"],
             },
           },
           links: {
-            label: "Links",
+            label: msg("fields.links", "Links"),
             type: "array",
             defaultItemProps: {
               item: {
@@ -759,18 +760,18 @@ const fields: YextFields<CasualDiningFooterProps> = {
             },
             arrayFields: {
               item: {
-                label: "Link",
+                label: msg("fields.link", "Link"),
                 type: "object",
                 objectFields: {
                   text: {
-                    label: "Text",
+                    label: msg("fields.text", "Text"),
                     type: "entityField",
                     filter: {
                       types: ["type.string"],
                     },
                   },
                   href: {
-                    label: "Link",
+                    label: msg("fields.link", "Link"),
                     type: "entityField",
                     filter: {
                       types: ["type.string"],
@@ -790,7 +791,7 @@ const fields: YextFields<CasualDiningFooterProps> = {
     },
   },
   legalLinks: {
-    label: "Footer Links",
+    label: msg("fields.footerLinks", "Footer Links"),
     type: "array",
     defaultItemProps: {
       item: {
@@ -814,18 +815,18 @@ const fields: YextFields<CasualDiningFooterProps> = {
     },
     arrayFields: {
       item: {
-        label: "Item",
+        label: msg("fields.item", "Item"),
         type: "object",
         objectFields: {
           text: {
-            label: "Text",
+            label: msg("fields.text", "Text"),
             type: "entityField",
             filter: {
               types: ["type.string"],
             },
           },
           href: {
-            label: "Link",
+            label: msg("fields.link", "Link"),
             type: "entityField",
             filter: {
               types: ["type.string"],
@@ -1438,7 +1439,7 @@ const CasualDiningFooterComponent = (props: CasualDiningFooterProps) => {
 };
 
 export const CasualDiningFooter: YextComponentConfig<CasualDiningFooterProps> = {
-  label: "Footer",
+  label: msg("components.footer", "Footer"),
   fields,
   defaultProps,
   render: (props: unknown) => (

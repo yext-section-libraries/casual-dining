@@ -1,4 +1,5 @@
 import type { SectionConfig } from "@yext/visual-editor";
+import { msg } from "@yext/visual-editor";
 
 import * as React from "react";
 import { AnalyticsScopeProvider } from "@yext/pages-components";
@@ -371,84 +372,84 @@ type CasualDiningStoryProps = {
 
 const eyebrowConfig = createStyledTextConfig({
   kind: "plain",
-  label: "Eyebrow",
+  label: msg("fields.eyebrow", "Eyebrow"),
   includeColor: true,
 });
 
 const headingConfig = createStyledTextConfig({
   kind: "plain",
-  label: "Heading",
+  label: msg("fields.heading", "Heading"),
   includeColor: true,
 });
 
 const contentConfig = createStyledTextConfig({
   kind: "richText",
-  label: "Story Content",
+  label: msg("fields.storyContent", "Story Content"),
   includeColor: true,
 });
 
 const fields: YextFields<CasualDiningStoryProps> = {
   section: {
-    label: "Section",
+    label: msg("fields.section", "Section"),
     type: "object",
     objectFields: {
       visibleOnLivePage: {
-        label: "Visible on Live Page",
+        label: msg("fields.visibleOnLivePage", "Visible on Live Page"),
         type: "radio",
         options: [
-          { label: "Yes", value: true },
-          { label: "No", value: false },
+          { label: msg("fields.options.yes", "Yes"), value: true },
+          { label: msg("fields.options.no", "No"), value: false },
         ],
       },
       backgroundColor: {
-        label: "Background Color",
+        label: msg("fields.backgroundColor", "Background Color"),
         type: "basicSelector",
         options: "BACKGROUND_COLOR",
       },
     },
   },
   eyebrow: {
-    label: "Eyebrow",
+    label: msg("fields.eyebrow", "Eyebrow"),
     type: "object",
     objectFields: eyebrowConfig.fields!,
   },
   heading: {
-    label: "Heading",
+    label: msg("fields.heading", "Heading"),
     type: "object",
     objectFields: headingConfig.fields!,
   },
   sectionImage: {
-    label: "Section Image",
+    label: msg("fields.sectionImage", "Section Image"),
     type: "object",
     objectFields: {
       image: {
         type: "entityField",
-        label: "Image",
+        label: msg("fields.image", "Image"),
         filter: {
           types: ["type.image"],
         },
       },
       aspectRatio: {
-        label: "Aspect Ratio",
+        label: msg("fields.options.aspectRatio", "Aspect Ratio"),
         type: "basicSelector",
         options: aspectRatioOptions,
       },
       imageConstrain: {
-        label: "Image Constrain",
+        label: msg("fields.imageConstrain", "Image Constrain"),
         type: "select",
         options: [
-          { label: "Fixed", value: "fixed" },
-          { label: "Filled", value: "filled" },
+          { label: msg("fields.options.fixed", "Fixed"), value: "fixed" },
+          { label: msg("fields.options.filled", "Filled"), value: "filled" },
         ],
       },
       styles: {
-        label: "Image Styles",
+        label: msg("fields.imageStyles", "Image Styles"),
         type: "styledImage",
       },
     },
   },
   content: {
-    label: "Story Content",
+    label: msg("fields.storyContent", "Story Content"),
     type: "object",
     objectFields: contentConfig.fields!,
   },
@@ -614,7 +615,7 @@ const CasualDiningStoryComponent: PuckComponent<CasualDiningStoryProps> = (
 
 export const CasualDiningStory: YextComponentConfig<CasualDiningStoryProps> =
   {
-    label: "Story",
+    label: msg("components.story", "Story"),
     fields,
     defaultProps: {
       section: {
