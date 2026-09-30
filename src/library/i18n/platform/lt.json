@@ -30,11 +30,13 @@
     "reviews": "Atsiliepimai",
     "story": "Istorija"
   },
+  "currentLocation": "Dabartinė vieta",
   "customSearchArea": "Pasirinktinė paieškos sritis",
   "distance": "Atstumas",
   "distanceLineFromSearch": "<strong>{{distance}}</strong> iš paieškos",
   "distanceLineFromSearchLocation": "<strong>{{distance}}</strong> nuo {{searchLocation}}",
   "distanceLineFromYou": "<strong>{{distance}}</strong> nuo jūsų",
+  "email": "El. paštas",
   "enableCookies": "Įgalinti slapukus",
   "fields": {
     "accentColor": "Akcentinė spalva",
