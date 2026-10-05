@@ -1,3 +1,5 @@
+import "../shared/typography.css";
+import { StyledTextComponent } from "../shared/typography";
 import type { SectionConfig } from "@yext/visual-editor";
 import { msg } from "@yext/visual-editor";
 
@@ -11,7 +13,6 @@ import {
   getDefaultRTF,
   getSurfaceColorStyle,
   getAnalyticsScopeHash,
-  StyledTextComponent,
   useDocument,
   VisibilityWrapper,
   type StyledPlainTextProps,
@@ -38,18 +39,8 @@ const capturedStyles = String.raw`:root {
   --inner: 20px;
   --radius: 14px;
   --radius-small: 10px;
-  --font-heading: "Bricolage Grotesque", sans-serif;
-  --font-body: "DM Sans", sans-serif;
-  --font-body-small: 0.9rem;
-  --font-body-medium: 1.02rem;
-  --font-body-large: 1.12rem;
-  --font-heading-x-small: clamp(1.6rem, 2.1vw, 2.15rem);
-  --font-heading-small: clamp(2rem, 2.8vw, 2.95rem);
-  --font-heading-large: clamp(2.7rem, 4.9vw, 5rem);
-  --font-heading-hero: clamp(3.4rem, 8vw, 7.4rem);
   --section-padding: 50px;
   --section-padding-large: 80px;
-  --line: 1.45;
 }
 
 *,
@@ -67,10 +58,7 @@ margin: 0;
   min-width: 320px;
   color: var(--COLOR-TEXT);
   background: var(--COLOR-BG);
-  font-family: var(--font-body);
-  font-size: 16px;
-  line-height: var(--line);
-  -webkit-font-smoothing: antialiased;
+
   text-rendering: optimizeLegibility;
 }
 
@@ -97,11 +85,6 @@ button:focus-visible,
 input:focus-visible {
 outline: 2px solid var(--COLOR-ACCENT);
   outline-offset: 3px;
-}
-
-button,
-input {
-font: inherit;
 }
 
 button {
@@ -140,10 +123,6 @@ width: min(var(--content-max), calc(100% - (var(--outer) * 2)));
   margin: 0 auto;
 }
 
-.accordion__content {
-font-size: var(--font-body-medium);
-}
-
 .section-padding {
 padding-top: var(--section-padding);
   padding-bottom: var(--section-padding);
@@ -156,20 +135,10 @@ background: var(--COLOR-BG);
 
 .heading-large {
 margin: 0;
-  font-family: var(--font-heading);
-  font-weight: 500;
-  letter-spacing: -0.03em;
-}
-
-.heading-large {
-font-size: var(--font-heading-large);
-  line-height: 0.96;
 }
 
 .heading-large :where(h1, h2, h3, h4, h5, h6, div, span, p) {
 margin: 0;
-  font: inherit;
-  letter-spacing: inherit;
 }
 
 .theme__header .section-padding {
@@ -211,8 +180,6 @@ display: flex;
   gap: 16px;
   margin: 0;
   padding: 20px 0;
-  font-family: var(--font-heading);
-  font-size: 1.25rem;
 }
 
 .accordion__title:hover {
@@ -544,7 +511,7 @@ const CasualDiningFaqComponent: PuckComponent<CasualDiningFaqProps> = (
 };
 
 export const CasualDiningFaq: YextComponentConfig<CasualDiningFaqProps> = {
-  label: msg("components.faq", "FAQ"),
+  label: msg("components.faqSection", "FAQ Section"),
   fields,
   defaultProps: {
     section: {
@@ -577,7 +544,7 @@ export const CasualDiningFaq: YextComponentConfig<CasualDiningFaqProps> = {
 
 export const config: SectionConfig = {
   id: "CasualDiningFaq",
-  displayName: "FAQ",
+  displayName: "FAQ Section",
   description: "FAQ",
   pageSetTypes: ["ENTITY"],
 };

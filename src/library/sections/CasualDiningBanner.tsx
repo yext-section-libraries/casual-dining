@@ -1,3 +1,6 @@
+import { Body } from "../shared/typography";
+import { resolveBodyStyles, resolveTextStyles } from "../shared/typography";
+import "../shared/typography.css";
 import type { SectionConfig } from "@yext/visual-editor";
 import { msg } from "@yext/visual-editor";
 
@@ -5,7 +8,6 @@ import { PuckComponent } from "@puckeditor/core";
 import { CircleSlash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
-  Body,
   EntityField,
   MaybeRTF,
   PageSection,
@@ -21,10 +23,7 @@ import {
   resolveYextEntityField,
   useDocument,
 } from "@yext/visual-editor";
-import {
-  createRtfField,
-  defaultTextStyles,
-} from "../shared/sectionHelpers";
+import { createRtfField, defaultTextStyles } from "../shared/sectionHelpers";
 
 type CasualDiningBannerProps = {
   data: {
@@ -147,10 +146,10 @@ const CasualDiningBannerComponent: PuckComponent<CasualDiningBannerProps> = ({
         <div className="relative flex h-20 w-full flex-row items-center justify-center gap-3 rounded-lg border border-gray-200 bg-gray-100 px-4">
           <CircleSlash2 className="h-10 w-10 flex-shrink-0 text-gray-400" />
           <div className="flex flex-col items-start">
-            <Body className="font-medium text-gray-500" variant="sm">
+            <Body className="text-gray-500" variant="sm">
               Section hidden for this page
             </Body>
-            <Body className="font-normal text-gray-500" variant="sm">
+            <Body className="text-gray-500" variant="sm">
               The mapped banner field is empty
             </Body>
           </div>
@@ -160,7 +159,7 @@ const CasualDiningBannerComponent: PuckComponent<CasualDiningBannerProps> = ({
   }
 
   const richTextStyleOverrides = {
-    ...data.styles,
+    ...resolveTextStyles(data.styles),
     color: data.fontColor ?? section.backgroundColor.contrastingColor,
   };
   const resolvedText = resolveYextEntityField(
@@ -192,6 +191,7 @@ const CasualDiningBannerComponent: PuckComponent<CasualDiningBannerProps> = ({
       >
         <MaybeRTF
           data={resolvedText}
+          style={resolveBodyStyles(data.styles)}
           richTextStyleOverrides={richTextStyleOverrides}
         />
       </EntityField>
@@ -202,35 +202,36 @@ const CasualDiningBannerComponent: PuckComponent<CasualDiningBannerProps> = ({
 /**
  * Displays a full-width, editor-configurable rich-text banner.
  */
-export const CasualDiningBanner: YextComponentConfig<CasualDiningBannerProps> = {
-  label: msg("components.banner", "Banner"),
-  fields: CasualDiningBannerFields,
-  defaultProps: {
-    data: {
-      text: createRtfField("Banner Text"),
-      styles: defaultTextStyles,
+export const CasualDiningBanner: YextComponentConfig<CasualDiningBannerProps> =
+  {
+    label: msg("components.bannerSection", "Banner Section"),
+    fields: CasualDiningBannerFields,
+    defaultProps: {
+      data: {
+        text: createRtfField("Banner Text"),
+        styles: defaultTextStyles,
+      },
+      styles: {
+        textAlignment: "center",
+      },
+      section: {
+        backgroundColor: backgroundColors.color1.value,
+        visibleOnLivePage: true,
+      },
     },
-    styles: {
-      textAlignment: "center",
-    },
-    section: {
-      backgroundColor: backgroundColors.color1.value,
-      visibleOnLivePage: true,
-    },
-  },
-  render: (props) => (
-    <VisibilityWrapper
-      isEditing={props.puck.isEditing}
-      liveVisibility={props.section.visibleOnLivePage}
-    >
-      <CasualDiningBannerComponent {...props} />
-    </VisibilityWrapper>
-  ),
-};
+    render: (props) => (
+      <VisibilityWrapper
+        isEditing={props.puck.isEditing}
+        liveVisibility={props.section.visibleOnLivePage}
+      >
+        <CasualDiningBannerComponent {...props} />
+      </VisibilityWrapper>
+    ),
+  };
 
 export const config: SectionConfig = {
   id: "CasualDiningBanner",
-  displayName: "Banner",
+  displayName: "Banner Section",
   description: "Banner",
-  pageSetTypes: ["ENTITY"],
+  pageSetTypes: ["ENTITY", "DIRECTORY", "LOCATOR"],
 };

@@ -1,3 +1,5 @@
+import "../shared/typography.css";
+import { StyledTextComponent } from "../shared/typography";
 import type { SectionConfig } from "@yext/visual-editor";
 import { msg } from "@yext/visual-editor";
 
@@ -15,7 +17,6 @@ import {
   Image,
   getAnalyticsScopeHash,
   getSurfaceColorStyle,
-  StyledTextComponent,
   useDocument,
   VisibilityWrapper,
   type ComprehensiveCTAValue,
@@ -45,18 +46,8 @@ const capturedStyles = String.raw`:root {
   --inner: 20px;
   --radius: 14px;
   --radius-small: 10px;
-  --font-heading: "Bricolage Grotesque", sans-serif;
-  --font-body: "DM Sans", sans-serif;
-  --font-body-small: 0.9rem;
-  --font-body-medium: 1.02rem;
-  --font-body-large: 1.12rem;
-  --font-heading-x-small: clamp(1.6rem, 2.1vw, 2.15rem);
-  --font-heading-small: clamp(2rem, 2.8vw, 2.95rem);
-  --font-heading-large: clamp(2.7rem, 4.9vw, 5rem);
-  --font-heading-hero: clamp(3.4rem, 8vw, 7.4rem);
   --section-padding: 50px;
   --section-padding-large: 80px;
-  --line: 1.45;
 }
 
 *,
@@ -74,10 +65,7 @@ margin: 0;
   min-width: 320px;
   color: var(--COLOR-TEXT);
   background: var(--COLOR-BG);
-  font-family: var(--font-body);
-  font-size: 16px;
-  line-height: var(--line);
-  -webkit-font-smoothing: antialiased;
+
   text-rendering: optimizeLegibility;
 }
 
@@ -104,11 +92,6 @@ button:focus-visible,
 input:focus-visible {
 outline: 2px solid var(--COLOR-ACCENT);
   outline-offset: 3px;
-}
-
-button,
-input {
-font: inherit;
 }
 
 button {
@@ -148,12 +131,6 @@ width: min(var(--content-max), calc(100% - (var(--outer) * 2)));
   margin: 0 auto;
 }
 
-.body-medium,
-.grid__description,
-.product-item__caption {
-font-size: var(--font-body-medium);
-}
-
 .section-padding {
 padding-top: var(--section-padding);
   padding-bottom: var(--section-padding);
@@ -166,19 +143,10 @@ background: var(--COLOR-BG);
 
 .heading-small {
 margin: 0;
-  font-family: var(--font-heading);
-  font-weight: 500;
-  letter-spacing: -0.03em;
-}
-
-.heading-small {
-font-size: clamp(1.4rem, 1.8vw, 1.8rem);
 }
 
 .heading-small :where(h1, h2, h3, h4, h5, h6, div, span, p) {
 margin: 0;
-  font: inherit;
-  letter-spacing: inherit;
 }
 
 .btn {
@@ -188,7 +156,7 @@ display: inline-flex;
   min-height: 56px;
   padding-inline: 1.7rem;
   border-radius: 999px;
-  font-weight: 700;
+
   text-decoration: none;
   border: 1px solid transparent;
   transition:
@@ -302,15 +270,10 @@ text-align: center;
 
 .product-item__title {
 margin: 0;
-  font-family: var(--font-heading);
-  font-size: 1.32rem;
-  line-height: 1.06;
 }
 
 .product-item__title :where(h1, h2, h3, h4, h5, h6, div, span, p) {
 margin: 0;
-  font: inherit;
-  letter-spacing: inherit;
 }
 
 .product-item__caption {
@@ -573,8 +536,14 @@ const fields: YextFields<CasualDiningFeaturedFieldProps> = {
                 label: msg("fields.imageConstrain", "Image Constrain"),
                 type: "select",
                 options: [
-                  { label: msg("fields.options.fixed", "Fixed"), value: "fixed" },
-                  { label: msg("fields.options.filled", "Filled"), value: "filled" },
+                  {
+                    label: msg("fields.options.fixed", "Fixed"),
+                    value: "fixed",
+                  },
+                  {
+                    label: msg("fields.options.filled", "Filled"),
+                    value: "filled",
+                  },
                 ],
               },
               styles: {
@@ -819,7 +788,7 @@ const CasualDiningFeaturedComponent: PuckComponent<
 
 export const CasualDiningFeatured: YextComponentConfig<CasualDiningFeaturedFieldProps> =
   {
-    label: msg("components.featured", "Featured"),
+    label: msg("components.featuredSection", "Featured Items Section"),
     fields,
     defaultProps: {
       section: {
@@ -883,7 +852,7 @@ export const CasualDiningFeatured: YextComponentConfig<CasualDiningFeaturedField
 
 export const config: SectionConfig = {
   id: "CasualDiningFeatured",
-  displayName: "Featured",
+  displayName: "Featured Items Section",
   description: "Featured",
   pageSetTypes: ["ENTITY"],
 };

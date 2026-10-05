@@ -1,3 +1,5 @@
+import "../shared/typography.css";
+import { StyledTextComponent } from "../shared/typography";
 import type { SectionConfig } from "@yext/visual-editor";
 import { msg } from "@yext/visual-editor";
 
@@ -12,7 +14,6 @@ import {
   getSurfaceColorStyle,
   getAnalyticsScopeHash,
   resolveComponentData,
-  StyledTextComponent,
   useDocument,
   VisibilityWrapper,
   type StyledImageValue,
@@ -29,6 +30,7 @@ import {
   createRtfField,
   createTextField,
 } from "../shared/sectionHelpers";
+import { useTranslation } from "react-i18next";
 
 const capturedStyles = String.raw`:root {
 --content-max: 1440px;
@@ -38,18 +40,8 @@ const capturedStyles = String.raw`:root {
   --inner: 20px;
   --radius: 14px;
   --radius-small: 10px;
-  --font-heading: "Bricolage Grotesque", sans-serif;
-  --font-body: "DM Sans", sans-serif;
-  --font-body-small: 0.9rem;
-  --font-body-medium: 1.02rem;
-  --font-body-large: 1.12rem;
-  --font-heading-x-small: clamp(1.6rem, 2.1vw, 2.15rem);
-  --font-heading-small: clamp(2rem, 2.8vw, 2.95rem);
-  --font-heading-large: clamp(2.7rem, 4.9vw, 5rem);
-  --font-heading-hero: clamp(3.4rem, 8vw, 7.4rem);
   --section-padding: 50px;
   --section-padding-large: 80px;
-  --line: 1.45;
 }
 
 *,
@@ -67,10 +59,7 @@ margin: 0;
   min-width: 320px;
   color: var(--COLOR-TEXT);
   background: var(--COLOR-BG);
-  font-family: var(--font-body);
-  font-size: 16px;
-  line-height: var(--line);
-  -webkit-font-smoothing: antialiased;
+
   text-rendering: optimizeLegibility;
 }
 
@@ -97,11 +86,6 @@ button:focus-visible,
 input:focus-visible {
 outline: 2px solid var(--COLOR-ACCENT);
   outline-offset: 3px;
-}
-
-button,
-input {
-font: inherit;
 }
 
 button {
@@ -144,17 +128,8 @@ width: min(100%, calc(100% - (var(--outer) * 2)));
 text-align: left;
 }
 
-.body-medium,
-.hero__rte {
-font-size: var(--font-body-medium);
-}
-
 .hero__subheading {
 margin: 0;
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
 }
 
 .block-padding + .block-padding {
@@ -215,29 +190,15 @@ margin-bottom: 12px;
 
 .hero__title {
 margin: 14px 0 0;
-  font-family: var(--font-heading);
-  font-size: var(--font-heading-hero);
-  line-height: 0.94;
-  letter-spacing: -0.05em;
 }
 
 .story__title {
 margin: 14px 0 0;
-  font-family: var(--font-heading);
-  font-size: 32px;
-  line-height: 0.94;
-  letter-spacing: -0.05em;
 }
 
 .hero__subheading :where(h1, h2, h3, h4, h5, h6, div, span, p),
 .story__title :where(h1, h2, h3, h4, h5, h6, div, span, p) {
 margin: 0;
-  font: inherit;
-  letter-spacing: inherit;
-}
-
-.index-hero .hero__title {
-font-size: clamp(3rem, 6.3vw, 5.5rem);
 }
 
 .hero__rte {
@@ -324,9 +285,6 @@ width: min(100%, 560px);
 }
 
 @media (max-width: 768px) {
-.index-hero .hero__title {
-font-size: clamp(2.4rem, 14vw, 3rem);
-}
 
 .brick__section {
 grid-template-columns: 1fr;
@@ -468,7 +426,8 @@ const CasualDiningStoryComponent: PuckComponent<CasualDiningStoryProps> = (
   props,
 ) => {
   const streamDocument = useDocument();
-  const locale = streamDocument?.locale ?? "en";
+  const { i18n } = useTranslation();
+  const locale = i18n.language;
   const sectionImageStyles = props.sectionImage?.styles ?? {
     borderRadius: "default",
   };
@@ -485,7 +444,9 @@ const CasualDiningStoryComponent: PuckComponent<CasualDiningStoryProps> = (
   );
   const sectionImageWrapperStyle: React.CSSProperties = {
     aspectRatio:
-      props.sectionImage.aspectRatio > 0 ? props.sectionImage.aspectRatio : undefined,
+      props.sectionImage.aspectRatio > 0
+        ? props.sectionImage.aspectRatio
+        : undefined,
     height: "auto",
     overflow:
       props.sectionImage.imageConstrain === "filled" ||
@@ -557,51 +518,51 @@ const CasualDiningStoryComponent: PuckComponent<CasualDiningStoryProps> = (
                 className={`brick__block brick__block--text${hasImage ? "" : " brick__block--text-only"}`}
               >
                 <div className="brick__block__text">
-                    <div className="hero__content hero__content--compact hero__content--no-padding">
-                      <div className="hero__subheading block-padding">
-                        <EntityField
-                          displayName="Eyebrow"
-                          fieldId={props.eyebrow.data.text.field}
-                          constantValueEnabled={
-                            props.eyebrow.data.text.constantValueEnabled
-                          }
-                        >
-                          <StyledTextComponent
-                            kind="plain"
-                            {...props.eyebrow}
-                            tag="p"
-                          />
-                        </EntityField>
-                      </div>
-                      <div className="story__title block-padding">
-                        <EntityField
-                          displayName="Heading"
-                          fieldId={props.heading.data.text.field}
-                          constantValueEnabled={
-                            props.heading.data.text.constantValueEnabled
-                          }
-                        >
-                          <StyledTextComponent
-                            kind="plain"
-                            {...props.heading}
-                            tag="h2"
-                          />
-                        </EntityField>
-                      </div>
-                      <div className="hero__rte body-medium block-padding">
-                        <EntityField
-                          displayName="Story Content"
-                          fieldId={props.content.data.text.field}
-                          constantValueEnabled={
-                            props.content.data.text.constantValueEnabled
-                          }
-                        >
-                          <StyledTextComponent
-                            kind="richText"
-                            {...props.content}
-                          />
-                        </EntityField>
-                      </div>
+                  <div className="hero__content hero__content--compact hero__content--no-padding">
+                    <div className="hero__subheading block-padding">
+                      <EntityField
+                        displayName="Eyebrow"
+                        fieldId={props.eyebrow.data.text.field}
+                        constantValueEnabled={
+                          props.eyebrow.data.text.constantValueEnabled
+                        }
+                      >
+                        <StyledTextComponent
+                          kind="plain"
+                          {...props.eyebrow}
+                          tag="p"
+                        />
+                      </EntityField>
+                    </div>
+                    <div className="story__title block-padding">
+                      <EntityField
+                        displayName="Heading"
+                        fieldId={props.heading.data.text.field}
+                        constantValueEnabled={
+                          props.heading.data.text.constantValueEnabled
+                        }
+                      >
+                        <StyledTextComponent
+                          kind="plain"
+                          {...props.heading}
+                          tag="h2"
+                        />
+                      </EntityField>
+                    </div>
+                    <div className="hero__rte body-medium block-padding">
+                      <EntityField
+                        displayName="Story Content"
+                        fieldId={props.content.data.text.field}
+                        constantValueEnabled={
+                          props.content.data.text.constantValueEnabled
+                        }
+                      >
+                        <StyledTextComponent
+                          kind="richText"
+                          {...props.content}
+                        />
+                      </EntityField>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -613,57 +574,56 @@ const CasualDiningStoryComponent: PuckComponent<CasualDiningStoryProps> = (
   );
 };
 
-export const CasualDiningStory: YextComponentConfig<CasualDiningStoryProps> =
-  {
-    label: msg("components.story", "Story"),
-    fields,
-    defaultProps: {
-      section: {
-        backgroundColor: {
-          selectedColor: "palette-tertiary",
-          contrastingColor: "palette-tertiary-contrast",
-        },
-        visibleOnLivePage: true,
+export const CasualDiningStory: YextComponentConfig<CasualDiningStoryProps> = {
+  label: msg("components.storySection", "Story Section"),
+  fields,
+  defaultProps: {
+    section: {
+      backgroundColor: {
+        selectedColor: "palette-tertiary",
+        contrastingColor: "palette-tertiary-contrast",
       },
-      eyebrow: {
-        ...eyebrowConfig.defaultProps,
-        data: {
-          text: createTextField("What is [[name]]?"),
-        },
-      } as StyledPlainTextProps,
-      heading: {
-        ...headingConfig.defaultProps,
-        data: {
-          text: createTextField(
-            "A laid-back [[address.city]] burger spot built on quality, hospitality, and bold flavor.",
-          ),
-        },
-      } as StyledPlainTextProps,
-      sectionImage: {
-        image: {
-          field: "",
-          constantValue: {
-            url: "https://a.mktgcdn.com/p/fbSbItkZpsHpkc8qHH7GxvQkWzxsfm6mGc0k4Lmfl-A/1267x1900.jpg",
-            width: 1267,
-            height: 1900,
-            alternateText: "Story image",
-          },
-          constantValueEnabled: true,
-        },
-        aspectRatio: 0.75,
-        imageConstrain: "filled",
-        styles: {
-          borderRadius: "default",
-        },
-      },
-      content: defaultContent,
+      visibleOnLivePage: true,
     },
-    render: (props) => <CasualDiningStoryComponent {...props} />,
-  };
+    eyebrow: {
+      ...eyebrowConfig.defaultProps,
+      data: {
+        text: createTextField("What is [[name]]?"),
+      },
+    } as StyledPlainTextProps,
+    heading: {
+      ...headingConfig.defaultProps,
+      data: {
+        text: createTextField(
+          "A laid-back [[address.city]] burger spot built on quality, hospitality, and bold flavor.",
+        ),
+      },
+    } as StyledPlainTextProps,
+    sectionImage: {
+      image: {
+        field: "",
+        constantValue: {
+          url: "https://a.mktgcdn.com/p/fbSbItkZpsHpkc8qHH7GxvQkWzxsfm6mGc0k4Lmfl-A/1267x1900.jpg",
+          width: 1267,
+          height: 1900,
+          alternateText: "Story image",
+        },
+        constantValueEnabled: true,
+      },
+      aspectRatio: 0.75,
+      imageConstrain: "filled",
+      styles: {
+        borderRadius: "default",
+      },
+    },
+    content: defaultContent,
+  },
+  render: (props) => <CasualDiningStoryComponent {...props} />,
+};
 
 export const config: SectionConfig = {
   id: "CasualDiningStory",
-  displayName: "Story",
+  displayName: "Story Section",
   description: "Story",
   pageSetTypes: ["ENTITY"],
 };

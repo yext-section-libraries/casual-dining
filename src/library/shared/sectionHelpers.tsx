@@ -1,3 +1,4 @@
+import "./typography.css";
 import type { ComplexImageType, ImageType } from "@yext/pages-components";
 import {
   getDefaultRTF,
@@ -31,7 +32,7 @@ export const CapturedStyleRoot = ({
   style?: CSSProperties;
   styles: string;
 }) => (
-  <div style={style ?? casualDiningThemeVars}>
+  <div className="casual-dining-body" style={style ?? casualDiningThemeVars}>
     <style>{styles}</style>
     {children}
   </div>
