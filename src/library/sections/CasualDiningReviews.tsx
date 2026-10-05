@@ -1,3 +1,5 @@
+import "../shared/typography.css";
+import { StyledTextComponent } from "../shared/typography";
 import type { SectionConfig } from "@yext/visual-editor";
 import { msg } from "@yext/visual-editor";
 
@@ -12,7 +14,6 @@ import {
   getAnalyticsScopeHash,
   getSurfaceColorStyle,
   getThemeColorCssValue,
-  StyledTextComponent,
   useDocument,
   VisibilityWrapper,
   type StyledPlainTextProps,
@@ -20,10 +21,7 @@ import {
   type YextComponentConfig,
   type YextFields,
 } from "@yext/visual-editor";
-import {
-  CapturedStyleRoot,
-  createTextField,
-} from "../shared/sectionHelpers";
+import { CapturedStyleRoot, createTextField } from "../shared/sectionHelpers";
 
 const capturedStyles = String.raw`:root {
 --content-max: 1440px;
@@ -33,18 +31,8 @@ const capturedStyles = String.raw`:root {
   --inner: 20px;
   --radius: 14px;
   --radius-small: 10px;
-  --font-heading: "Bricolage Grotesque", sans-serif;
-  --font-body: "DM Sans", sans-serif;
-  --font-body-small: 0.9rem;
-  --font-body-medium: 1.02rem;
-  --font-body-large: 1.12rem;
-  --font-heading-x-small: clamp(1.6rem, 2.1vw, 2.15rem);
-  --font-heading-small: clamp(2rem, 2.8vw, 2.95rem);
-  --font-heading-large: clamp(2.7rem, 4.9vw, 5rem);
-  --font-heading-hero: clamp(3.4rem, 8vw, 7.4rem);
   --section-padding: 50px;
   --section-padding-large: 80px;
-  --line: 1.45;
 }
 
 *,
@@ -62,10 +50,7 @@ margin: 0;
   min-width: 320px;
   color: var(--COLOR-TEXT);
   background: var(--COLOR-BG);
-  font-family: var(--font-body);
-  font-size: 16px;
-  line-height: var(--line);
-  -webkit-font-smoothing: antialiased;
+
   text-rendering: optimizeLegibility;
 }
 
@@ -92,11 +77,6 @@ button:focus-visible,
 input:focus-visible {
 outline: 2px solid var(--COLOR-ACCENT);
   outline-offset: 3px;
-}
-
-button,
-input {
-font: inherit;
 }
 
 button {
@@ -139,10 +119,6 @@ width: min(100%, calc(100% - (var(--outer) * 2)));
 text-align: left;
 }
 
-.body-medium {
-font-size: var(--font-body-medium);
-}
-
 .color-scheme-1 {
 background: var(--COLOR-BG);
   color: var(--COLOR-TEXT);
@@ -150,20 +126,10 @@ background: var(--COLOR-BG);
 
 .heading-large {
 margin: 0;
-  font-family: var(--font-heading);
-  font-weight: 500;
-  letter-spacing: -0.03em;
-}
-
-.heading-large {
-font-size: var(--font-heading-large);
-  line-height: 0.96;
 }
 
 .heading-large :where(h1, h2, h3, h4, h5, h6, div, span, p) {
 margin: 0;
-  font: inherit;
-  letter-spacing: inherit;
 }
 
 .grid {
@@ -196,14 +162,10 @@ display: flex;
 
 .reviews__rating-score {
 margin: 0;
-  font-family: var(--font-heading);
-  font-size: 1.55rem;
-  line-height: 1;
 }
 
 .reviews__rating-score :where(div, span, p) {
 margin: 0;
-  font: inherit;
 }
 
 .reviews__rating-divider {
@@ -223,15 +185,12 @@ margin: 0;
 
 .reviews__label {
 margin: 20px 0 0;
-  font-family: var(--font-heading);
-  font-size: 1.25rem;
-  font-weight: 600;
+
   color: inherit;
 }
 
 .reviews__label :where(div, span, p) {
 margin: 0;
-  font: inherit;
 }
 
 .reviews__grid-item {
@@ -266,7 +225,6 @@ margin: 0;
 
 .review__quote-block {
 color: inherit;
-  line-height: 1.5;
 }
 
 .review__author {
@@ -278,18 +236,8 @@ margin-top: 0;
   margin-bottom: 18px;
 }
 
-.review__author__name {
-font-family: var(--font-heading);
-  font-size: 1.12rem;
-  line-height: 1;
-  letter-spacing: -0.02em;
-  font-weight: 500;
-}
-
 .review__author__name :where(div, span, p) {
 margin: 0;
-  font: inherit;
-  letter-spacing: inherit;
 }
 
 .review__author__content {
@@ -299,7 +247,7 @@ display: grid;
 
 .review__meta {
 margin: 0;
-  font-weight: 700;
+
   color: inherit;
 }
 
@@ -776,7 +724,9 @@ const CasualDiningReviewsComponent: PuckComponent<CasualDiningReviewsProps> = (
                               <div className="review__author__name">
                                 <StyledTextComponent
                                   kind="plain"
-                                  fontOptions={props.cardStyling.header.fontOptions}
+                                  fontOptions={
+                                    props.cardStyling.header.fontOptions
+                                  }
                                   data={{
                                     text: createTextField(
                                       review.authorName ?? "",
@@ -798,7 +748,9 @@ const CasualDiningReviewsComponent: PuckComponent<CasualDiningReviewsProps> = (
                           <blockquote className="review__quote-block review__quote-block--first-party body-medium">
                             <StyledTextComponent
                               kind="plain"
-                              fontOptions={props.cardStyling.content.fontOptions}
+                              fontOptions={
+                                props.cardStyling.content.fontOptions
+                              }
                               data={{
                                 text: createTextField(review.content ?? ""),
                               }}
@@ -809,7 +761,9 @@ const CasualDiningReviewsComponent: PuckComponent<CasualDiningReviewsProps> = (
                             <div className="review__comments">
                               <StyledTextComponent
                                 kind="plain"
-                                fontOptions={props.cardStyling.content.fontOptions}
+                                fontOptions={
+                                  props.cardStyling.content.fontOptions
+                                }
                                 data={{
                                   text: createTextField(
                                     review.comments[0].content,
@@ -835,7 +789,7 @@ const CasualDiningReviewsComponent: PuckComponent<CasualDiningReviewsProps> = (
 
 export const CasualDiningReviews: YextComponentConfig<CasualDiningReviewsProps> =
   {
-    label: msg("components.reviews", "Reviews"),
+    label: msg("components.reviewsSection", "Reviews Section"),
     fields,
     defaultProps,
     render: (props) => <CasualDiningReviewsComponent {...props} />,
@@ -843,7 +797,7 @@ export const CasualDiningReviews: YextComponentConfig<CasualDiningReviewsProps> 
 
 export const config: SectionConfig = {
   id: "CasualDiningReviews",
-  displayName: "Reviews",
+  displayName: "Reviews Section",
   description: "Reviews",
   pageSetTypes: ["ENTITY"],
 };

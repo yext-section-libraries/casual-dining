@@ -1,3 +1,5 @@
+import "../shared/typography.css";
+import { StyledTextComponent } from "../shared/typography";
 import type { SectionConfig } from "@yext/visual-editor";
 import { msg } from "@yext/visual-editor";
 
@@ -13,7 +15,6 @@ import {
   getSurfaceColorStyle,
   getThemeColorCssValue,
   resolveComponentData,
-  StyledTextComponent,
   useDocument,
   VisibilityWrapper,
   type ComprehensiveCTAValue,
@@ -29,6 +30,7 @@ import {
   aspectRatioOptions,
   CapturedStyleRoot,
 } from "../shared/sectionHelpers";
+import { useTranslation } from "react-i18next";
 
 const themeVars: React.CSSProperties = {
   ["--COLOR-BG" as string]: "var(--palette-tertiary)",
@@ -50,18 +52,8 @@ const capturedStyles = String.raw`
   --inner: 20px;
   --radius: 14px;
   --radius-small: 10px;
-  --font-heading: "Bricolage Grotesque", sans-serif;
-  --font-body: "DM Sans", sans-serif;
-  --font-body-small: 0.9rem;
-  --font-body-medium: 1.02rem;
-  --font-body-large: 1.12rem;
-  --font-heading-x-small: clamp(1.6rem, 2.1vw, 2.15rem);
-  --font-heading-small: clamp(2rem, 2.8vw, 2.95rem);
-  --font-heading-large: clamp(2.7rem, 4.9vw, 5rem);
-  --font-heading-hero: clamp(3.4rem, 8vw, 7.4rem);
   --section-padding: 50px;
   --section-padding-large: 80px;
-  --line: 1.45;
 }
 
 *,
@@ -79,10 +71,7 @@ body {
   min-width: 320px;
   color: var(--COLOR-TEXT);
   background: var(--COLOR-BG);
-  font-family: var(--font-body);
-  font-size: 16px;
-  line-height: var(--line);
-  -webkit-font-smoothing: antialiased;
+
   text-rendering: optimizeLegibility;
 }
 
@@ -109,11 +98,6 @@ button:focus-visible,
 input:focus-visible {
   outline: 2px solid var(--COLOR-ACCENT);
   outline-offset: 3px;
-}
-
-button,
-input {
-  font: inherit;
 }
 
 button {
@@ -208,25 +192,16 @@ summary::-webkit-details-marker {
 .promo-banner__title {
   max-width: none;
   margin: 0;
-  font-family: var(--font-heading);
-  font-size: clamp(3.6rem, 7.8vw, 8.3rem);
-  font-weight: 600;
-  letter-spacing: -0.05rem;
-  line-height: 0.92;
 }
 
 .promo-banner__title :where(h1, h2, h3, h4, h5, h6, div, span, p) {
   margin: 0;
-  font: inherit;
-  letter-spacing: inherit;
 }
 
 .promo-banner__description {
   max-width: 760px;
   margin: 1.5rem auto 0;
   color: inherit;
-  font-size: clamp(1.05rem, 1.55vw, 1.35rem);
-  line-height: 1.55;
 }
 
 .promo-banner__actions {
@@ -381,7 +356,8 @@ const fields: YextFields<CasualDiningPromoProps> = {
 
 const CasualDiningPromoComponent = (props: RuntimeProps) => {
   const streamDocument = useDocument<any>();
-  const locale = streamDocument.locale ?? "en";
+  const { i18n } = useTranslation();
+  const locale = i18n.language;
   const resolvedImage = resolveComponentData(
     props.image.image,
     locale,
@@ -531,139 +507,138 @@ const CasualDiningPromoComponent = (props: RuntimeProps) => {
   );
 };
 
-export const CasualDiningPromo: YextComponentConfig<CasualDiningPromoProps> =
-  {
-    label: msg("components.promo", "Promo"),
-    fields,
-    defaultProps: {
-      section: {
-        visibleOnLivePage: true,
-        overlayColor: defaultOverlayColor,
-      },
-      title: {
-        ...titleConfig.defaultProps,
-        data: {
-          text: {
-            field: "",
-            constantValue: {
-              defaultValue:
-                "Black Truffle Mac & Cheese for the right comfort-food mood.",
-              hasLocalizedValue: "true",
-            },
-            constantValueEnabled: true,
-          },
-        },
-      } as StyledPlainTextProps,
-      description: {
-        ...descriptionConfig.defaultProps,
-        data: {
-          text: {
-            field: "",
-            constantValue: {
-              defaultValue:
-                "Creamy cavatappi pasta tossed in a smoked gouda and white cheddar blend, finished with black truffle oil, toasted breadcrumbs, and fresh herbs.",
-              hasLocalizedValue: "true",
-            },
-            constantValueEnabled: true,
-          },
-        },
-      } as StyledRichTextProps,
-      image: {
-        image: {
+export const CasualDiningPromo: YextComponentConfig<CasualDiningPromoProps> = {
+  label: msg("components.promoSection", "Promo Section"),
+  fields,
+  defaultProps: {
+    section: {
+      visibleOnLivePage: true,
+      overlayColor: defaultOverlayColor,
+    },
+    title: {
+      ...titleConfig.defaultProps,
+      data: {
+        text: {
           field: "",
           constantValue: {
-            url: "https://a.mktgcdn.com/p/UHR6VTEvcR-yDMqPSOS7LyK87Qt56EOrmfNbhLQxI08/1267x1900.jpg",
-            width: 1267,
-            height: 1900,
-            alternateText: "Promotional image",
+            defaultValue:
+              "Black Truffle Mac & Cheese for the right comfort-food mood.",
+            hasLocalizedValue: "true",
           },
           constantValueEnabled: true,
         },
-        aspectRatio: 0,
-        imageConstrain: "filled",
-        styles: {
+      },
+    } as StyledPlainTextProps,
+    description: {
+      ...descriptionConfig.defaultProps,
+      data: {
+        text: {
+          field: "",
+          constantValue: {
+            defaultValue:
+              "Creamy cavatappi pasta tossed in a smoked gouda and white cheddar blend, finished with black truffle oil, toasted breadcrumbs, and fresh herbs.",
+            hasLocalizedValue: "true",
+          },
+          constantValueEnabled: true,
+        },
+      },
+    } as StyledRichTextProps,
+    image: {
+      image: {
+        field: "",
+        constantValue: {
+          url: "https://a.mktgcdn.com/p/UHR6VTEvcR-yDMqPSOS7LyK87Qt56EOrmfNbhLQxI08/1267x1900.jpg",
+          width: 1267,
+          height: 1900,
+          alternateText: "Promotional image",
+        },
+        constantValueEnabled: true,
+      },
+      aspectRatio: 0,
+      imageConstrain: "filled",
+      styles: {
+        borderRadius: "default",
+      },
+    },
+    primaryCta: {
+      data: {
+        actionType: "link",
+        cta: {
+          field: "",
+          selectedType: "textAndLink",
+          constantValue: {
+            label: {
+              defaultValue: "EXPLORE THE DISH",
+              hasLocalizedValue: "true",
+            },
+            link: {
+              defaultValue: "#",
+              hasLocalizedValue: "true",
+            },
+            openInNewTab: false,
+            ctaType: "textAndLink",
+          },
+          constantValueEnabled: true,
+        },
+        openInNewTab: false,
+      },
+      styles: {
+        variant: "primary",
+        button: {
+          fontFamily: "default",
+          fontSize: "default",
+          fontWeight: "default",
+          fontStyle: "default",
+          textTransform: "default",
+          letterSpacing: "default",
           borderRadius: "default",
         },
       },
-      primaryCta: {
-        data: {
-          actionType: "link",
-          cta: {
-            field: "",
-            selectedType: "textAndLink",
-            constantValue: {
-              label: {
-                defaultValue: "EXPLORE THE DISH",
-                hasLocalizedValue: "true",
-              },
-              link: {
-                defaultValue: "#",
-                hasLocalizedValue: "true",
-              },
-              openInNewTab: false,
-              ctaType: "textAndLink",
+    },
+    secondaryCta: {
+      data: {
+        actionType: "link",
+        cta: {
+          field: "",
+          selectedType: "textAndLink",
+          constantValue: {
+            label: {
+              defaultValue: "VIEW FULL MENU",
+              hasLocalizedValue: "true",
             },
-            constantValueEnabled: true,
+            link: {
+              defaultValue: "#featured-menu",
+              hasLocalizedValue: "true",
+            },
+            openInNewTab: false,
+            ctaType: "textAndLink",
           },
-          openInNewTab: false,
+          constantValueEnabled: true,
         },
-        styles: {
-          variant: "primary",
-          button: {
-            fontFamily: "default",
-            fontSize: "default",
-            fontWeight: "default",
-            fontStyle: "default",
-            textTransform: "default",
-            letterSpacing: "default",
-            borderRadius: "default",
-          },
-        },
+        openInNewTab: false,
       },
-      secondaryCta: {
-        data: {
-          actionType: "link",
-          cta: {
-            field: "",
-            selectedType: "textAndLink",
-            constantValue: {
-              label: {
-                defaultValue: "VIEW FULL MENU",
-                hasLocalizedValue: "true",
-              },
-              link: {
-                defaultValue: "#featured-menu",
-                hasLocalizedValue: "true",
-              },
-              openInNewTab: false,
-              ctaType: "textAndLink",
-            },
-            constantValueEnabled: true,
-          },
-          openInNewTab: false,
-        },
-        styles: {
-          variant: "secondary",
-          button: {
-            fontFamily: "default",
-            fontSize: "default",
-            fontWeight: "default",
-            fontStyle: "default",
-            textTransform: "default",
-            letterSpacing: "default",
-            borderRadius: "default",
-          },
+      styles: {
+        variant: "secondary",
+        button: {
+          fontFamily: "default",
+          fontSize: "default",
+          fontWeight: "default",
+          fontStyle: "default",
+          textTransform: "default",
+          letterSpacing: "default",
+          borderRadius: "default",
         },
       },
     },
-    render: (props) => (
-      <CasualDiningPromoComponent {...(props as RuntimeProps)} />
-    ),
-  };
+  },
+  render: (props) => (
+    <CasualDiningPromoComponent {...(props as RuntimeProps)} />
+  ),
+};
 
 export const config: SectionConfig = {
   id: "CasualDiningPromo",
-  displayName: "Promo",
+  displayName: "Promo Section",
   description: "Promo",
   pageSetTypes: ["ENTITY"],
 };

@@ -1,3 +1,5 @@
+import "../shared/typography.css";
+import { StyledTextComponent } from "../shared/typography";
 import type { SectionConfig } from "@yext/visual-editor";
 import { msg } from "@yext/visual-editor";
 
@@ -14,7 +16,6 @@ import {
   createStyledTextConfig,
   EntityField,
   Image,
-  StyledTextComponent,
   getAnalyticsScopeHash,
   getSurfaceColorStyle,
   getThemeColorCssValue,
@@ -34,6 +35,7 @@ import {
   aspectRatioOptions,
   CapturedStyleRoot,
 } from "../shared/sectionHelpers";
+import { useTranslation } from "react-i18next";
 
 const themeVars: React.CSSProperties = {
   ["--COLOR-BG" as string]: "var(--palette-tertiary)",
@@ -52,18 +54,8 @@ const capturedStyles = String.raw`
   --inner: 20px;
   --radius: 14px;
   --radius-small: 10px;
-  --font-heading: "Bricolage Grotesque", sans-serif;
-  --font-body: "DM Sans", sans-serif;
-  --font-body-small: 0.9rem;
-  --font-body-medium: 1.02rem;
-  --font-body-large: 1.12rem;
-  --font-heading-x-small: clamp(1.6rem, 2.1vw, 2.15rem);
-  --font-heading-small: clamp(2rem, 2.8vw, 2.95rem);
-  --font-heading-large: clamp(2.7rem, 4.9vw, 5rem);
-  --font-heading-hero: clamp(3.4rem, 8vw, 7.4rem);
   --section-padding: 50px;
   --section-padding-large: 80px;
-  --line: 1.45;
 }
 
 *,
@@ -81,10 +73,7 @@ body {
   min-width: 320px;
   color: var(--COLOR-TEXT);
   background: var(--COLOR-BG);
-  font-family: var(--font-body);
-  font-size: 16px;
-  line-height: var(--line);
-  -webkit-font-smoothing: antialiased;
+
   text-rendering: optimizeLegibility;
 }
 
@@ -166,10 +155,6 @@ body {
 
 .hero__subheading {
   margin-bottom: 18px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
 }
 
 .hero__subheading :where(p, div, span) {
@@ -178,17 +163,10 @@ body {
 
 .hero__title {
   margin: 0;
-  font-family: var(--font-heading, inherit);
-  font-size: clamp(3rem, 6.3vw, 5.5rem);
-  font-weight: 500;
-  line-height: 0.94;
-  letter-spacing: -0.05em;
 }
 
 .hero__title :where(h1, div, span) {
   margin: 0;
-  font: inherit;
-  letter-spacing: inherit;
 }
 
 .hero__rte {
@@ -199,11 +177,6 @@ body {
 .hero__rte,
 .hero__rte :where(p, span, strong, em, a, ul, ol, li, blockquote) {
   color: var(--hero-rtf-color, inherit) !important;
-  font-family: var(--hero-rtf-font-family, inherit) !important;
-  font-size: var(--hero-rtf-font-size, inherit) !important;
-  font-weight: var(--hero-rtf-font-weight, inherit) !important;
-  font-style: var(--hero-rtf-font-style, inherit) !important;
-  text-transform: var(--hero-rtf-text-transform, inherit) !important;
 }
 
 .hero__rte p + p {
@@ -254,12 +227,6 @@ body {
   .hero__button,
   .hero__button > * {
     width: auto;
-  }
-}
-
-@media (max-width: 480px) {
-  .hero__title {
-    font-size: clamp(2.4rem, 14vw, 3rem);
   }
 }
 `;
@@ -556,11 +523,15 @@ const CasualDiningNewHeroComponent: PuckComponent<CasualDiningNewHeroProps> = (
   props,
 ) => {
   const streamDocument = useDocument<{ locale?: string }>();
-  const locale = streamDocument?.locale ?? "en";
+  const { i18n } = useTranslation();
+  const locale = i18n.language;
   const isEditing = Boolean(props.puck?.isEditing);
   const resolvedBackgroundImage = props.background?.image
     ? (resolveComponentData(props.background.image, locale, streamDocument) as
-        ImageType | ComplexImageType | TranslatableAssetImage | undefined)
+        | ImageType
+        | ComplexImageType
+        | TranslatableAssetImage
+        | undefined)
     : undefined;
   const resolvedBackgroundImageUrl =
     resolvedBackgroundImage && "url" in resolvedBackgroundImage
@@ -652,7 +623,9 @@ const CasualDiningNewHeroComponent: PuckComponent<CasualDiningNewHeroProps> = (
                   ) : null}
                   <Background
                     as="div"
-                    background={showBackgroundImage ? overlayColor : heroSurfaceBackground}
+                    background={
+                      showBackgroundImage ? overlayColor : heroSurfaceBackground
+                    }
                     className="hero__content__wrapper content-align--bottom-left"
                     style={{ background: overlayBackground }}
                   >
@@ -703,7 +676,8 @@ const CasualDiningNewHeroComponent: PuckComponent<CasualDiningNewHeroProps> = (
                       </div>
                       <div className="hero__button-group">
                         {ctaRows.map((row, index) => {
-                          const resolvedCta = row?.item ?? defaultCtas[index]?.item;
+                          const resolvedCta =
+                            row?.item ?? defaultCtas[index]?.item;
                           if (!resolvedCta) {
                             return null;
                           }
@@ -745,7 +719,7 @@ const CasualDiningNewHeroComponent: PuckComponent<CasualDiningNewHeroProps> = (
 
 export const CasualDiningHero: YextComponentConfig<CasualDiningNewHeroFieldProps> =
   {
-    label: msg("components.hero", "Hero"),
+    label: msg("components.heroSection", "Hero Section"),
     fields,
     defaultProps: {
       section: {
@@ -813,7 +787,7 @@ export const CasualDiningHero: YextComponentConfig<CasualDiningNewHeroFieldProps
 
 export const config: SectionConfig = {
   id: "CasualDiningHero",
-  displayName: "Hero",
+  displayName: "Hero Section",
   description: "Hero",
   pageSetTypes: ["ENTITY"],
 };

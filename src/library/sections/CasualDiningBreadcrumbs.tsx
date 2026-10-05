@@ -1,3 +1,5 @@
+import { resolveTextStyles } from "../shared/typography";
+import "../shared/typography.css";
 import type { SectionConfig } from "@yext/visual-editor";
 import { msg } from "@yext/visual-editor";
 
@@ -93,34 +95,13 @@ const CasualDiningBreadcrumbsComponent: PuckComponent<
   );
   const breadcrumbLinkStyle: React.CSSProperties = {
     color: getThemeColorCssValue(props.breadcrumbLinks.fontColor),
-    fontFamily:
-      props.breadcrumbLinks.styles.fontFamily === "default"
-        ? "var(--fontFamily-link-fontFamily)"
-        : props.breadcrumbLinks.styles.fontFamily,
-    fontSize:
-      props.breadcrumbLinks.styles.fontSize === "default"
-        ? "var(--fontSize-link-fontSize)"
-        : props.breadcrumbLinks.styles.fontSize,
-    fontStyle:
-      props.breadcrumbLinks.styles.fontStyle === "default"
-        ? undefined
-        : props.breadcrumbLinks.styles.fontStyle,
-    fontWeight:
-      props.breadcrumbLinks.styles.fontWeight === "default"
-        ? "var(--fontWeight-link-fontWeight)"
-        : props.breadcrumbLinks.styles.fontWeight,
-    textTransform:
-      props.breadcrumbLinks.styles.textTransform === "default"
-        ? "var(--textTransform-link-textTransform)"
-        : props.breadcrumbLinks.styles.textTransform,
-    letterSpacing: "var(--letterSpacing-link-letterSpacing)",
+    ...resolveTextStyles(props.breadcrumbLinks.styles),
   };
 
   if (!breadcrumbs.length) {
     return props.puck?.isEditing ? (
       <p
         style={{
-          fontFamily: "Arial, Helvetica, sans-serif",
           padding: "18px 24px",
         }}
       >
@@ -166,7 +147,7 @@ const CasualDiningBreadcrumbsComponent: PuckComponent<
                   </span>
                 )}
                 {isCurrentPage ? (
-                  <span aria-current="page">{label}</span>
+                  <span className="casual-dining-link" style={breadcrumbLinkStyle} aria-current="page">{label}</span>
                 ) : (
                   <Link
                     eventName={`breadcrumb${breadcrumbIndex}`}

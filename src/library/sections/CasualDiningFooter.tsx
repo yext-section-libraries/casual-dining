@@ -1,3 +1,5 @@
+import "../shared/typography.css";
+import { StyledTextComponent } from "../shared/typography";
 import type { SectionConfig } from "@yext/visual-editor";
 import { msg } from "@yext/visual-editor";
 
@@ -13,7 +15,6 @@ import {
   getAnalyticsScopeHash,
   getSurfaceColorStyle,
   resolveComponentData,
-  StyledTextComponent,
   useDocument,
   VisibilityWrapper,
   type StyledImageValue,
@@ -30,6 +31,7 @@ import {
   aspectRatioOptions,
   CapturedStyleRoot,
 } from "../shared/sectionHelpers";
+import { useTranslation } from "react-i18next";
 
 export type HoursIntervalData = {
   start?: string;
@@ -90,18 +92,8 @@ const capturedStyles = String.raw`:root {
   --inner: 20px;
   --radius: 14px;
   --radius-small: 10px;
-  --font-heading: "Bricolage Grotesque", sans-serif;
-  --font-body: "DM Sans", sans-serif;
-  --font-body-small: 0.9rem;
-  --font-body-medium: 1.02rem;
-  --font-body-large: 1.12rem;
-  --font-heading-x-small: clamp(1.6rem, 2.1vw, 2.15rem);
-  --font-heading-small: clamp(2rem, 2.8vw, 2.95rem);
-  --font-heading-large: clamp(2.7rem, 4.9vw, 5rem);
-  --font-heading-hero: clamp(3.4rem, 8vw, 7.4rem);
   --section-padding: 50px;
   --section-padding-large: 80px;
-  --line: 1.45;
 }
 
 *,
@@ -119,10 +111,7 @@ margin: 0;
   min-width: 320px;
   color: var(--COLOR-TEXT);
   background: var(--COLOR-BG);
-  font-family: var(--font-body);
-  font-size: 16px;
-  line-height: var(--line);
-  -webkit-font-smoothing: antialiased;
+
   text-rendering: optimizeLegibility;
 }
 
@@ -149,11 +138,6 @@ button:focus-visible,
 input:focus-visible {
 outline: 2px solid var(--COLOR-ACCENT);
   outline-offset: 3px;
-}
-
-button,
-input {
-font: inherit;
 }
 
 button {
@@ -192,10 +176,6 @@ width: min(100%, calc(100% - (var(--outer) * 2)));
   margin: 0 auto;
 }
 
-.rte {
-font-size: var(--font-body-medium);
-}
-
 .unstyled {
 list-style: none;
   padding: 0;
@@ -207,23 +187,12 @@ padding-top: var(--section-padding);
   padding-bottom: var(--section-padding);
 }
 
-
 .heading-x-small {
 margin: 0;
-  font-family: var(--font-heading);
-  font-weight: 500;
-  letter-spacing: -0.03em;
-}
-
-.heading-x-small {
-font-size: var(--font-heading-x-small);
-  line-height: 1;
 }
 
 .heading-x-small :where(h1, h2, h3, h4, h5, h6, div, span, p) {
 margin: 0;
-  font: inherit;
-  letter-spacing: inherit;
 }
 
 .theme__header .section-padding {
@@ -518,26 +487,28 @@ const footerBadgePresets = [
 ];
 
 const createFooterLinkItems = (links: Array<{ label: string; href: string }>) =>
-  links.map((item): FooterLinkRow => ({
-    item: {
-      text: {
-        field: "",
-        constantValue: {
-          defaultValue: item.label,
-          hasLocalizedValue: "true" as const,
+  links.map(
+    (item): FooterLinkRow => ({
+      item: {
+        text: {
+          field: "",
+          constantValue: {
+            defaultValue: item.label,
+            hasLocalizedValue: "true" as const,
+          },
+          constantValueEnabled: true,
         },
-        constantValueEnabled: true,
-      },
-      href: {
-        field: "",
-        constantValue: {
-          defaultValue: item.href,
-          hasLocalizedValue: "true" as const,
+        href: {
+          field: "",
+          constantValue: {
+            defaultValue: item.href,
+            hasLocalizedValue: "true" as const,
+          },
+          constantValueEnabled: true,
         },
-        constantValueEnabled: true,
       },
-    },
-  }));
+    }),
+  );
 
 const fields: YextFields<CasualDiningFooterProps> = {
   section: {
@@ -594,7 +565,10 @@ const fields: YextFields<CasualDiningFooterProps> = {
             type: "select",
             options: [
               { label: msg("fields.options.fixed", "Fixed"), value: "fixed" },
-              { label: msg("fields.options.filled", "Filled"), value: "filled" },
+              {
+                label: msg("fields.options.filled", "Filled"),
+                value: "filled",
+              },
             ],
           },
           styles: {
@@ -780,7 +754,8 @@ const fields: YextFields<CasualDiningFooterProps> = {
                 },
               },
             },
-            getItemSummary: (_row, index?: number) => `Link ${(index ?? 0) + 1}`,
+            getItemSummary: (_row, index?: number) =>
+              `Link ${(index ?? 0) + 1}`,
           },
         },
         getItemSummary: (
@@ -928,29 +903,31 @@ const defaultProps: CasualDiningFooterProps = {
       },
     },
   })) satisfies Array<FooterSocialLinkRow>,
-  appBadges: footerBadgePresets.map((item): FooterBadgeField => ({
-    cta: {
-      data: {
-        actionType: "link",
-        cta: {
-          field: "",
-          constantValueEnabled: true,
-          constantValue: {
-            ctaType: "presetImage",
-            label: "",
-            link: item.href,
-            linkType: "URL",
+  appBadges: footerBadgePresets.map(
+    (item): FooterBadgeField => ({
+      cta: {
+        data: {
+          actionType: "link",
+          cta: {
+            field: "",
+            constantValueEnabled: true,
+            constantValue: {
+              ctaType: "presetImage",
+              label: "",
+              link: item.href,
+              linkType: "URL",
+            },
+            selectedType: "presetImage",
           },
-          selectedType: "presetImage",
+          openInNewTab: true,
         },
-        openInNewTab: true,
+        styles: {
+          variant: "link",
+          presetImage: item.presetImage,
+        },
       },
-      styles: {
-        variant: "link",
-        presetImage: item.presetImage,
-      },
-    },
-  })),
+    }),
+  ),
   footerLinks: {
     columns: [
       {
@@ -1001,7 +978,8 @@ const defaultProps: CasualDiningFooterProps = {
 
 const CasualDiningFooterComponent = (props: CasualDiningFooterProps) => {
   const streamDocument = useDocument();
-  const locale = streamDocument?.locale ?? "en";
+  const { i18n } = useTranslation();
+  const locale = i18n.language;
   const isEditing = Boolean(props.puck?.isEditing);
   const socialLinks =
     Array.isArray(props.socialLinks) && props.socialLinks.length > 0
@@ -1438,14 +1416,15 @@ const CasualDiningFooterComponent = (props: CasualDiningFooterProps) => {
   );
 };
 
-export const CasualDiningFooter: YextComponentConfig<CasualDiningFooterProps> = {
-  label: msg("components.footer", "Footer"),
-  fields,
-  defaultProps,
-  render: (props: unknown) => (
-    <CasualDiningFooterComponent {...(props as CasualDiningFooterProps)} />
-  ),
-};
+export const CasualDiningFooter: YextComponentConfig<CasualDiningFooterProps> =
+  {
+    label: msg("components.footer", "Footer"),
+    fields,
+    defaultProps,
+    render: (props: unknown) => (
+      <CasualDiningFooterComponent {...(props as CasualDiningFooterProps)} />
+    ),
+  };
 
 export const config: SectionConfig = {
   id: "CasualDiningFooter",

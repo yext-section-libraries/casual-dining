@@ -1,3 +1,5 @@
+import { resolveTextStyles } from "../shared/typography";
+import "../shared/typography.css";
 import type { SectionConfig } from "@yext/visual-editor";
 import { msg } from "@yext/visual-editor";
 
@@ -160,7 +162,7 @@ const getTextStyles = ({
   styles,
 }: {
   color?: ThemeColor;
-  styles: Pick<
+  styles?: Pick<
     StyledLinkValue,
     | "fontFamily"
     | "fontSize"
@@ -172,14 +174,9 @@ const getTextStyles = ({
 }): React.CSSProperties => {
   return {
     color: getThemeColorCssValue(color),
-    fontFamily: styles.fontFamily === "default" ? undefined : styles.fontFamily,
-    fontSize: styles.fontSize === "default" ? undefined : styles.fontSize,
-    fontWeight: styles.fontWeight === "default" ? undefined : styles.fontWeight,
-    fontStyle: styles.fontStyle === "default" ? undefined : styles.fontStyle,
-    textTransform:
-      styles.textTransform === "default" ? undefined : styles.textTransform,
+    ...resolveTextStyles(styles),
     letterSpacing:
-      styles.letterSpacing === "default" ? undefined : styles.letterSpacing,
+      styles?.letterSpacing === "default" ? undefined : styles?.letterSpacing,
   };
 };
 
@@ -232,10 +229,25 @@ const CasualDiningHeaderFields: YextFields<CasualDiningHeaderProps> = {
     label: msg("fields.variant", "Variant"),
     type: "select",
     options: [
-      { label: msg("fields.options.centeredLogoSplitNav", "Centered Logo Split Nav"), value: "centerLogoSplitNav" },
-      { label: msg("fields.options.logoLeftInlineNav", "Logo Left Inline Nav"), value: "logoLeftInlineNav" },
-      { label: msg("fields.options.stackedNavBelow", "Stacked Nav Below"), value: "stackedNavBelow" },
-      { label: msg("fields.options.utilityTopRow", "Utility Top Row"), value: "utilityTopRow" },
+      {
+        label: msg(
+          "fields.options.centeredLogoSplitNav",
+          "Centered Logo Split Nav",
+        ),
+        value: "centerLogoSplitNav",
+      },
+      {
+        label: msg("fields.options.logoLeftInlineNav", "Logo Left Inline Nav"),
+        value: "logoLeftInlineNav",
+      },
+      {
+        label: msg("fields.options.stackedNavBelow", "Stacked Nav Below"),
+        value: "stackedNavBelow",
+      },
+      {
+        label: msg("fields.options.utilityTopRow", "Utility Top Row"),
+        value: "utilityTopRow",
+      },
     ],
   },
   section: {
@@ -366,8 +378,14 @@ const CasualDiningHeaderFields: YextFields<CasualDiningHeaderProps> = {
                 label: msg("fields.imageConstrain", "Image Constrain"),
                 type: "select",
                 options: [
-                  { label: msg("fields.options.fixed", "Fixed"), value: "fixed" },
-                  { label: msg("fields.options.filled", "Filled"), value: "filled" },
+                  {
+                    label: msg("fields.options.fixed", "Fixed"),
+                    value: "fixed",
+                  },
+                  {
+                    label: msg("fields.options.filled", "Filled"),
+                    value: "filled",
+                  },
                 ],
               },
               styles: {
@@ -518,13 +536,13 @@ const CasualDiningHeaderFields: YextFields<CasualDiningHeaderProps> = {
   },
 };
 
-const CasualDiningHeaderComponent: PuckComponent<
-  CasualDiningHeaderProps
-> = (props) => {
-  const { t } = useTranslation();
+const CasualDiningHeaderComponent: PuckComponent<CasualDiningHeaderProps> = (
+  props,
+) => {
+  const { t, i18n } = useTranslation();
   const analytics = useAnalytics();
   const streamDocument = useDocument<StreamDocument>();
-  const locale = streamDocument.locale ?? "en";
+  const locale = i18n.language;
   const [menuOpen, setMenuOpen] = React.useState(false);
 
   const resolvedLogoImage = resolveComponentData(
@@ -660,7 +678,9 @@ const CasualDiningHeaderComponent: PuckComponent<
     }
 
     const resolvedIconImage = iconImage as
-      ImageType | ComplexImageType | TranslatableAssetImage;
+      | ImageType
+      | ComplexImageType
+      | TranslatableAssetImage;
     const iconHeight = 32;
     const iconAspectRatio =
       iconImageProps.aspectRatio > 0 ? iconImageProps.aspectRatio : 1;
@@ -809,7 +829,9 @@ const CasualDiningHeaderComponent: PuckComponent<
         <Image
           image={
             resolvedLogoImage as
-              ImageType | ComplexImageType | TranslatableAssetImage
+              | ImageType
+              | ComplexImageType
+              | TranslatableAssetImage
           }
           className="h-full w-full"
           style={logoStyle}

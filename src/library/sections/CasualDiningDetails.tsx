@@ -1,3 +1,5 @@
+import "../shared/typography.css";
+import { resolveBodyStyles, StyledTextComponent } from "../shared/typography";
 import type { SectionConfig } from "@yext/visual-editor";
 import { msg } from "@yext/visual-editor";
 
@@ -23,7 +25,6 @@ import {
   getAnalyticsScopeHash,
   getSurfaceColorStyle,
   resolveComponentData,
-  StyledTextComponent,
   useDocument,
   VisibilityWrapper,
   type ComprehensiveCTAValue,
@@ -87,18 +88,8 @@ const capturedStyles = String.raw`:root {
   --inner: 20px;
   --radius: 14px;
   --radius-small: 10px;
-  --font-heading: "Bricolage Grotesque", sans-serif;
-  --font-body: "DM Sans", sans-serif;
-  --font-body-small: 0.9rem;
-  --font-body-medium: 1.02rem;
-  --font-body-large: 1.12rem;
-  --font-heading-x-small: clamp(1.6rem, 2.1vw, 2.15rem);
-  --font-heading-small: clamp(2rem, 2.8vw, 2.95rem);
-  --font-heading-large: clamp(2.7rem, 4.9vw, 5rem);
-  --font-heading-hero: clamp(3.4rem, 8vw, 7.4rem);
   --section-padding: 50px;
   --section-padding-large: 80px;
-  --line: 1.45;
 }
 
 *,
@@ -116,10 +107,7 @@ margin: 0;
   min-width: 320px;
   color: var(--COLOR-TEXT);
   background: var(--COLOR-BG);
-  font-family: var(--font-body);
-  font-size: 16px;
-  line-height: var(--line);
-  -webkit-font-smoothing: antialiased;
+
   text-rendering: optimizeLegibility;
 }
 
@@ -146,11 +134,6 @@ button:focus-visible,
 input:focus-visible {
 outline: 2px solid var(--COLOR-ACCENT);
   outline-offset: 3px;
-}
-
-button,
-input {
-font: inherit;
 }
 
 button {
@@ -189,10 +172,6 @@ width: min(var(--content-max), calc(100% - (var(--outer) * 2)));
   margin: 0 auto;
 }
 
-.body-medium {
-font-size: var(--font-body-medium);
-}
-
 .section-padding {
 padding-top: var(--section-padding);
   padding-bottom: var(--section-padding);
@@ -205,19 +184,10 @@ background: var(--COLOR-BG);
 
 .heading-small {
 margin: 0;
-  font-family: var(--font-heading);
-  font-weight: 500;
-  letter-spacing: -0.03em;
-}
-
-.heading-small {
-font-size: clamp(1.4rem, 1.8vw, 1.8rem);
 }
 
 .heading-small :where(h1, h2, h3, h4, h5, h6, div, span, p) {
 margin: 0;
-  font: inherit;
-  letter-spacing: inherit;
 }
 
 .theme__header .section-padding {
@@ -277,9 +247,6 @@ border-bottom: 0;
 .core-info__item strong {
 display: block;
   margin-bottom: 8px;
-  font-size: 0.83rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
 }
 
 .core-info__item p {
@@ -295,7 +262,7 @@ margin-top: 18px;
 display: inline-flex;
   align-items: center;
   margin-top: 16px;
-  font-weight: 700;
+
   color: inherit;
   text-decoration: underline;
   text-underline-offset: 0.16em;
@@ -576,8 +543,14 @@ const fields: YextFields<CasualDiningDetailsProps> = {
         label: msg("fields.phoneFormat", "Phone Format"),
         type: "radio",
         options: [
-          { label: msg("fields.options.domestic", "Domestic"), value: "domestic" },
-          { label: msg("fields.options.international", "International"), value: "international" },
+          {
+            label: msg("fields.options.domestic", "Domestic"),
+            value: "domestic",
+          },
+          {
+            label: msg("fields.options.international", "International"),
+            value: "international",
+          },
         ],
       },
       includeHyperlink: {
@@ -627,13 +600,34 @@ const fields: YextFields<CasualDiningDetailsProps> = {
             label: msg("fields.startOfWeek", "Start Of Week"),
             type: "select",
             options: [
-              { label: msg("fields.options.monday", "Monday"), value: "monday" },
-              { label: msg("fields.options.tuesday", "Tuesday"), value: "tuesday" },
-              { label: msg("fields.options.wednesday", "Wednesday"), value: "wednesday" },
-              { label: msg("fields.options.thursday", "Thursday"), value: "thursday" },
-              { label: msg("fields.options.friday", "Friday"), value: "friday" },
-              { label: msg("fields.options.saturday", "Saturday"), value: "saturday" },
-              { label: msg("fields.options.sunday", "Sunday"), value: "sunday" },
+              {
+                label: msg("fields.options.monday", "Monday"),
+                value: "monday",
+              },
+              {
+                label: msg("fields.options.tuesday", "Tuesday"),
+                value: "tuesday",
+              },
+              {
+                label: msg("fields.options.wednesday", "Wednesday"),
+                value: "wednesday",
+              },
+              {
+                label: msg("fields.options.thursday", "Thursday"),
+                value: "thursday",
+              },
+              {
+                label: msg("fields.options.friday", "Friday"),
+                value: "friday",
+              },
+              {
+                label: msg("fields.options.saturday", "Saturday"),
+                value: "saturday",
+              },
+              {
+                label: msg("fields.options.sunday", "Sunday"),
+                value: "sunday",
+              },
               { label: msg("fields.options.today", "Today"), value: "today" },
             ],
           },
@@ -646,7 +640,10 @@ const fields: YextFields<CasualDiningDetailsProps> = {
             ],
           },
           showAdditionalHoursText: {
-            label: msg("fields.options.showAdditionalHoursText", "Show Additional Hours Text"),
+            label: msg(
+              "fields.options.showAdditionalHoursText",
+              "Show Additional Hours Text",
+            ),
             type: "radio",
             options: [
               { label: msg("fields.options.yes", "Yes"), value: true },
@@ -657,8 +654,14 @@ const fields: YextFields<CasualDiningDetailsProps> = {
             label: msg("fields.alignment", "Alignment"),
             type: "select",
             options: [
-              { label: msg("fields.options.start", "Start"), value: "items-start" },
-              { label: msg("fields.options.center", "Center"), value: "items-center" },
+              {
+                label: msg("fields.options.start", "Start"),
+                value: "items-start",
+              },
+              {
+                label: msg("fields.options.center", "Center"),
+                value: "items-center",
+              },
               { label: msg("fields.options.end", "End"), value: "items-end" },
             ],
           },
@@ -716,7 +719,7 @@ const CasualDiningDetailsComponent: PuckComponent<CasualDiningDetailsProps> = (
     comingSoon?: boolean;
     additionalHoursText?: string;
   }>();
-  const locale = streamDocument?.locale ?? "en";
+  const locale = i18n.language;
   const sectionSurfaceStyle = getSurfaceColorStyle(
     props.section.backgroundColor,
     streamDocument,
@@ -745,27 +748,9 @@ const CasualDiningDetailsComponent: PuckComponent<CasualDiningDetailsProps> = (
     timeFormatLocale: i18n.language,
   };
   const bodyTextStyle = {
-    color: getThemeColorCssValue(props.body.fontOptions.color) ?? sectionTextColor,
-    fontFamily:
-      props.body.fontOptions.fontFamily === "default"
-        ? undefined
-        : props.body.fontOptions.fontFamily,
-    fontSize:
-      props.body.fontOptions.fontSize === "default"
-        ? undefined
-        : props.body.fontOptions.fontSize,
-    fontWeight:
-      props.body.fontOptions.fontWeight === "default"
-        ? undefined
-        : props.body.fontOptions.fontWeight,
-    fontStyle:
-      props.body.fontOptions.fontStyle === "default"
-        ? undefined
-        : props.body.fontOptions.fontStyle,
-    textTransform:
-      props.body.fontOptions.textTransform === "default"
-        ? undefined
-        : props.body.fontOptions.textTransform,
+    color:
+      getThemeColorCssValue(props.body.fontOptions?.color) ?? sectionTextColor,
+    ...resolveBodyStyles(props.body.fontOptions),
   } satisfies React.CSSProperties;
   const hoursAlignmentStyle =
     props.hours.settings.alignment === "items-center"
@@ -853,10 +838,7 @@ const CasualDiningDetailsComponent: PuckComponent<CasualDiningDetailsProps> = (
                       props.introText.data.text.constantValueEnabled
                     }
                   >
-                    <StyledTextComponent
-                      kind="richText"
-                      {...props.introText}
-                    />
+                    <StyledTextComponent kind="richText" {...props.introText} />
                   </EntityField>
                 </div>
               </div>
@@ -1085,7 +1067,9 @@ const CasualDiningDetailsComponent: PuckComponent<CasualDiningDetailsProps> = (
                   <EntityField
                     displayName="Services"
                     fieldId={props.dining.text.field}
-                    constantValueEnabled={props.dining.text.constantValueEnabled}
+                    constantValueEnabled={
+                      props.dining.text.constantValueEnabled
+                    }
                   >
                     <ul className="core-info__list">
                       {(Array.isArray(resolvedDining) ? resolvedDining : [])
@@ -1097,16 +1081,22 @@ const CasualDiningDetailsComponent: PuckComponent<CasualDiningDetailsProps> = (
                           if (
                             item &&
                             typeof item === "object" &&
-                          typeof (item as { defaultValue?: string }).defaultValue === "string"
+                            typeof (item as { defaultValue?: string })
+                              .defaultValue === "string"
                           ) {
-                          return (item as { defaultValue: string }).defaultValue.trim();
+                            return (
+                              item as { defaultValue: string }
+                            ).defaultValue.trim();
                           }
 
                           return "";
                         })
                         .filter(Boolean)
                         .map((item, index) => (
-                        <li key={`${item}-${index}`} style={{ listStyleType: "disc" }}>
+                          <li
+                            key={`${item}-${index}`}
+                            style={{ listStyleType: "disc" }}
+                          >
                             <StyledTextComponent
                               kind="plain"
                               {...props.body}
@@ -1135,7 +1125,7 @@ const CasualDiningDetailsComponent: PuckComponent<CasualDiningDetailsProps> = (
 
 export const CasualDiningDetails: YextComponentConfig<CasualDiningDetailsProps> =
   {
-    label: msg("components.details", "Details"),
+    label: msg("components.detailsSection", "Details Section"),
     fields,
     defaultProps: {
       section: {
@@ -1281,7 +1271,7 @@ export const CasualDiningDetails: YextComponentConfig<CasualDiningDetailsProps> 
 
 export const config: SectionConfig = {
   id: "CasualDiningDetails",
-  displayName: "Details",
+  displayName: "Details Section",
   description: "Details",
   pageSetTypes: ["ENTITY"],
 };

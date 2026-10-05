@@ -1,3 +1,4 @@
+import "../shared/typography.css";
 import type { SectionConfig } from "@yext/visual-editor";
 import { msg } from "@yext/visual-editor";
 
@@ -42,18 +43,8 @@ const capturedStyles = String.raw`:root {
   --inner: 20px;
   --radius: 14px;
   --radius-small: 10px;
-  --font-heading: "Bricolage Grotesque", sans-serif;
-  --font-body: "DM Sans", sans-serif;
-  --font-body-small: 0.9rem;
-  --font-body-medium: 1.02rem;
-  --font-body-large: 1.12rem;
-  --font-heading-x-small: clamp(1.6rem, 2.1vw, 2.15rem);
-  --font-heading-small: clamp(2rem, 2.8vw, 2.95rem);
-  --font-heading-large: clamp(2.7rem, 4.9vw, 5rem);
-  --font-heading-hero: clamp(3.4rem, 8vw, 7.4rem);
   --section-padding: 50px;
   --section-padding-large: 80px;
-  --line: 1.45;
 }
 
 *,
@@ -71,10 +62,7 @@ margin: 0;
   min-width: 320px;
   color: var(--COLOR-TEXT);
   background: var(--COLOR-BG);
-  font-family: var(--font-body);
-  font-size: 16px;
-  line-height: var(--line);
-  -webkit-font-smoothing: antialiased;
+
   text-rendering: optimizeLegibility;
 }
 
@@ -101,11 +89,6 @@ button:focus-visible,
 input:focus-visible {
 outline: 2px solid var(--COLOR-ACCENT);
   outline-offset: 3px;
-}
-
-button,
-input {
-font: inherit;
 }
 
 button {
@@ -147,10 +130,6 @@ width: min(var(--content-max), calc(100% - (var(--outer) * 2)));
 
 .product-item__eyebrow {
 margin: 0;
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
 }
 
 .section-padding {
@@ -184,7 +163,7 @@ margin-top: 0;
 display: inline-flex;
   align-items: center;
   margin-top: 16px;
-  font-weight: 700;
+
   color: inherit;
   text-decoration: underline;
   text-underline-offset: 0.16em;
@@ -559,7 +538,10 @@ const fields: YextFields<CasualDiningLocationsFieldProps> = {
             type: "radio",
             options: [
               { label: msg("fields.options.link", "Link"), value: "link" },
-              { label: msg("fields.options.outline", "Outline"), value: "secondary" },
+              {
+                label: msg("fields.options.outline", "Outline"),
+                value: "secondary",
+              },
               { label: msg("fields.options.solid", "Solid"), value: "primary" },
             ],
           },
@@ -704,9 +686,7 @@ const CasualDiningLocationsComponent: PuckComponent<
               <EntityField
                 displayName="Map Coordinate"
                 fieldId={props.map.coordinate.field}
-                constantValueEnabled={
-                  props.map.coordinate.constantValueEnabled
-                }
+                constantValueEnabled={props.map.coordinate.constantValueEnabled}
                 fullHeight
               >
                 <MapboxStaticMapComponent
@@ -762,9 +742,8 @@ const CasualDiningLocationsComponent: PuckComponent<
                         const locationCoordinate = getCoordinatePair(
                           row.yextDisplayCoordinate ?? row.geocodedCoordinate,
                         );
-                        const directionsUrl = getDirectionsUrl(
-                          locationCoordinate,
-                        );
+                        const directionsUrl =
+                          getDirectionsUrl(locationCoordinate);
                         const distanceText = getDistanceText(
                           sourceCoordinate,
                           locationCoordinate,
@@ -794,7 +773,7 @@ const CasualDiningLocationsComponent: PuckComponent<
                               level={props.cardStyles.header.level}
                               color={props.cardStyles.header.color}
                               className="location-card__title"
-                              style={{ margin: "0 0 14px", lineHeight: 1.02 }}
+                              style={{ margin: "0 0 14px" }}
                             >
                               {row.name}
                             </Heading>
@@ -817,7 +796,11 @@ const CasualDiningLocationsComponent: PuckComponent<
                             </Body>
                             <CTA
                               label="Get Directions"
-                              link={directionsUrl === "#" ? resolvedUrl : directionsUrl}
+                              link={
+                                directionsUrl === "#"
+                                  ? resolvedUrl
+                                  : directionsUrl
+                              }
                               variant={props.cardStyles.cta.variant}
                               color={props.cardStyles.cta.color}
                               className="core-info__link location-card__cta-link"
@@ -850,7 +833,7 @@ const CasualDiningLocationsComponent: PuckComponent<
 
 export const CasualDiningLocations: YextComponentConfig<CasualDiningLocationsFieldProps> =
   {
-    label: msg("components.locations", "Locations"),
+    label: msg("components.locationsSection", "Nearby Locations Section"),
     fields,
     defaultProps,
     render: (props) => <CasualDiningLocationsComponent {...props} />,
@@ -858,7 +841,7 @@ export const CasualDiningLocations: YextComponentConfig<CasualDiningLocationsFie
 
 export const config: SectionConfig = {
   id: "CasualDiningLocations",
-  displayName: "Locations",
+  displayName: "Nearby Locations Section",
   description: "Locations",
   pageSetTypes: ["ENTITY"],
 };
