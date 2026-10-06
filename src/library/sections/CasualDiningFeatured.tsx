@@ -788,7 +788,7 @@ const CasualDiningFeaturedComponent: PuckComponent<
 
 export const CasualDiningFeatured: YextComponentConfig<CasualDiningFeaturedFieldProps> =
   {
-    label: msg("components.featuredSection", "Featured Items Section"),
+    label: msg("components.featuredLabel", "Featured Items"),
     fields,
     defaultProps: {
       section: {
@@ -852,7 +852,7 @@ export const CasualDiningFeatured: YextComponentConfig<CasualDiningFeaturedField
 
 export const config: SectionConfig = {
   id: "CasualDiningFeatured",
-  displayName: "Featured Items Section",
+  displayName: "Featured Items",
   description: "Featured",
   pageSetTypes: ["ENTITY"],
 };

@@ -833,7 +833,7 @@ const CasualDiningLocationsComponent: PuckComponent<
 
 export const CasualDiningLocations: YextComponentConfig<CasualDiningLocationsFieldProps> =
   {
-    label: msg("components.locationsSection", "Nearby Locations Section"),
+    label: msg("components.locationsLabel", "Nearby Locations"),
     fields,
     defaultProps,
     render: (props) => <CasualDiningLocationsComponent {...props} />,
@@ -841,7 +841,7 @@ export const CasualDiningLocations: YextComponentConfig<CasualDiningLocationsFie
 
 export const config: SectionConfig = {
   id: "CasualDiningLocations",
-  displayName: "Nearby Locations Section",
+  displayName: "Nearby Locations",
   description: "Locations",
   pageSetTypes: ["ENTITY"],
 };

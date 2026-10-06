@@ -789,7 +789,7 @@ const CasualDiningReviewsComponent: PuckComponent<CasualDiningReviewsProps> = (
 
 export const CasualDiningReviews: YextComponentConfig<CasualDiningReviewsProps> =
   {
-    label: msg("components.reviewsSection", "Reviews Section"),
+    label: msg("components.reviewsLabel", "Reviews"),
     fields,
     defaultProps,
     render: (props) => <CasualDiningReviewsComponent {...props} />,
@@ -797,7 +797,7 @@ export const CasualDiningReviews: YextComponentConfig<CasualDiningReviewsProps> 
 
 export const config: SectionConfig = {
   id: "CasualDiningReviews",
-  displayName: "Reviews Section",
+  displayName: "Reviews",
   description: "Reviews",
   pageSetTypes: ["ENTITY"],
 };

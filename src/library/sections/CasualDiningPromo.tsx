@@ -508,7 +508,7 @@ const CasualDiningPromoComponent = (props: RuntimeProps) => {
 };
 
 export const CasualDiningPromo: YextComponentConfig<CasualDiningPromoProps> = {
-  label: msg("components.promoSection", "Promo Section"),
+  label: msg("components.promoLabel", "Promo"),
   fields,
   defaultProps: {
     section: {
@@ -638,7 +638,7 @@ export const CasualDiningPromo: YextComponentConfig<CasualDiningPromoProps> = {
 
 export const config: SectionConfig = {
   id: "CasualDiningPromo",
-  displayName: "Promo Section",
+  displayName: "Promo",
   description: "Promo",
   pageSetTypes: ["ENTITY"],
 };
