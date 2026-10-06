@@ -511,7 +511,7 @@ const CasualDiningFaqComponent: PuckComponent<CasualDiningFaqProps> = (
 };
 
 export const CasualDiningFaq: YextComponentConfig<CasualDiningFaqProps> = {
-  label: msg("components.faqSection", "FAQ Section"),
+  label: msg("components.faqLabel", "FAQ"),
   fields,
   defaultProps: {
     section: {
@@ -544,7 +544,7 @@ export const CasualDiningFaq: YextComponentConfig<CasualDiningFaqProps> = {
 
 export const config: SectionConfig = {
   id: "CasualDiningFaq",
-  displayName: "FAQ Section",
+  displayName: "FAQ",
   description: "FAQ",
   pageSetTypes: ["ENTITY"],
 };

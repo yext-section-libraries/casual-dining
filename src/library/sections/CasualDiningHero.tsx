@@ -719,7 +719,7 @@ const CasualDiningNewHeroComponent: PuckComponent<CasualDiningNewHeroProps> = (
 
 export const CasualDiningHero: YextComponentConfig<CasualDiningNewHeroFieldProps> =
   {
-    label: msg("components.heroSection", "Hero Section"),
+    label: msg("components.heroLabel", "Hero"),
     fields,
     defaultProps: {
       section: {
@@ -787,7 +787,7 @@ export const CasualDiningHero: YextComponentConfig<CasualDiningNewHeroFieldProps
 
 export const config: SectionConfig = {
   id: "CasualDiningHero",
-  displayName: "Hero Section",
+  displayName: "Hero",
   description: "Hero",
   pageSetTypes: ["ENTITY"],
 };

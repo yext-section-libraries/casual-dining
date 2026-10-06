@@ -204,7 +204,7 @@ const CasualDiningBannerComponent: PuckComponent<CasualDiningBannerProps> = ({
  */
 export const CasualDiningBanner: YextComponentConfig<CasualDiningBannerProps> =
   {
-    label: msg("components.bannerSection", "Banner Section"),
+    label: msg("components.bannerLabel", "Banner"),
     fields: CasualDiningBannerFields,
     defaultProps: {
       data: {
@@ -231,7 +231,7 @@ export const CasualDiningBanner: YextComponentConfig<CasualDiningBannerProps> =
 
 export const config: SectionConfig = {
   id: "CasualDiningBanner",
-  displayName: "Banner Section",
+  displayName: "Banner",
   description: "Banner",
   pageSetTypes: ["ENTITY", "DIRECTORY", "LOCATOR"],
 };
