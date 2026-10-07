@@ -1,4 +1,5 @@
 import { FieldLabel, setDeep } from "@puckeditor/core";
+import { type MultiSelectorField } from "@yext/visual-editor";
 import { type MultiSelectorValue } from "@yext/visual-editor/section-library-support";
 import { YextAutoField } from "@yext/visual-editor/section-library-support";
 import { TranslatableString } from "@yext/visual-editor/section-library-support";
@@ -20,6 +21,8 @@ import {
   type YextCustomFieldRenderProps,
   YextComponentConfig,
   YextFields,
+  YextFieldMap,
+  YextTransformedProps,
 } from "@yext/visual-editor/section-library-support";
 import { ImageStylingFields } from "../contentBlocks/image/styling";
 import { getFacetFieldOptions } from "./Filters";
@@ -129,7 +132,79 @@ export interface LocatorProps {
   distanceDisplay?: DistanceDisplayOption;
 }
 
+const transformedFields = {
+  pageHeading: {
+    type: "object",
+    label: msg("fields.pageHeading", "Page Heading"),
+    objectFields: {
+      title: {
+        type: "translatableString",
+        transform: true,
+        label: msg("fields.title", "Title"),
+        filter: { types: ["type.string"] },
+      },
+      color: {
+        type: "basicSelector",
+        label: msg("fields.color", "Color"),
+        options: "SITE_COLOR",
+      },
+    },
+  },
+  filters: {
+    label: msg("fields.filters", "Filters"),
+    type: "object",
+    objectFields: {
+      openNowButton: {
+        label: msg("fields.options.includeOpenNow", "Include Open Now Button"),
+        type: "radio",
+        options: [
+          { label: msg("fields.options.yes", "Yes"), value: true },
+          { label: msg("fields.options.no", "No"), value: false },
+        ],
+      },
+      showDistanceOptions: {
+        label: msg(
+          "fields.options.showDistanceOptions",
+          "Include Distance Options",
+        ),
+        type: "radio",
+        options: [
+          { label: msg("fields.options.yes", "Yes"), value: true },
+          { label: msg("fields.options.no", "No"), value: false },
+        ],
+      },
+      accentColor: {
+        type: "basicSelector",
+        label: msg("fields.accentColor", "Accent Color"),
+        options: "SITE_COLOR",
+      },
+      facetFields: {
+        type: "multiSelector",
+        transform: true,
+        label: msg("fields.dynamicFilters", "Dynamic Filters"),
+        dropdownLabel: msg("fields.field", "Field"),
+        options: () => {
+          const entityTypeSourceMap = getLocatorEntityTypeSourceMap();
+          const entityTypes =
+            Object.keys(entityTypeSourceMap).filter(isLocatorEntityType);
+          return getFacetFieldOptions(entityTypes);
+        },
+        placeholderOptionLabel: msg(
+          "fields.options.selectAField",
+          "Select a field",
+        ),
+      } as MultiSelectorField<string> & { transform: true }, // TODO(SUMO-8378): remove cast when puck fixes objectFields typing
+    },
+  },
+} satisfies YextFieldMap<Pick<LocatorProps, "pageHeading" | "filters">>;
+
+export type LocatorRenderProps = YextTransformedProps<
+  LocatorProps,
+  typeof transformedFields
+>;
+
 const locatorFields: YextFields<LocatorProps> = {
+  ...transformedFields,
   mapStyle: {
     type: "basicSelector",
     label: msg("fields.mapStyle", "Map Style"),
@@ -283,51 +358,6 @@ const locatorFields: YextFields<LocatorProps> = {
       pinColor: backgroundColors.background6.value,
     },
   },
-  filters: {
-    label: msg("fields.filters", "Filters"),
-    type: "object",
-    objectFields: {
-      openNowButton: {
-        label: msg("fields.options.includeOpenNow", "Include Open Now Button"),
-        type: "radio",
-        options: [
-          { label: msg("fields.options.yes", "Yes"), value: true },
-          { label: msg("fields.options.no", "No"), value: false },
-        ],
-      },
-      showDistanceOptions: {
-        label: msg(
-          "fields.options.showDistanceOptions",
-          "Include Distance Options"
-        ),
-        type: "radio",
-        options: [
-          { label: msg("fields.options.yes", "Yes"), value: true },
-          { label: msg("fields.options.no", "No"), value: false },
-        ],
-      },
-      accentColor: {
-        type: "basicSelector",
-        label: msg("fields.accentColor", "Accent Color"),
-        options: "SITE_COLOR",
-      },
-      facetFields: {
-        type: "multiSelector",
-        label: msg("fields.dynamicFilters", "Dynamic Filters"),
-        dropdownLabel: msg("fields.field", "Field"),
-        options: () => {
-          const entityTypeSourceMap = getLocatorEntityTypeSourceMap();
-          const entityTypes =
-            Object.keys(entityTypeSourceMap).filter(isLocatorEntityType);
-          return getFacetFieldOptions(entityTypes);
-        },
-        placeholderOptionLabel: msg(
-          "fields.options.selectAField",
-          "Select a field"
-        ),
-      } as any, // TODO(SUMO-8378): remove 'as any' when puck fixes objectFields typing
-    },
-  },
   mapStartingLocation: {
     type: "object",
     label: msg("fields.options.mapStartingLocation", "Map Starting Location"),
@@ -339,22 +369,6 @@ const locatorFields: YextFields<LocatorProps> = {
       longitude: {
         label: msg("fields.longitude", "Longitude"),
         type: "text",
-      },
-    },
-  },
-  pageHeading: {
-    type: "object",
-    label: msg("fields.pageHeading", "Page Heading"),
-    objectFields: {
-      title: {
-        type: "translatableString",
-        label: msg("fields.title", "Title"),
-        filter: { types: ["type.string"] },
-      },
-      color: {
-        type: "basicSelector",
-        label: msg("fields.color", "Color"),
-        options: "SITE_COLOR",
       },
     },
   },
@@ -405,7 +419,10 @@ const locatorFields: YextFields<LocatorProps> = {
 /**
  * Available on Locator templates.
  */
-export const LocatorComponent: YextComponentConfig<LocatorProps> = {
+export const LocatorComponent: YextComponentConfig<
+  LocatorProps,
+  typeof transformedFields
+> = {
   fields: locatorFields,
   /**
    * Locks array lengths for `locationStyles` and `resultCard` to the current
@@ -417,7 +434,7 @@ export const LocatorComponent: YextComponentConfig<LocatorProps> = {
       ? getLocatorEntityTypeSourceMap(entityDocument)
       : { [DEFAULT_ENTITY_TYPE]: undefined };
     const entityTypes = Object.keys(
-      entityTypeSourceMap
+      entityTypeSourceMap,
     ) as (keyof typeof entityTypeSourceMap)[];
     const entityTypeCount = entityTypes.length;
 
@@ -425,12 +442,12 @@ export const LocatorComponent: YextComponentConfig<LocatorProps> = {
     updatedFields = setDeep(
       updatedFields,
       "locationStyles.min",
-      entityTypeCount
+      entityTypeCount,
     );
     updatedFields = setDeep(
       updatedFields,
       "locationStyles.max",
-      entityTypeCount
+      entityTypeCount,
     );
     updatedFields = setDeep(updatedFields, "resultCard.min", entityTypeCount);
     updatedFields = setDeep(updatedFields, "resultCard.max", entityTypeCount);
@@ -462,7 +479,7 @@ export const LocatorComponent: YextComponentConfig<LocatorProps> = {
       ? getLocatorEntityTypeSourceMap(entityDocument)
       : { [DEFAULT_ENTITY_TYPE]: undefined };
     const entityTypes = Object.keys(
-      entityTypeSourceMap
+      entityTypeSourceMap,
     ) as (keyof typeof entityTypeSourceMap)[];
 
     const previousLocationStyles = data.props.locationStyles ?? [];
@@ -470,25 +487,25 @@ export const LocatorComponent: YextComponentConfig<LocatorProps> = {
     const hasSameEntityTypes = (currentEntityTypes: string[]) =>
       currentEntityTypes.length === entityTypes.length &&
       entityTypes.every((entityType) =>
-        currentEntityTypes.includes(entityType)
+        currentEntityTypes.includes(entityType),
       );
 
     const locationStylesByEntityType = new globalThis.Map(
       previousLocationStyles
         .filter((item) => !!item.entityType)
-        .map((item) => [item.entityType, item] as const)
+        .map((item) => [item.entityType, item] as const),
     );
     const resultCardsByEntityType = new globalThis.Map(
       previousResultCard
         .filter((item) => !!item?.props?.entityType)
-        .map((item) => [item.props.entityType, item] as const)
+        .map((item) => [item.props.entityType, item] as const),
     );
 
     const previousLocationStyleEntityTypes = previousLocationStyles.map(
-      (item) => item.entityType
+      (item) => item.entityType,
     );
     const previousResultCardEntityTypes = previousResultCard.map(
-      (item) => item.props?.entityType
+      (item) => item.props?.entityType,
     );
 
     const shouldReconcileLocationStyles =

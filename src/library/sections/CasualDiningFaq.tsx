@@ -1,16 +1,12 @@
 import "../shared/typography.css";
-import { StyledTextComponent } from "../shared/typography";
-import type { SectionConfig } from "@yext/visual-editor";
-import { msg } from "@yext/visual-editor";
-
-import * as React from "react";
-import { AnalyticsScopeProvider } from "@yext/pages-components";
+import { createTextConfig, TransformedText } from "../shared/transformedText";
 import {
+  type YextFieldMap,
+  type YextTransformedProps,
+  type SectionConfig,
+  msg,
   Background,
   createItemSource,
-  createStyledTextConfig,
-  EntityField,
-  getDefaultRTF,
   getSurfaceColorStyle,
   getAnalyticsScopeHash,
   useDocument,
@@ -22,8 +18,11 @@ import {
   type TranslatableString,
   type YextComponentConfig,
   type YextEntityField,
-  type YextFields,
 } from "@yext/visual-editor";
+
+import React from "react";
+import { AnalyticsScopeProvider } from "@yext/pages-components";
+
 import { PuckComponent } from "@puckeditor/core";
 import {
   CapturedStyleRoot,
@@ -326,25 +325,13 @@ type CasualDiningFaqProps = {
   faqs: FaqCollection;
 };
 
-const headingConfig = createStyledTextConfig({
-  kind: "plain",
-  label: msg("fields.heading", "Heading"),
-  includeColor: true,
-});
+const headingConfig = createTextConfig("plain");
 
-const questionConfig = createStyledTextConfig({
-  kind: "plain",
-  label: msg("fields.question", "Question"),
-  includeColor: true,
-});
+const questionConfig = createTextConfig("plain");
 
-const answerConfig = createStyledTextConfig({
-  kind: "richText",
-  label: msg("fields.answer", "Answer"),
-  includeColor: true,
-});
+const answerConfig = createTextConfig("richText");
 
-const fields: YextFields<CasualDiningFaqProps> = {
+const fields = {
   section: {
     label: msg("fields.section", "Section"),
     type: "object",
@@ -373,7 +360,7 @@ const fields: YextFields<CasualDiningFaqProps> = {
     label: msg("fields.faqItems", "FAQ Items"),
     type: "object",
     objectFields: {
-      data: faqItemsSource.field,
+      data: { ...faqItemsSource.field, transform: true },
       styles: {
         label: msg("fields.sharedStyles", "Shared Styles"),
         type: "object",
@@ -396,19 +383,15 @@ const fields: YextFields<CasualDiningFaqProps> = {
       },
     },
   },
-};
+} satisfies YextFieldMap<CasualDiningFaqProps>;
 
-const CasualDiningFaqComponent: PuckComponent<CasualDiningFaqProps> = (
-  props,
-) => {
+const CasualDiningFaqComponent: PuckComponent<
+  YextTransformedProps<CasualDiningFaqProps, typeof fields>
+> = (props) => {
   const streamDocument = useDocument<any>();
   const [openIndex, setOpenIndex] = React.useState(0);
   const sectionSurfaceStyle = getSurfaceColorStyle(
     props.section.backgroundColor,
-    streamDocument,
-  );
-  const resolvedFaqItems = faqItemsSource.resolveItems(
-    props.faqs.data,
     streamDocument,
   );
 
@@ -431,77 +414,47 @@ const CasualDiningFaqComponent: PuckComponent<CasualDiningFaqProps> = (
             <div className="wrapper">
               <div className="faq-shell__intro">
                 <div className="heading-small">
-                  <EntityField
-                    displayName="Heading"
-                    fieldId={props.heading.data.text.field}
-                    constantValueEnabled={
-                      props.heading.data.text.constantValueEnabled
-                    }
-                  >
-                    <StyledTextComponent
-                      kind="plain"
-                      {...props.heading}
-                      tag="h2"
-                    />
-                  </EntityField>
+                  <TransformedText kind="plain" {...props.heading} tag="h2" />
                 </div>
               </div>
-              <EntityField
-                displayName="FAQ Items"
-                fieldId={props.faqs.data.field}
-                constantValueEnabled={props.faqs.data.constantValueEnabled}
-              >
-                <div className="accordion-group__items">
-                  {resolvedFaqItems.map((item, index) => {
-                    return (
-                      <details
-                        key={index}
-                        className="accordion"
-                        open={index === openIndex}
-                        onToggle={(event) => {
-                          if (
-                            (event.currentTarget as HTMLDetailsElement).open
-                          ) {
-                            setOpenIndex(index);
-                          }
-                        }}
-                      >
-                        <summary className="accordion__title h4">
-                          <StyledTextComponent
-                            kind="plain"
-                            {...props.faqs.styles.question}
-                            data={{
-                              text: {
-                                field: "",
-                                constantValue: item.question ?? "",
-                                constantValueEnabled: true,
-                              },
-                            }}
-                            tag="span"
-                          />
-                          <span
-                            className="accordion__icon"
-                            aria-hidden="true"
-                          />
-                        </summary>
-                        <div className="accordion__content">
-                          <StyledTextComponent
-                            kind="richText"
-                            {...props.faqs.styles.answer}
-                            data={{
-                              text: {
-                                field: "",
-                                constantValue: item.answer ?? getDefaultRTF(""),
-                                constantValueEnabled: true,
-                              },
-                            }}
-                          />
-                        </div>
-                      </details>
-                    );
-                  })}
-                </div>
-              </EntityField>
+              <div className="accordion-group__items">
+                {props.faqs.data.map((item, index) => {
+                  return (
+                    <details
+                      key={index}
+                      className="accordion"
+                      open={index === openIndex}
+                      onToggle={(event) => {
+                        if (
+                          (event.currentTarget as HTMLDetailsElement).open
+                        ) {
+                          setOpenIndex(index);
+                        }
+                      }}
+                    >
+                      <summary className="accordion__title h4">
+                        <TransformedText
+                          kind="plain"
+                          {...props.faqs.styles.question}
+                          data={{ text: item.question }}
+                          tag="span"
+                        />
+                        <span
+                          className="accordion__icon"
+                          aria-hidden="true"
+                        />
+                      </summary>
+                      <div className="accordion__content">
+                        <TransformedText
+                          kind="richText"
+                          {...props.faqs.styles.answer}
+                          data={{ text: item.answer }}
+                        />
+                      </div>
+                    </details>
+                  );
+                })}
+              </div>
             </div>
           </Background>
         </CapturedStyleRoot>
@@ -510,7 +463,10 @@ const CasualDiningFaqComponent: PuckComponent<CasualDiningFaqProps> = (
   );
 };
 
-export const CasualDiningFaq: YextComponentConfig<CasualDiningFaqProps> = {
+export const CasualDiningFaq: YextComponentConfig<
+  CasualDiningFaqProps,
+  typeof fields
+> = {
   label: msg("components.faqLabel", "FAQ"),
   fields,
   defaultProps: {

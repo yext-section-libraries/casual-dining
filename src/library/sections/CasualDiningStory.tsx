@@ -1,19 +1,15 @@
 import "../shared/typography.css";
-import { StyledTextComponent } from "../shared/typography";
-import type { SectionConfig } from "@yext/visual-editor";
-import { msg } from "@yext/visual-editor";
-
-import * as React from "react";
-import { AnalyticsScopeProvider } from "@yext/pages-components";
-import { YextFields } from "@yext/visual-editor";
+import type { ImageType, ComplexImageType } from "@yext/pages-components";
 import {
+  type TranslatableAssetImage,
+  type YextFieldMap,
+  type YextTransformedProps,
+  type SectionConfig,
+  msg,
   Background,
-  createStyledTextConfig,
-  EntityField,
   Image,
   getSurfaceColorStyle,
   getAnalyticsScopeHash,
-  resolveComponentData,
   useDocument,
   VisibilityWrapper,
   type StyledImageValue,
@@ -23,14 +19,19 @@ import {
   type YextComponentConfig,
   type YextEntityField,
 } from "@yext/visual-editor";
+import { createTextConfig, TransformedText } from "../shared/transformedText";
+
+import React from "react";
+import { AnalyticsScopeProvider } from "@yext/pages-components";
+
 import { PuckComponent } from "@puckeditor/core";
 import {
   aspectRatioOptions,
   CapturedStyleRoot,
+  hasImageSource,
   createRtfField,
   createTextField,
 } from "../shared/sectionHelpers";
-import { useTranslation } from "react-i18next";
 
 const capturedStyles = String.raw`:root {
 --content-max: 1440px;
@@ -320,7 +321,9 @@ type CasualDiningStoryProps = {
   eyebrow: StyledPlainTextProps;
   heading: StyledPlainTextProps;
   sectionImage: {
-    image: YextEntityField<any>;
+    image: YextEntityField<
+      ImageType | ComplexImageType | TranslatableAssetImage
+    >;
     aspectRatio: number;
     imageConstrain: "fixed" | "filled";
     styles?: StyledImageValue;
@@ -328,25 +331,13 @@ type CasualDiningStoryProps = {
   content: StyledRichTextProps;
 };
 
-const eyebrowConfig = createStyledTextConfig({
-  kind: "plain",
-  label: msg("fields.eyebrow", "Eyebrow"),
-  includeColor: true,
-});
+const eyebrowConfig = createTextConfig("plain");
 
-const headingConfig = createStyledTextConfig({
-  kind: "plain",
-  label: msg("fields.heading", "Heading"),
-  includeColor: true,
-});
+const headingConfig = createTextConfig("plain");
 
-const contentConfig = createStyledTextConfig({
-  kind: "richText",
-  label: msg("fields.storyContent", "Story Content"),
-  includeColor: true,
-});
+const contentConfig = createTextConfig("richText");
 
-const fields: YextFields<CasualDiningStoryProps> = {
+const fields = {
   section: {
     label: msg("fields.section", "Section"),
     type: "object",
@@ -382,6 +373,7 @@ const fields: YextFields<CasualDiningStoryProps> = {
     objectFields: {
       image: {
         type: "entityField",
+        transform: true,
         label: msg("fields.image", "Image"),
         filter: {
           types: ["type.image"],
@@ -411,7 +403,7 @@ const fields: YextFields<CasualDiningStoryProps> = {
     type: "object",
     objectFields: contentConfig.fields!,
   },
-};
+} satisfies YextFieldMap<CasualDiningStoryProps>;
 
 const defaultContent: StyledRichTextProps = {
   ...contentConfig.defaultProps!,
@@ -422,26 +414,15 @@ const defaultContent: StyledRichTextProps = {
   },
 };
 
-const CasualDiningStoryComponent: PuckComponent<CasualDiningStoryProps> = (
-  props,
-) => {
+const CasualDiningStoryComponent: PuckComponent<
+  YextTransformedProps<CasualDiningStoryProps, typeof fields>
+> = (props) => {
   const streamDocument = useDocument();
-  const { i18n } = useTranslation();
-  const locale = i18n.language;
   const sectionImageStyles = props.sectionImage?.styles ?? {
     borderRadius: "default",
   };
-  const resolvedImage = resolveComponentData(
-    props.sectionImage?.image,
-    locale,
-    streamDocument,
-  ) as { url?: string } | undefined;
-  const hasImage = Boolean(
-    resolvedImage &&
-    typeof resolvedImage === "object" &&
-    "url" in resolvedImage &&
-    resolvedImage.url,
-  );
+  const image = props.sectionImage?.image;
+  const hasImage = hasImageSource(image);
   const sectionImageWrapperStyle: React.CSSProperties = {
     aspectRatio:
       props.sectionImage.aspectRatio > 0
@@ -495,22 +476,13 @@ const CasualDiningStoryComponent: PuckComponent<CasualDiningStoryProps> = (
               {hasImage ? (
                 <div className="brick__block brick__block--images">
                   <div className="brick__block__image">
-                    <EntityField
-                      displayName="Section Image"
-                      fieldId={props.sectionImage.image.field}
-                      constantValueEnabled={
-                        props.sectionImage.image.constantValueEnabled
-                      }
-                      fullHeight
-                    >
-                      <div style={sectionImageWrapperStyle}>
-                        <Image
-                          image={resolvedImage as any}
-                          className="section-image"
-                          style={sectionImageStyle}
-                        />
-                      </div>
-                    </EntityField>
+                    <div style={sectionImageWrapperStyle}>
+                      <Image
+                        image={image}
+                        className="section-image"
+                        style={sectionImageStyle}
+                      />
+                    </div>
                   </div>
                 </div>
               ) : null}
@@ -520,48 +492,21 @@ const CasualDiningStoryComponent: PuckComponent<CasualDiningStoryProps> = (
                 <div className="brick__block__text">
                   <div className="hero__content hero__content--compact hero__content--no-padding">
                     <div className="hero__subheading block-padding">
-                      <EntityField
-                        displayName="Eyebrow"
-                        fieldId={props.eyebrow.data.text.field}
-                        constantValueEnabled={
-                          props.eyebrow.data.text.constantValueEnabled
-                        }
-                      >
-                        <StyledTextComponent
-                          kind="plain"
-                          {...props.eyebrow}
-                          tag="p"
-                        />
-                      </EntityField>
+                      <TransformedText
+                        kind="plain"
+                        {...props.eyebrow}
+                        tag="p"
+                      />
                     </div>
                     <div className="story__title block-padding">
-                      <EntityField
-                        displayName="Heading"
-                        fieldId={props.heading.data.text.field}
-                        constantValueEnabled={
-                          props.heading.data.text.constantValueEnabled
-                        }
-                      >
-                        <StyledTextComponent
-                          kind="plain"
-                          {...props.heading}
-                          tag="h2"
-                        />
-                      </EntityField>
+                      <TransformedText
+                        kind="plain"
+                        {...props.heading}
+                        tag="h2"
+                      />
                     </div>
                     <div className="hero__rte body-medium block-padding">
-                      <EntityField
-                        displayName="Story Content"
-                        fieldId={props.content.data.text.field}
-                        constantValueEnabled={
-                          props.content.data.text.constantValueEnabled
-                        }
-                      >
-                        <StyledTextComponent
-                          kind="richText"
-                          {...props.content}
-                        />
-                      </EntityField>
+                      <TransformedText kind="richText" {...props.content} />
                     </div>
                   </div>
                 </div>
@@ -574,7 +519,10 @@ const CasualDiningStoryComponent: PuckComponent<CasualDiningStoryProps> = (
   );
 };
 
-export const CasualDiningStory: YextComponentConfig<CasualDiningStoryProps> = {
+export const CasualDiningStory: YextComponentConfig<
+  CasualDiningStoryProps,
+  typeof fields
+> = {
   label: msg("components.storyLabel", "Story"),
   fields,
   defaultProps: {

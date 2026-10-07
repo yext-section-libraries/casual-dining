@@ -37,7 +37,7 @@ export const resolveBodyStyles = (
   return { ...resolved, ...variables };
 };
 
-const resolveRichTextStyles = (
+export const resolveRichTextStyles = (
   styles?: Partial<StyledTextValue>,
 ): React.CSSProperties => {
   const resolved = resolveTextStyles(styles);

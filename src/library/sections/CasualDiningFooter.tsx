@@ -1,20 +1,17 @@
 import "../shared/typography.css";
-import { StyledTextComponent } from "../shared/typography";
-import type { SectionConfig } from "@yext/visual-editor";
-import { msg } from "@yext/visual-editor";
-
-import * as React from "react";
-import { AnalyticsScopeProvider } from "@yext/pages-components";
+import type { PuckComponent } from "@puckeditor/core";
+import { createTextConfig, TransformedText } from "../shared/transformedText";
 import {
+  type YextFieldMap,
+  type YextTransformedProps,
+  type SectionConfig,
+  msg,
   Background,
   ComprehensiveCTA,
   type ComprehensiveCTAValue,
-  createStyledTextConfig,
-  EntityField,
   Image,
   getAnalyticsScopeHash,
   getSurfaceColorStyle,
-  resolveComponentData,
   useDocument,
   VisibilityWrapper,
   type StyledImageValue,
@@ -25,64 +22,16 @@ import {
   type TranslatableString,
   type YextEntityField,
   type YextComponentConfig,
-  type YextFields,
 } from "@yext/visual-editor";
+
+import React from "react";
+import { AnalyticsScopeProvider } from "@yext/pages-components";
+
 import {
   aspectRatioOptions,
   CapturedStyleRoot,
+  hasImageSource,
 } from "../shared/sectionHelpers";
-import { useTranslation } from "react-i18next";
-
-export type HoursIntervalData = {
-  start?: string;
-  end?: string;
-};
-
-export type HoursDayData = {
-  isClosed?: boolean;
-  openIntervals?: HoursIntervalData[];
-};
-
-export type HoursData = Record<string, string | HoursDayData | undefined>;
-
-export type ImageConstantValue = {
-  url?: string;
-  width?: number;
-  height?: number;
-  alternateText?: string;
-};
-
-export type ImageFieldValue = {
-  field?: string;
-  constantValue?: ImageConstantValue;
-  constantValueEnabled?: boolean;
-};
-
-export type AddressFieldSet = {
-  source: "entity" | "custom";
-  subheading?: string;
-  subheadingFontColor?: ThemeColor;
-  customLine1: string;
-  customLine2: string;
-  customCity: string;
-  customState: string;
-  customZipCode: string;
-  contentFontColor?: ThemeColor;
-};
-
-export type LocationAddressField = {
-  source: "entity" | "custom";
-  entityLine1: unknown;
-  entityLine2: unknown;
-  entityCity: unknown;
-  entityState: unknown;
-  entityZipCode: unknown;
-  customLine1: string;
-  customLine2: string;
-  customCity: string;
-  customState: string;
-  customZipCode: string;
-};
 
 const capturedStyles = String.raw`:root {
 --content-max: 1440px;
@@ -356,17 +305,9 @@ margin-left: auto;
 }
 }`;
 
-const brandTextConfig = createStyledTextConfig({
-  kind: "plain",
-  label: msg("fields.text", "Text"),
-  includeColor: true,
-});
+const brandTextConfig = createTextConfig("plain");
 
-const descriptionConfig = createStyledTextConfig({
-  kind: "richText",
-  label: msg("fields.description", "Description"),
-  includeColor: true,
-});
+const descriptionConfig = createTextConfig("richText");
 
 type FooterImageField = {
   image: YextEntityField<TranslatableAssetImage>;
@@ -510,7 +451,7 @@ const createFooterLinkItems = (links: Array<{ label: string; href: string }>) =>
     }),
   );
 
-const fields: YextFields<CasualDiningFooterProps> = {
+const fields = {
   section: {
     label: msg("fields.section", "Section"),
     type: "object",
@@ -550,6 +491,7 @@ const fields: YextFields<CasualDiningFooterProps> = {
         objectFields: {
           image: {
             type: "entityField",
+            transform: true,
             label: msg("fields.image", "Image"),
             filter: {
               types: ["type.image"],
@@ -595,6 +537,7 @@ const fields: YextFields<CasualDiningFooterProps> = {
           label: {
             label: msg("fields.label", "Label"),
             type: "entityField",
+            transform: true,
             filter: {
               types: ["type.string"],
             },
@@ -602,6 +545,7 @@ const fields: YextFields<CasualDiningFooterProps> = {
           href: {
             label: msg("fields.link", "Link"),
             type: "entityField",
+            transform: true,
             filter: {
               types: ["type.string"],
             },
@@ -609,6 +553,7 @@ const fields: YextFields<CasualDiningFooterProps> = {
           icon: {
             label: msg("fields.icon", "Icon"),
             type: "entityField",
+            transform: true,
             filter: {
               types: ["type.image"],
             },
@@ -656,6 +601,7 @@ const fields: YextFields<CasualDiningFooterProps> = {
       cta: {
         label: msg("fields.cta", "CTA"),
         type: "comprehensiveCTA",
+        transform: true,
       },
     },
     defaultItemProps: {
@@ -705,6 +651,7 @@ const fields: YextFields<CasualDiningFooterProps> = {
           label: {
             label: msg("fields.columnLabel", "Column Label"),
             type: "entityField",
+            transform: true,
             filter: {
               types: ["type.string"],
             },
@@ -740,6 +687,7 @@ const fields: YextFields<CasualDiningFooterProps> = {
                   text: {
                     label: msg("fields.text", "Text"),
                     type: "entityField",
+                    transform: true,
                     filter: {
                       types: ["type.string"],
                     },
@@ -747,6 +695,7 @@ const fields: YextFields<CasualDiningFooterProps> = {
                   href: {
                     label: msg("fields.link", "Link"),
                     type: "entityField",
+                    transform: true,
                     filter: {
                       types: ["type.string"],
                     },
@@ -796,6 +745,7 @@ const fields: YextFields<CasualDiningFooterProps> = {
           text: {
             label: msg("fields.text", "Text"),
             type: "entityField",
+            transform: true,
             filter: {
               types: ["type.string"],
             },
@@ -803,6 +753,7 @@ const fields: YextFields<CasualDiningFooterProps> = {
           href: {
             label: msg("fields.link", "Link"),
             type: "entityField",
+            transform: true,
             filter: {
               types: ["type.string"],
             },
@@ -813,7 +764,7 @@ const fields: YextFields<CasualDiningFooterProps> = {
     getItemSummary: (_row: FooterBottomLinkRow | undefined, index?: number) =>
       `Footer Link ${(index ?? 0) + 1}`,
   },
-};
+} satisfies YextFieldMap<CasualDiningFooterProps>;
 
 const defaultProps: CasualDiningFooterProps = {
   section: {
@@ -976,28 +927,13 @@ const defaultProps: CasualDiningFooterProps = {
   })) satisfies Array<FooterBottomLinkRow>,
 };
 
-const CasualDiningFooterComponent = (props: CasualDiningFooterProps) => {
+const CasualDiningFooterComponent: PuckComponent<
+  YextTransformedProps<CasualDiningFooterProps, typeof fields>
+> = (props) => {
   const streamDocument = useDocument();
-  const { i18n } = useTranslation();
-  const locale = i18n.language;
   const isEditing = Boolean(props.puck?.isEditing);
-  const socialLinks =
-    Array.isArray(props.socialLinks) && props.socialLinks.length > 0
-      ? props.socialLinks
-      : defaultProps.socialLinks;
-  const brandImageStyles = props.brand?.image?.styles ?? {
-    borderRadius: "default",
-  };
-  const resolvedBrandImage = resolveComponentData(
-    props.brand?.image?.image,
-    locale,
-    streamDocument,
-  );
-  const brandImageUrl = props.brand?.image?.image?.constantValue?.url;
-  const footerColumns = Array.isArray(props.footerLinks?.columns)
-    ? props.footerLinks.columns
-    : defaultProps.footerLinks.columns;
-  const legalLinks = props.legalLinks ?? defaultProps.legalLinks;
+  const brandImageStyles = props.brand.image.styles;
+  const brandImage = props.brand.image.image;
   const sectionSurfaceStyle = getSurfaceColorStyle(
     props.section?.backgroundColor,
     streamDocument,
@@ -1035,169 +971,83 @@ const CasualDiningFooterComponent = (props: CasualDiningFooterProps) => {
               <div className="site-footer wrapper--full-padded">
                 <div className="footer__blocks">
                   <div className="footer__block footer__block--text">
-                    {brandImageUrl ? (
+                    {hasImageSource(brandImage) ? (
                       <div className="footer__block__title">
-                        <EntityField
-                          displayName="Brand Image"
-                          fieldId={props.brand.image.image.field}
-                          constantValueEnabled={
-                            props.brand.image.image.constantValueEnabled
-                          }
-                        >
-                          <Image
-                            image={resolvedBrandImage!}
-                            style={{
-                              display: "block",
-                              margin: "0 auto",
-                              width: "auto",
-                              maxHeight: 100,
-                              height:
-                                props.brand?.image?.aspectRatio > 0
-                                  ? "100%"
-                                  : "auto",
-                              objectFit:
-                                props.brand?.image?.imageConstrain === "filled"
-                                  ? "cover"
-                                  : "contain",
-                              borderRadius:
-                                brandImageStyles.borderRadius === "default"
-                                  ? undefined
-                                  : brandImageStyles.borderRadius,
-                            }}
-                          />
-                        </EntityField>
+                        <Image
+                          image={brandImage!}
+                          style={{
+                            display: "block",
+                            margin: "0 auto",
+                            width: "auto",
+                            maxHeight: 100,
+                            height:
+                              props.brand?.image?.aspectRatio > 0
+                                ? "100%"
+                                : "auto",
+                            objectFit:
+                              props.brand?.image?.imageConstrain === "filled"
+                                ? "cover"
+                                : "contain",
+                            borderRadius:
+                              brandImageStyles.borderRadius === "default"
+                                ? undefined
+                                : brandImageStyles.borderRadius,
+                          }}
+                        />
                       </div>
                     ) : null}
                     <div className="h3 footer__block__title heading-x-small">
-                      <EntityField
-                        displayName="Brand Text"
-                        fieldId={props.brand.text.data.text.field}
-                        constantValueEnabled={
-                          props.brand.text.data.text.constantValueEnabled
-                        }
-                      >
-                        <StyledTextComponent
-                          kind="plain"
-                          {...props.brand.text}
-                          tag="h3"
-                        />
-                      </EntityField>
+                      <TransformedText
+                        kind="plain"
+                        {...props.brand.text}
+                        tag="h3"
+                      />
                     </div>
                     <div className="footer__block__content">
                       <div className="rte">
-                        <EntityField
-                          displayName="Description"
-                          fieldId={props.description.data.text.field}
-                          constantValueEnabled={
-                            props.description.data.text.constantValueEnabled
-                          }
-                        >
-                          <StyledTextComponent
-                            kind="richText"
-                            {...props.description}
-                          />
-                        </EntityField>
+                        <TransformedText
+                          kind="richText"
+                          {...props.description}
+                        />
                       </div>
                       <div className="footer__socials">
-                        {socialLinks.map((row, index: number) => {
+                        {props.socialLinks.map((row, index: number) => {
                           const item = row?.item;
                           if (!item) {
                             return null;
                           }
-                          const href = resolveComponentData(
-                            item.href,
-                            locale,
-                            streamDocument,
-                          );
-                          const label = resolveComponentData(
-                            item.label,
-                            locale,
-                            streamDocument,
-                          );
-                          const icon = resolveComponentData(
-                            item.icon,
-                            locale,
-                            streamDocument,
-                          );
-                          const resolvedLabel =
-                            typeof label === "string"
-                              ? label
-                              : `social-${index}`;
-                          const hasIcon =
-                            !!icon &&
-                            typeof icon === "object" &&
-                            ("url" in icon ||
-                              ("image" in icon &&
-                                !!icon.image &&
-                                typeof icon.image === "object" &&
-                                "url" in icon.image));
-                          const iconUrl =
-                            hasIcon && icon && typeof icon === "object"
-                              ? "url" in icon
-                                ? icon.url
-                                : "image" in icon &&
-                                    icon.image &&
-                                    typeof icon.image === "object" &&
-                                    "url" in icon.image
-                                  ? icon.image.url
-                                  : undefined
-                              : undefined;
+                          const label = item.label ?? `social-${index}`;
+                          const iconUrl = item.icon?.url;
                           return (
-                            <EntityField
+                            <a
                               key={`social-${index}`}
-                              displayName="Social Link Destination"
-                              fieldId={item.href.field}
-                              constantValueEnabled={
-                                item.href.constantValueEnabled
-                              }
+                              href={item.href}
+                              aria-label={label}
+                              style={{ color: sectionTextColor }}
                             >
-                              <a
-                                href={
-                                  typeof href === "string" ? href : undefined
-                                }
-                                aria-label={resolvedLabel}
-                                style={{ color: sectionTextColor }}
-                              >
-                                {hasIcon && typeof iconUrl === "string" ? (
-                                  <EntityField
-                                    displayName="Social Icon"
-                                    fieldId={item.icon.field}
-                                    constantValueEnabled={
-                                      item.icon.constantValueEnabled
-                                    }
-                                  >
-                                    <span
-                                      aria-hidden="true"
-                                      className="footer__social-icon"
-                                      style={{
-                                        display: "block",
-                                        width: 20,
-                                        height: 20,
-                                        backgroundColor: "currentColor",
-                                        WebkitMaskImage: `url(${iconUrl})`,
-                                        maskImage: `url(${iconUrl})`,
-                                        WebkitMaskRepeat: "no-repeat",
-                                        maskRepeat: "no-repeat",
-                                        WebkitMaskPosition: "center",
-                                        maskPosition: "center",
-                                        WebkitMaskSize: "contain",
-                                        maskSize: "contain",
-                                      }}
-                                    />
-                                  </EntityField>
-                                ) : (
-                                  <EntityField
-                                    displayName="Social Label"
-                                    fieldId={item.label.field}
-                                    constantValueEnabled={
-                                      item.label.constantValueEnabled
-                                    }
-                                  >
-                                    <span>{resolvedLabel}</span>
-                                  </EntityField>
-                                )}
-                              </a>
-                            </EntityField>
+                              {iconUrl ? (
+                                <span
+                                  aria-hidden="true"
+                                  className="footer__social-icon"
+                                  style={{
+                                    display: "block",
+                                    width: 20,
+                                    height: 20,
+                                    backgroundColor: "currentColor",
+                                    WebkitMaskImage: `url(${iconUrl})`,
+                                    maskImage: `url(${iconUrl})`,
+                                    WebkitMaskRepeat: "no-repeat",
+                                    maskRepeat: "no-repeat",
+                                    WebkitMaskPosition: "center",
+                                    maskPosition: "center",
+                                    WebkitMaskSize: "contain",
+                                    maskSize: "contain",
+                                  }}
+                                />
+                              ) : (
+                                <span>{label}</span>
+                              )}
+                            </a>
                           );
                         })}
                       </div>
@@ -1207,114 +1057,42 @@ const CasualDiningFooterComponent = (props: CasualDiningFooterProps) => {
                   <div className="footer__block footer__block--divider footer__block--divider--inline" />
 
                   <div className="footer__menus">
-                    {footerColumns.map((row, columnIndex: number) => {
-                      const column =
-                        row && typeof row === "object"
-                          ? row
-                          : defaultProps.footerLinks.columns[columnIndex];
-                      if (!column) {
-                        return null;
-                      }
-                      const links = Array.isArray(column.links)
-                        ? column.links
-                        : [];
-                      const resolvedColumnLabel = column?.label
-                        ? resolveComponentData(
-                            column.label as any,
-                            locale,
-                            streamDocument,
-                          )
-                        : undefined;
+                    {props.footerLinks.columns.map((column, columnIndex) => {
                       const columnLabel =
-                        typeof resolvedColumnLabel === "string"
-                          ? resolvedColumnLabel
-                          : `Column ${columnIndex + 1}`;
+                        column.label ?? `Column ${columnIndex + 1}`;
 
                       return (
                         <div
                           className="footer__block footer__block--menu"
                           key={columnLabel}
                         >
-                          {column.label ? (
-                            <EntityField
-                              displayName="Footer Column Heading"
-                              fieldId={column.label.field}
-                              constantValueEnabled={
-                                column.label.constantValueEnabled
-                              }
-                            >
-                              <h3
-                                className="h3 footer__block__title heading-x-small"
-                                style={{ color: sectionTextColor }}
-                              >
-                                {columnLabel}
-                              </h3>
-                            </EntityField>
-                          ) : (
-                            <h3
-                              className="h3 footer__block__title heading-x-small"
-                              style={{ color: sectionTextColor }}
-                            >
-                              {columnLabel}
-                            </h3>
-                          )}
+                          <h3
+                            className="h3 footer__block__title heading-x-small"
+                            style={{ color: sectionTextColor }}
+                          >
+                            {columnLabel}
+                          </h3>
                           <div className="footer__block__content">
                             <ul className="footer__quicklinks unstyled">
-                              {links.map((linkRow, linkIndex) => {
-                                const fallbackColumn =
-                                  defaultProps.footerLinks.columns[columnIndex];
-                                const item =
-                                  (linkRow && typeof linkRow === "object"
-                                    ? linkRow.item
-                                    : undefined) ??
-                                  fallbackColumn?.links?.[linkIndex]?.item;
-                                if (!item) {
-                                  return null;
-                                }
-                                const resolvedHref = resolveComponentData(
-                                  item.href,
-                                  locale,
-                                  streamDocument,
-                                );
-                                const resolvedText = resolveComponentData(
-                                  item.text,
-                                  locale,
-                                  streamDocument,
-                                );
+                              {(column.links ?? []).map(
+                                (linkRow, linkIndex) => {
+                                  const item = linkRow.item;
+                                  if (!item) {
+                                    return null;
+                                  }
 
-                                return (
-                                  <li key={`${columnLabel}-${linkIndex}`}>
-                                    <EntityField
-                                      displayName="Footer Link Destination"
-                                      fieldId={item.href.field}
-                                      constantValueEnabled={
-                                        item.href.constantValueEnabled
-                                      }
-                                    >
-                                      <EntityField
-                                        displayName="Footer Link Text"
-                                        fieldId={item.text.field}
-                                        constantValueEnabled={
-                                          item.text.constantValueEnabled
-                                        }
+                                  return (
+                                    <li key={`${columnLabel}-${linkIndex}`}>
+                                      <a
+                                        href={item.href}
+                                        style={{ color: sectionTextColor }}
                                       >
-                                        <a
-                                          href={
-                                            typeof resolvedHref === "string"
-                                              ? resolvedHref
-                                              : undefined
-                                          }
-                                          style={{ color: sectionTextColor }}
-                                        >
-                                          {typeof resolvedText === "string"
-                                            ? resolvedText
-                                            : null}
-                                        </a>
-                                      </EntityField>
-                                    </EntityField>
-                                  </li>
-                                );
-                              })}
+                                        {item.text}
+                                      </a>
+                                    </li>
+                                  );
+                                },
+                              )}
                             </ul>
                           </div>
                         </div>
@@ -1332,47 +1110,19 @@ const CasualDiningFooterComponent = (props: CasualDiningFooterProps) => {
               <div className="supporting-menu__inner wrapper--full-padded">
                 <div className="supporting-menu__item supporting-menu__item--copyright">
                   <ul className="supporting-menu__copyright inline-list body-small">
-                    {legalLinks.map((row, index: number) => {
-                      const item = row?.item ?? legalLinks[index]?.item;
+                    {props.legalLinks.map((row, index) => {
+                      const item = row?.item;
                       if (!item) {
                         return null;
                       }
-                      const href = resolveComponentData(
-                        item.href,
-                        locale,
-                        streamDocument,
-                      );
-                      const text = resolveComponentData(
-                        item.text,
-                        locale,
-                        streamDocument,
-                      );
                       return (
                         <li key={`legal-${index}`}>
-                          <EntityField
-                            displayName="Legal Link Destination"
-                            fieldId={item.href.field}
-                            constantValueEnabled={
-                              item.href.constantValueEnabled
-                            }
+                          <a
+                            href={item.href}
+                            style={{ color: footerBottomTextColor }}
                           >
-                            <EntityField
-                              displayName="Legal Link Text"
-                              fieldId={item.text.field}
-                              constantValueEnabled={
-                                item.text.constantValueEnabled
-                              }
-                            >
-                              <a
-                                href={
-                                  typeof href === "string" ? href : undefined
-                                }
-                                style={{ color: footerBottomTextColor }}
-                              >
-                                {typeof text === "string" ? text : null}
-                              </a>
-                            </EntityField>
-                          </EntityField>
+                            {item.text}
+                          </a>
                         </li>
                       );
                     })}
@@ -1380,31 +1130,26 @@ const CasualDiningFooterComponent = (props: CasualDiningFooterProps) => {
                 </div>
                 <div className="supporting-menu__item supporting-menu__item--apps">
                   <div className="app-badges">
-                    {(props.appBadges ?? defaultProps.appBadges).map(
-                      (badge, index) => {
-                        const badgeCta = badge?.cta;
-                        if (!badgeCta) {
-                          return null;
-                        }
+                    {props.appBadges.map((badge, index) => {
+                      const badgeCta = badge?.cta;
+                      if (!badgeCta) {
+                        return null;
+                      }
 
-                        return (
-                          <EntityField
-                            key={`app-badge-${index}`}
-                            displayName="App Badge"
-                            fieldId={badgeCta.data.cta.field}
-                            constantValueEnabled={
-                              badgeCta.data.cta.constantValueEnabled
-                            }
-                          >
-                            <ComprehensiveCTA
-                              value={badgeCta}
-                              eventName={`footerBadge${index}`}
-                              className="app-badge--image"
-                            />
-                          </EntityField>
-                        );
-                      },
-                    )}
+                      return (
+                        <ComprehensiveCTA key={`app-badge-${index}`}
+                          value={{
+                            data: badgeCta.data,
+                            styles: badgeCta.styles,
+                            className: badgeCta.className,
+                            eventName: badgeCta.eventName,
+                            sx: badgeCta.sx as React.CSSProperties,
+                          }}
+                          eventName={`footerBadge${index}`}
+                          className="app-badge--image"
+                        />
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -1416,15 +1161,15 @@ const CasualDiningFooterComponent = (props: CasualDiningFooterProps) => {
   );
 };
 
-export const CasualDiningFooter: YextComponentConfig<CasualDiningFooterProps> =
-  {
-    label: msg("components.footer", "Footer"),
-    fields,
-    defaultProps,
-    render: (props: unknown) => (
-      <CasualDiningFooterComponent {...(props as CasualDiningFooterProps)} />
-    ),
-  };
+export const CasualDiningFooter: YextComponentConfig<
+  CasualDiningFooterProps,
+  typeof fields
+> = {
+  label: msg("components.footer", "Footer"),
+  fields,
+  defaultProps,
+  render: (props) => <CasualDiningFooterComponent {...props} />,
+};
 
 export const config: SectionConfig = {
   id: "CasualDiningFooter",
