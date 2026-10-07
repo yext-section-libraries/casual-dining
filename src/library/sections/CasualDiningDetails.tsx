@@ -1,9 +1,28 @@
 import "../shared/typography.css";
-import { resolveBodyStyles, StyledTextComponent } from "../shared/typography";
-import type { SectionConfig } from "@yext/visual-editor";
-import { msg } from "@yext/visual-editor";
+import { resolveBodyStyles } from "../shared/typography";
+import { createTextConfig, TransformedText } from "../shared/transformedText";
+import {
+  type YextFieldMap,
+  type YextTransformedProps,
+  type SectionConfig,
+  msg,
+  Background,
+  ComprehensiveCTA,
+  getThemeColorCssValue,
+  getAnalyticsScopeHash,
+  getSurfaceColorStyle,
+  useDocument,
+  VisibilityWrapper,
+  type ComprehensiveCTAValue,
+  type StyledPlainTextProps,
+  type StyledRichTextProps,
+  type ThemeColor,
+  type YextComponentConfig,
+  type YextEntityField,
+  type TranslatableString,
+} from "@yext/visual-editor";
 
-import * as React from "react";
+import React from "react";
 import {
   Address,
   AnalyticsScopeProvider,
@@ -16,26 +35,7 @@ import {
 } from "@yext/pages-components";
 import { useTranslation } from "react-i18next";
 import { parsePhoneNumber } from "awesome-phonenumber";
-import {
-  Background,
-  ComprehensiveCTA,
-  createStyledTextConfig,
-  EntityField,
-  getThemeColorCssValue,
-  getAnalyticsScopeHash,
-  getSurfaceColorStyle,
-  resolveComponentData,
-  useDocument,
-  VisibilityWrapper,
-  type ComprehensiveCTAValue,
-  type StyledPlainTextProps,
-  type StyledRichTextProps,
-  type ThemeColor,
-  type YextComponentConfig,
-  type YextEntityField,
-  type YextFields,
-  type TranslatableString,
-} from "@yext/visual-editor";
+
 import { PuckComponent } from "@puckeditor/core";
 import {
   CapturedStyleRoot,
@@ -337,29 +337,13 @@ grid-template-columns: minmax(0, 1fr);
 }
 }`;
 
-const headingConfig = createStyledTextConfig({
-  kind: "plain",
-  label: msg("fields.heading", "Heading"),
-  includeColor: true,
-});
+const headingConfig = createTextConfig("plain");
 
-const subheadingConfig = createStyledTextConfig({
-  kind: "plain",
-  label: msg("fields.subheading", "Subheading"),
-  includeColor: true,
-});
+const subheadingConfig = createTextConfig("plain");
 
-const bodyConfig = createStyledTextConfig({
-  kind: "plain",
-  label: msg("fields.body", "Body"),
-  includeColor: true,
-});
+const bodyConfig = createTextConfig("plain");
 
-const introTextConfig = createStyledTextConfig({
-  kind: "richText",
-  label: msg("fields.introText", "Intro Text"),
-  includeColor: true,
-});
+const introTextConfig = createTextConfig("richText");
 
 const defaultLinkStyles: Partial<ComprehensiveCTAValue>["styles"] = {
   variant: "link",
@@ -421,7 +405,7 @@ type CasualDiningDetailsProps = {
   dining: StyledTextListProps;
 };
 
-const fields: YextFields<CasualDiningDetailsProps> = {
+const fields = {
   section: {
     label: msg("fields.section", "Section"),
     type: "object",
@@ -472,6 +456,7 @@ const fields: YextFields<CasualDiningDetailsProps> = {
       subheading: {
         label: msg("fields.addressSubheading", "Address Subheading"),
         type: "entityField",
+        transform: true,
         filter: {
           types: ["type.string"],
         },
@@ -479,6 +464,7 @@ const fields: YextFields<CasualDiningDetailsProps> = {
       address: {
         label: msg("fields.address", "Address"),
         type: "entityField",
+        transform: true,
         filter: {
           types: ["type.address"],
         },
@@ -487,6 +473,7 @@ const fields: YextFields<CasualDiningDetailsProps> = {
       directionsLink: {
         label: msg("fields.directionsLink", "Directions Link"),
         type: "comprehensiveCTA",
+        transform: true,
       },
       showRegion: {
         label: msg("fields.showRegion", "Show Region"),
@@ -513,6 +500,7 @@ const fields: YextFields<CasualDiningDetailsProps> = {
       subheading: {
         label: msg("fields.phoneSubheading", "Phone Subheading"),
         type: "entityField",
+        transform: true,
         filter: {
           types: ["type.string"],
         },
@@ -524,6 +512,7 @@ const fields: YextFields<CasualDiningDetailsProps> = {
           number: {
             label: msg("fields.number", "Number"),
             type: "entityField",
+            transform: true,
             filter: {
               types: ["type.phone"],
             },
@@ -566,6 +555,7 @@ const fields: YextFields<CasualDiningDetailsProps> = {
   websiteLink: {
     label: msg("fields.websiteLink", "Website Link"),
     type: "comprehensiveCTA",
+    transform: true,
   },
   hours: {
     label: msg("fields.hours", "Hours"),
@@ -574,6 +564,7 @@ const fields: YextFields<CasualDiningDetailsProps> = {
       subheading: {
         label: msg("fields.hoursSubheading", "Hours Subheading"),
         type: "entityField",
+        transform: true,
         filter: {
           types: ["type.string"],
         },
@@ -585,6 +576,7 @@ const fields: YextFields<CasualDiningDetailsProps> = {
           hours: {
             label: msg("fields.hours", "Hours"),
             type: "entityField",
+            transform: true,
             filter: {
               types: ["type.hours"],
             },
@@ -676,6 +668,7 @@ const fields: YextFields<CasualDiningDetailsProps> = {
       subheading: {
         label: msg("fields.servicesSubheading", "Services Subheading"),
         type: "entityField",
+        transform: true,
         filter: {
           types: ["type.string"],
         },
@@ -683,6 +676,7 @@ const fields: YextFields<CasualDiningDetailsProps> = {
       text: {
         label: msg("fields.textList", "Text List"),
         type: "entityField",
+        transform: true,
         filter: {
           types: ["type.string"],
           includeListsOnly: true,
@@ -690,11 +684,11 @@ const fields: YextFields<CasualDiningDetailsProps> = {
       },
     },
   },
-};
+} satisfies YextFieldMap<CasualDiningDetailsProps>;
 
-const CasualDiningDetailsComponent: PuckComponent<CasualDiningDetailsProps> = (
-  props,
-) => {
+const CasualDiningDetailsComponent: PuckComponent<
+  YextTransformedProps<CasualDiningDetailsProps, typeof fields>
+> = (props) => {
   const { t, i18n } = useTranslation();
   const dayOfWeekNames = React.useMemo<DayOfWeekNames>(() => {
     const formatter = new Intl.DateTimeFormat(i18n.language, {
@@ -719,27 +713,13 @@ const CasualDiningDetailsComponent: PuckComponent<CasualDiningDetailsProps> = (
     comingSoon?: boolean;
     additionalHoursText?: string;
   }>();
-  const locale = i18n.language;
   const sectionSurfaceStyle = getSurfaceColorStyle(
     props.section.backgroundColor,
     streamDocument,
   );
   const sectionTextColor = sectionSurfaceStyle?.color;
-  const resolvedAddress = resolveComponentData(
-    props.address.address,
-    locale,
-    streamDocument,
-  );
-  const resolvedHours = resolveComponentData(
-    props.hours.data.hours,
-    locale,
-    streamDocument,
-  );
-  const resolvedDining = resolveComponentData(
-    props.dining.text,
-    locale,
-    streamDocument,
-  );
+  const address = props.address.address;
+  const hours = props.hours.data.hours;
   const additionalHoursText = streamDocument?.additionalHoursText?.trim();
   const intervalTranslations: HoursTableIntervalTranslations = {
     isClosed: t("closed", "Closed"),
@@ -749,7 +729,7 @@ const CasualDiningDetailsComponent: PuckComponent<CasualDiningDetailsProps> = (
   };
   const bodyTextStyle = {
     color:
-      getThemeColorCssValue(props.body.fontOptions?.color) ?? sectionTextColor,
+      getThemeColorCssValue(props.body.fontOptions.color) ?? sectionTextColor,
     ...resolveBodyStyles(props.body.fontOptions),
   } satisfies React.CSSProperties;
   const hoursAlignmentStyle =
@@ -758,44 +738,17 @@ const CasualDiningDetailsComponent: PuckComponent<CasualDiningDetailsProps> = (
       : props.hours.settings.alignment === "items-end"
         ? { marginLeft: "auto", textAlign: "right" as const }
         : {};
-  const phoneItems = props.phone.items
-    .map((item) => {
-      const resolvedValue = resolveComponentData(
-        item.number,
-        locale,
-        streamDocument,
-      );
-      const resolvedNumber =
-        typeof resolvedValue === "string"
-          ? resolvedValue.trim()
-          : typeof item.number.constantValue === "string"
-            ? item.number.constantValue.trim()
-            : "";
-
-      if (!resolvedNumber) {
-        return null;
-      }
-
-      const formattedNumber = phoneFormatValue(
-        resolvedNumber,
-        props.phone.phoneFormat,
-      );
-
-      return {
-        content: formattedNumber,
-        entityField: item.number,
-        href: phoneHrefValue(resolvedNumber),
-      };
-    })
-    .filter(
-      (
-        item,
-      ): item is {
-        content: string;
-        entityField: YextEntityField<string>;
-        href: string;
-      } => item !== null,
-    );
+  const phoneItems = props.phone.items.flatMap(({ number }) => {
+    if (!number?.trim()) {
+      return [];
+    }
+    return [
+      {
+        content: phoneFormatValue(number, props.phone.phoneFormat),
+        href: phoneHrefValue(number),
+      },
+    ];
+  });
 
   return (
     <AnalyticsScopeProvider
@@ -816,30 +769,10 @@ const CasualDiningDetailsComponent: PuckComponent<CasualDiningDetailsProps> = (
             <div className="wrapper">
               <div className="core-info__intro">
                 <div className="heading-small">
-                  <EntityField
-                    displayName="Heading"
-                    fieldId={props.heading.data.text.field}
-                    constantValueEnabled={
-                      props.heading.data.text.constantValueEnabled
-                    }
-                  >
-                    <StyledTextComponent
-                      kind="plain"
-                      {...props.heading}
-                      tag="h2"
-                    />
-                  </EntityField>
+                  <TransformedText kind="plain" {...props.heading} tag="h2" />
                 </div>
                 <div className="body-medium">
-                  <EntityField
-                    displayName="Intro Text"
-                    fieldId={props.introText.data.text.field}
-                    constantValueEnabled={
-                      props.introText.data.text.constantValueEnabled
-                    }
-                  >
-                    <StyledTextComponent kind="richText" {...props.introText} />
-                  </EntityField>
+                  <TransformedText kind="richText" {...props.introText} />
                 </div>
               </div>
 
@@ -848,166 +781,92 @@ const CasualDiningDetailsComponent: PuckComponent<CasualDiningDetailsProps> = (
                   className="core-info__item core-info__item--contact"
                   style={{ color: sectionTextColor }}
                 >
-                  {hasAddressContent(resolvedAddress) ? (
+                  {hasAddressContent(address) ? (
                     <div className="core-info__stack">
-                      <EntityField
-                        displayName="Address Subheading"
-                        fieldId={props.address.subheading.field}
-                        constantValueEnabled={
-                          props.address.subheading.constantValueEnabled
-                        }
-                      >
-                        <StyledTextComponent
-                          kind="plain"
-                          {...props.subheading}
-                          data={{ text: props.address.subheading as any }}
-                          tag="strong"
-                        />
-                      </EntityField>
+                      <TransformedText
+                        kind="plain"
+                        {...props.subheading}
+                        data={{ text: props.address.subheading }}
+                        tag="strong"
+                      />
+
                       <div className="body-medium" style={bodyTextStyle}>
-                        <EntityField
-                          displayName="Address"
-                          fieldId={props.address.address.field}
-                          constantValueEnabled={
-                            props.address.address.constantValueEnabled
-                          }
-                        >
-                          <Address
-                            address={resolvedAddress}
-                            showRegion={props.address.showRegion}
-                            showCountry={props.address.showCountry}
-                          />
-                        </EntityField>
+                        <Address
+                          address={address}
+                          showRegion={props.address.showRegion}
+                          showCountry={props.address.showCountry}
+                        />
                       </div>
                     </div>
                   ) : null}
-                  <EntityField
-                    displayName="Directions Link"
-                    fieldId={props.address.directionsLink.data?.cta.field}
-                    constantValueEnabled={
-                      props.address.directionsLink.data?.cta
-                        .constantValueEnabled
-                    }
-                  >
-                    <ComprehensiveCTA
-                      value={{
-                        data: props.address.directionsLink.data,
-                        styles: props.address.directionsLink.styles,
-                      }}
-                      className="core-info__link"
-                    />
-                  </EntityField>
+                  <ComprehensiveCTA
+                    value={{
+                      data: props.address.directionsLink.data,
+                      styles: props.address.directionsLink.styles,
+                    }}
+                    className="core-info__link"
+                  />
                   {phoneItems.length > 0 ? (
                     <div className="core-info__stack">
-                      <EntityField
-                        displayName="Phone Subheading"
-                        fieldId={props.phone.subheading.field}
-                        constantValueEnabled={
-                          props.phone.subheading.constantValueEnabled
-                        }
-                      >
-                        <StyledTextComponent
-                          kind="plain"
-                          {...props.subheading}
-                          data={{ text: props.phone.subheading as any }}
-                          tag="strong"
-                        />
-                      </EntityField>
+                      <TransformedText
+                        kind="plain"
+                        {...props.subheading}
+                        data={{ text: props.phone.subheading }}
+                        tag="strong"
+                      />
+
                       <div className="body-medium">
                         {phoneItems.map((item) =>
                           props.phone.includeHyperlink ? (
-                            <EntityField
+                            <Link
                               key={item.content}
-                              displayName="Phone Number"
-                              fieldId={item.entityField.field}
-                              constantValueEnabled={
-                                item.entityField.constantValueEnabled
-                              }
+                              href={item.href}
+                              className="core-info__link"
                             >
-                              <Link
-                                href={item.href}
-                                className="core-info__link"
-                              >
-                                <StyledTextComponent
-                                  kind="plain"
-                                  {...props.body}
-                                  data={{
-                                    text: {
-                                      field: "",
-                                      constantValue: {
-                                        defaultValue: item.content,
-                                      },
-                                      constantValueEnabled: true,
-                                    },
-                                  }}
-                                  tag="span"
-                                />
-                              </Link>
-                            </EntityField>
-                          ) : (
-                            <EntityField
-                              key={item.content}
-                              displayName="Phone Number"
-                              fieldId={item.entityField.field}
-                              constantValueEnabled={
-                                item.entityField.constantValueEnabled
-                              }
-                            >
-                              <StyledTextComponent
+                              <TransformedText
                                 kind="plain"
                                 {...props.body}
                                 data={{
-                                  text: {
-                                    field: "",
-                                    constantValue: {
-                                      defaultValue: item.content,
-                                    },
-                                    constantValueEnabled: true,
-                                  },
+                                  text: item.content,
                                 }}
-                                tag="p"
+                                tag="span"
                               />
-                            </EntityField>
+                            </Link>
+                          ) : (
+                            <TransformedText
+                              key={item.content}
+                              kind="plain"
+                              {...props.body}
+                              data={{
+                                text: item.content,
+                              }}
+                              tag="p"
+                            />
                           ),
                         )}
                       </div>
                     </div>
                   ) : null}
-                  <EntityField
-                    displayName="Website Link"
-                    fieldId={props.websiteLink.data?.cta.field}
-                    constantValueEnabled={
-                      props.websiteLink.data?.cta.constantValueEnabled
-                    }
-                  >
-                    <ComprehensiveCTA
-                      value={{
-                        data: props.websiteLink.data,
-                        styles: props.websiteLink.styles,
-                      }}
-                      className="core-info__link"
-                    />
-                  </EntityField>
+                  <ComprehensiveCTA
+                    value={{
+                      data: props.websiteLink.data,
+                      styles: props.websiteLink.styles,
+                    }}
+                    className="core-info__link"
+                  />
                 </div>
-                {hasHoursContent(resolvedHours) ? (
+                {hasHoursContent(hours) ? (
                   <div
                     className="core-info__item"
                     style={{ color: sectionTextColor }}
                   >
-                    <EntityField
-                      displayName="Hours Subheading"
-                      fieldId={props.hours.subheading.field}
-                      constantValueEnabled={
-                        props.hours.subheading.constantValueEnabled
-                      }
-                    >
-                      <StyledTextComponent
-                        kind="plain"
-                        {...props.subheading}
-                        data={{ text: props.hours.subheading as any }}
-                        tag="strong"
-                      />
-                    </EntityField>
+                    <TransformedText
+                      kind="plain"
+                      {...props.subheading}
+                      data={{ text: props.hours.subheading }}
+                      tag="strong"
+                    />
+
                     <div
                       className="body-medium"
                       style={{
@@ -1019,24 +878,17 @@ const CasualDiningDetailsComponent: PuckComponent<CasualDiningDetailsProps> = (
                         ...hoursAlignmentStyle,
                       }}
                     >
-                      <EntityField
-                        displayName="Hours"
-                        fieldId={props.hours.data.hours.field}
-                        constantValueEnabled={
-                          props.hours.data.hours.constantValueEnabled
-                        }
-                      >
-                        <HoursTable
-                          className="hours-table"
-                          hours={resolvedHours}
-                          comingSoon={streamDocument?.comingSoon}
-                          dayOfWeekNames={dayOfWeekNames}
-                          startOfWeek={props.hours.settings.startOfWeek}
-                          collapseDays={props.hours.settings.collapseDays}
-                          timeOptions={{ hour12: true }}
-                          intervalTranslations={intervalTranslations}
-                        />
-                      </EntityField>
+                      <HoursTable
+                        className="hours-table"
+                        hours={hours}
+                        comingSoon={streamDocument?.comingSoon}
+                        dayOfWeekNames={dayOfWeekNames}
+                        startOfWeek={props.hours.settings.startOfWeek}
+                        collapseDays={props.hours.settings.collapseDays}
+                        timeOptions={{ hour12: true }}
+                        intervalTranslations={intervalTranslations}
+                      />
+
                       {additionalHoursText &&
                       props.hours.settings.showAdditionalHoursText ? (
                         <p className="body-small" style={{ marginTop: 16 }}>
@@ -1050,69 +902,33 @@ const CasualDiningDetailsComponent: PuckComponent<CasualDiningDetailsProps> = (
                   className="core-info__item"
                   style={{ color: sectionTextColor }}
                 >
-                  <EntityField
-                    displayName="Services Subheading"
-                    fieldId={props.dining.subheading.field}
-                    constantValueEnabled={
-                      props.dining.subheading.constantValueEnabled
-                    }
-                  >
-                    <StyledTextComponent
-                      kind="plain"
-                      {...props.subheading}
-                      data={{ text: props.dining.subheading as any }}
-                      tag="strong"
-                    />
-                  </EntityField>
-                  <EntityField
-                    displayName="Services"
-                    fieldId={props.dining.text.field}
-                    constantValueEnabled={
-                      props.dining.text.constantValueEnabled
-                    }
-                  >
-                    <ul className="core-info__list">
-                      {(Array.isArray(resolvedDining) ? resolvedDining : [])
-                        .map((item) => {
-                          if (typeof item === "string") {
-                            return item.trim();
-                          }
+                  <TransformedText
+                    kind="plain"
+                    {...props.subheading}
+                    data={{ text: props.dining.subheading }}
+                    tag="strong"
+                  />
 
-                          if (
-                            item &&
-                            typeof item === "object" &&
-                            typeof (item as { defaultValue?: string })
-                              .defaultValue === "string"
-                          ) {
-                            return (
-                              item as { defaultValue: string }
-                            ).defaultValue.trim();
-                          }
-
-                          return "";
-                        })
-                        .filter(Boolean)
-                        .map((item, index) => (
-                          <li
-                            key={`${item}-${index}`}
-                            style={{ listStyleType: "disc" }}
-                          >
-                            <StyledTextComponent
-                              kind="plain"
-                              {...props.body}
-                              data={{
-                                text: {
-                                  field: "",
-                                  constantValue: { defaultValue: item },
-                                  constantValueEnabled: true,
-                                },
-                              }}
-                              tag="span"
-                            />
-                          </li>
-                        ))}
-                    </ul>
-                  </EntityField>
+                  <ul className="core-info__list">
+                    {(props.dining.text ?? [])
+                      .map((item) => item?.trim())
+                      .filter(Boolean)
+                      .map((item, index) => (
+                        <li
+                          key={`${item}-${index}`}
+                          style={{ listStyleType: "disc" }}
+                        >
+                          <TransformedText
+                            kind="plain"
+                            {...props.body}
+                            data={{
+                              text: item,
+                            }}
+                            tag="span"
+                          />
+                        </li>
+                      ))}
+                  </ul>
                 </div>
               </div>
             </div>
@@ -1123,101 +939,62 @@ const CasualDiningDetailsComponent: PuckComponent<CasualDiningDetailsProps> = (
   );
 };
 
-export const CasualDiningDetails: YextComponentConfig<CasualDiningDetailsProps> =
-  {
-    label: msg("components.detailsLabel", "Details"),
-    fields,
-    defaultProps: {
-      section: {
-        backgroundColor: {
-          selectedColor: "palette-tertiary",
-          contrastingColor: "palette-tertiary-contrast",
-        },
-        visibleOnLivePage: true,
+export const CasualDiningDetails: YextComponentConfig<
+  CasualDiningDetailsProps,
+  typeof fields
+> = {
+  label: msg("components.detailsLabel", "Details"),
+  fields,
+  defaultProps: {
+    section: {
+      backgroundColor: {
+        selectedColor: "palette-tertiary",
+        contrastingColor: "palette-tertiary-contrast",
       },
-      heading: {
-        ...headingConfig.defaultProps,
-        data: {
-          text: createTextField("All about this location"),
-        },
-      } as StyledPlainTextProps,
-      subheading: {
-        fontOptions: subheadingConfig.defaultProps!.fontOptions,
+      visibleOnLivePage: true,
+    },
+    heading: {
+      ...headingConfig.defaultProps,
+      data: {
+        text: createTextField("All about this location"),
       },
-      body: {
-        fontOptions: bodyConfig.defaultProps!.fontOptions,
+    } as StyledPlainTextProps,
+    subheading: {
+      fontOptions: subheadingConfig.defaultProps!.fontOptions,
+    },
+    body: {
+      fontOptions: bodyConfig.defaultProps!.fontOptions,
+    },
+    introText: {
+      ...introTextConfig.defaultProps,
+      data: {
+        text: createRtfField(
+          "Everything you need before you head to [[name]] - [[geomodifier]].",
+        ),
       },
-      introText: {
-        ...introTextConfig.defaultProps,
-        data: {
-          text: createRtfField(
-            "Everything you need before you head to [[name]] - [[geomodifier]].",
-          ),
-        },
-      } as StyledRichTextProps,
+    } as StyledRichTextProps,
+    address: {
+      subheading: createTextField("Address"),
       address: {
-        subheading: createTextField("Address"),
-        address: {
-          field: "address",
-          constantValue: {
-            line1: "",
-            city: "",
-            postalCode: "",
-            countryCode: "",
-            region: "",
-          },
-          constantValueEnabled: false,
-        } satisfies YextEntityField<AddressType>,
-        directionsLink: {
-          data: {
-            actionType: "link",
-            cta: {
-              field: "",
-              selectedType: "getDirections",
-              constantValue: {
-                label: {
-                  defaultValue: "Get Directions",
-                  hasLocalizedValue: "true" as const,
-                },
-                link: {
-                  defaultValue: "#",
-                  hasLocalizedValue: "true" as const,
-                },
-                openInNewTab: false,
-                ctaType: "getDirections",
-              },
-              constantValueEnabled: true,
-            },
-            openInNewTab: false,
-          },
-          styles: defaultLinkStyles,
+        field: "address",
+        constantValue: {
+          line1: "",
+          city: "",
+          postalCode: "",
+          countryCode: "",
+          region: "",
         },
-        showRegion: true,
-        showCountry: false,
-      },
-      phone: {
-        subheading: createTextField("Phone"),
-        items: [
-          {
-            number: {
-              field: "mainPhone",
-              constantValue: "+1 (512) 555-0148",
-              constantValueEnabled: false,
-            },
-          },
-        ],
-        phoneFormat: "international",
-        includeHyperlink: false,
-      },
-      websiteLink: {
+        constantValueEnabled: false,
+      } satisfies YextEntityField<AddressType>,
+      directionsLink: {
         data: {
           actionType: "link",
           cta: {
             field: "",
-            selectedType: "textAndLink",
+            selectedType: "getDirections",
             constantValue: {
               label: {
-                defaultValue: "Website",
+                defaultValue: "Get Directions",
                 hasLocalizedValue: "true" as const,
               },
               link: {
@@ -1225,7 +1002,7 @@ export const CasualDiningDetails: YextComponentConfig<CasualDiningDetailsProps> 
                 hasLocalizedValue: "true" as const,
               },
               openInNewTab: false,
-              ctaType: "textAndLink",
+              ctaType: "getDirections",
             },
             constantValueEnabled: true,
           },
@@ -1233,41 +1010,82 @@ export const CasualDiningDetails: YextComponentConfig<CasualDiningDetailsProps> 
         },
         styles: defaultLinkStyles,
       },
-      hours: {
-        subheading: createTextField("Hours"),
-        data: {
-          hours: {
-            field: "hours",
-            constantValue: {},
+      showRegion: true,
+      showCountry: false,
+    },
+    phone: {
+      subheading: createTextField("Phone"),
+      items: [
+        {
+          number: {
+            field: "mainPhone",
+            constantValue: "+1 (512) 555-0148",
             constantValueEnabled: false,
-          } satisfies YextEntityField<HoursType>,
+          },
         },
-        settings: {
-          startOfWeek: "monday",
-          collapseDays: false,
-          showAdditionalHoursText: false,
-          alignment: "items-start",
-        },
-      },
-      dining: {
-        subheading: createTextField("Dining"),
-        text: {
+      ],
+      phoneFormat: "international",
+      includeHyperlink: false,
+    },
+    websiteLink: {
+      data: {
+        actionType: "link",
+        cta: {
           field: "",
-          constantValue: [
-            "Dine-in",
-            "Takeout",
-            "Delivery",
-            "Curbside pickup",
-            "Call-ahead ordering",
-            "Patio seating",
-            "Reservations through OpenTable",
-          ],
+          selectedType: "textAndLink",
+          constantValue: {
+            label: {
+              defaultValue: "Website",
+              hasLocalizedValue: "true" as const,
+            },
+            link: {
+              defaultValue: "#",
+              hasLocalizedValue: "true" as const,
+            },
+            openInNewTab: false,
+            ctaType: "textAndLink",
+          },
           constantValueEnabled: true,
         },
+        openInNewTab: false,
+      },
+      styles: defaultLinkStyles,
+    },
+    hours: {
+      subheading: createTextField("Hours"),
+      data: {
+        hours: {
+          field: "hours",
+          constantValue: {},
+          constantValueEnabled: false,
+        } satisfies YextEntityField<HoursType>,
+      },
+      settings: {
+        startOfWeek: "monday",
+        collapseDays: false,
+        showAdditionalHoursText: false,
+        alignment: "items-start",
       },
     },
-    render: (props) => <CasualDiningDetailsComponent {...props} />,
-  };
+    dining: {
+      subheading: createTextField("Dining"),
+      text: {
+        field: "",
+        constantValue: [
+          "Dine-in",
+          "Takeout",
+          "Delivery",
+          "Curbside pickup",
+          "Call-ahead ordering",
+          "Patio seating",
+          "Reservations through OpenTable",
+        ],
+        constantValueEnabled: true,
+      },
+    },
+  },
+  render: (props) => <CasualDiningDetailsComponent {...props} />,
+};
 
 export const config: SectionConfig = {
   id: "CasualDiningDetails",

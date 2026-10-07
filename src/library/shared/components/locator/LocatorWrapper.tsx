@@ -40,7 +40,6 @@ import {
   toMeters,
   toMiles,
 } from "@yext/visual-editor/section-library-support";
-import { resolveComponentData } from "@yext/visual-editor/section-library-support";
 import {
   createSearchAnalyticsConfig,
   createSearchHeadlessConfig,
@@ -60,7 +59,7 @@ import {
   Location,
   LocatorResultCard,
 } from "./LocatorResultCard";
-import type { LocatorProps } from "./Locator";
+import type { LocatorRenderProps } from "./Locator";
 import {
   COUNTRY_CODE_FIELD,
   FilterModal,
@@ -121,7 +120,7 @@ const updateLocationQuery = (location: string) => {
   }
 };
 
-export const LocatorWrapper = (props: WithPuckProps<LocatorProps>) => {
+export const LocatorWrapper = (props: WithPuckProps<LocatorRenderProps>) => {
   const streamDocument = useDocument();
   const { searchAnalyticsConfig, searcher } = React.useMemo(() => {
     const searchHeadlessConfig = createSearchHeadlessConfig(
@@ -166,7 +165,7 @@ const LocatorInternal = ({
   resultCard: resultCardConfigs,
   distanceDisplay,
   pageHeading,
-}: LocatorProps) => {
+}: LocatorRenderProps) => {
   // Adds unified [enable|disable]YextAnalytics to the window for both Pages and Search
   // analytics. Typically used during consent banner implementation.
   const searchAnalytics = useSearchAnalytics();
@@ -334,13 +333,7 @@ const LocatorInternal = ({
     setShowCurrentLocationButton(true);
   };
 
-  const selectedFacets: string[] = React.useMemo(
-    () =>
-      facetFields?.selections
-        ?.filter((selection) => selection.value !== undefined)
-        ?.map((selection) => selection.value as string) ?? [],
-    [facetFields]
-  );
+  const selectedFacets = React.useMemo(() => facetFields ?? [], [facetFields]);
   React.useEffect(() => {
     searchActions.setFacetAllowList(selectedFacets);
   }, [searchActions, selectedFacets]);
@@ -935,9 +928,7 @@ const LocatorInternal = ({
     getThemeColorCssValue(accentColor?.selectedColor) ??
     "var(--colors-palette-primary-dark)";
   const resolvedHeading =
-    (pageHeading?.title &&
-      resolveComponentData(pageHeading.title, i18n.language, streamDocument)) ||
-    t("findALocation", "Find a Location");
+    pageHeading?.title || t("findALocation", "Find a Location");
 
   const requireMapOptIn: boolean = streamDocument.__?.visualEditorConfig
     ? JSON.parse(streamDocument.__?.visualEditorConfig)?.requireMapOptIn

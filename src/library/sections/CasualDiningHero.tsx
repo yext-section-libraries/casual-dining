@@ -1,25 +1,17 @@
 import "../shared/typography.css";
-import { StyledTextComponent } from "../shared/typography";
-import type { SectionConfig } from "@yext/visual-editor";
-import { msg } from "@yext/visual-editor";
-
-import * as React from "react";
+import { createTextConfig, TransformedText } from "../shared/transformedText";
 import {
-  AnalyticsScopeProvider,
-  type ComplexImageType,
-  type ImageType,
-} from "@yext/pages-components";
-import { type PuckComponent } from "@puckeditor/core";
-import {
+  type YextFieldMap,
+  type YextTransformedProps,
+  type SectionConfig,
+  msg,
   ComprehensiveCTA,
   Background,
-  createStyledTextConfig,
   EntityField,
   Image,
   getAnalyticsScopeHash,
   getSurfaceColorStyle,
   getThemeColorCssValue,
-  resolveComponentData,
   useDocument,
   VisibilityWrapper,
   type ComprehensiveCTAValue,
@@ -29,13 +21,21 @@ import {
   type TranslatableAssetImage,
   type YextComponentConfig,
   type YextEntityField,
-  type YextFields,
 } from "@yext/visual-editor";
+
+import React from "react";
+import {
+  AnalyticsScopeProvider,
+  type ComplexImageType,
+  type ImageType,
+} from "@yext/pages-components";
+import { type PuckComponent } from "@puckeditor/core";
+
 import {
   aspectRatioOptions,
   CapturedStyleRoot,
+  hasImageSource,
 } from "../shared/sectionHelpers";
-import { useTranslation } from "react-i18next";
 
 const themeVars: React.CSSProperties = {
   ["--COLOR-BG" as string]: "var(--palette-tertiary)",
@@ -231,23 +231,11 @@ body {
 }
 `;
 
-const geomodifierConfig = createStyledTextConfig({
-  kind: "plain",
-  label: msg("fields.geomodifier", "Geomodifier"),
-  includeColor: true,
-});
+const geomodifierConfig = createTextConfig("plain");
 
-const headingConfig = createStyledTextConfig({
-  kind: "plain",
-  label: msg("fields.heading", "Heading"),
-  includeColor: true,
-});
+const headingConfig = createTextConfig("plain");
 
-const descriptionConfig = createStyledTextConfig({
-  kind: "richText",
-  label: msg("fields.description", "Description"),
-  includeColor: true,
-});
+const descriptionConfig = createTextConfig("richText");
 
 const defaultOverlayColor: ThemeColor = {
   selectedColor: "palette-secondary",
@@ -285,7 +273,7 @@ type CasualDiningNewHeroFieldProps = Omit<
   "id" | "puck"
 >;
 
-const fields: YextFields<CasualDiningNewHeroFieldProps> = {
+const fields = {
   section: {
     label: msg("fields.section", "Section"),
     type: "object",
@@ -311,6 +299,7 @@ const fields: YextFields<CasualDiningNewHeroFieldProps> = {
     objectFields: {
       image: {
         type: "entityField",
+        transform: true,
         label: msg("fields.image", "Image"),
         filter: {
           types: ["type.image"],
@@ -395,7 +384,7 @@ const fields: YextFields<CasualDiningNewHeroFieldProps> = {
     getItemSummary: (_row: HeroCtaRow, index?: number) =>
       `CTA ${(index ?? 0) + 1}`,
   },
-};
+} satisfies YextFieldMap<CasualDiningNewHeroFieldProps>;
 
 const defaultCtas: HeroCtaRow[] = [
   {
@@ -519,32 +508,14 @@ const defaultCtas: HeroCtaRow[] = [
   },
 ];
 
-const CasualDiningNewHeroComponent: PuckComponent<CasualDiningNewHeroProps> = (
-  props,
-) => {
+const CasualDiningNewHeroComponent: PuckComponent<
+  YextTransformedProps<CasualDiningNewHeroProps, typeof fields>
+> = (props) => {
   const streamDocument = useDocument<{ locale?: string }>();
-  const { i18n } = useTranslation();
-  const locale = i18n.language;
   const isEditing = Boolean(props.puck?.isEditing);
-  const resolvedBackgroundImage = props.background?.image
-    ? (resolveComponentData(props.background.image, locale, streamDocument) as
-        | ImageType
-        | ComplexImageType
-        | TranslatableAssetImage
-        | undefined)
-    : undefined;
-  const resolvedBackgroundImageUrl =
-    resolvedBackgroundImage && "url" in resolvedBackgroundImage
-      ? resolvedBackgroundImage.url
-      : resolvedBackgroundImage &&
-          "image" in resolvedBackgroundImage &&
-          resolvedBackgroundImage.image
-        ? resolvedBackgroundImage.image.url
-        : "";
+  const backgroundImage = props.background.image;
   const ctaRows = props.ctas ?? defaultCtas;
-  const showBackgroundImage = Boolean(
-    resolvedBackgroundImage && resolvedBackgroundImageUrl,
-  );
+  const showBackgroundImage = hasImageSource(backgroundImage);
   const overlayColor = props.section.overlayColor ?? defaultOverlayColor;
   const heroSurfaceBackground: ThemeColor = showBackgroundImage
     ? overlayColor
@@ -589,36 +560,22 @@ const CasualDiningNewHeroComponent: PuckComponent<CasualDiningNewHeroProps> = (
                 >
                   {showBackgroundImage ? (
                     <div className="video__poster">
-                      <EntityField
-                        displayName="Background Image"
-                        fieldId={props.background.image.field}
-                        constantValueEnabled={
-                          props.background.image.constantValueEnabled
-                        }
-                        fullHeight
-                      >
-                        <div className="image__hero__frame">
-                          <div className="image__hero__pane">
-                            <div className="image__hero__scale image__fill">
-                              <Image
-                                image={
-                                  resolvedBackgroundImage as
-                                    | ImageType
-                                    | ComplexImageType
-                                    | TranslatableAssetImage
-                                }
-                                className="hero__media-image"
-                                style={{
-                                  display: "block",
-                                  width: "100%",
-                                  height: "100%",
-                                  objectFit: "cover",
-                                }}
-                              />
-                            </div>
+                      <div className="image__hero__frame">
+                        <div className="image__hero__pane">
+                          <div className="image__hero__scale image__fill">
+                            <Image
+                              image={backgroundImage}
+                              className="hero__media-image"
+                              style={{
+                                display: "block",
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                              }}
+                            />
                           </div>
                         </div>
-                      </EntityField>
+                      </div>
                     </div>
                   ) : null}
                   <Background
@@ -631,48 +588,24 @@ const CasualDiningNewHeroComponent: PuckComponent<CasualDiningNewHeroProps> = (
                   >
                     <div className="hero__content hero__content--compact">
                       <div className="hero__subheading">
-                        <EntityField
-                          displayName="Geomodifier"
-                          fieldId={props.geomodifier.data.text.field}
-                          constantValueEnabled={
-                            props.geomodifier.data.text.constantValueEnabled
-                          }
-                        >
-                          <StyledTextComponent
-                            kind="plain"
-                            {...props.geomodifier}
-                            tag="p"
-                          />
-                        </EntityField>
+                        <TransformedText
+                          kind="plain"
+                          {...props.geomodifier}
+                          tag="p"
+                        />
                       </div>
                       <div className="hero__title">
-                        <EntityField
-                          displayName="Heading"
-                          fieldId={props.heading.data.text.field}
-                          constantValueEnabled={
-                            props.heading.data.text.constantValueEnabled
-                          }
-                        >
-                          <StyledTextComponent
-                            kind="plain"
-                            {...props.heading}
-                            tag="h1"
-                          />
-                        </EntityField>
+                        <TransformedText
+                          kind="plain"
+                          {...props.heading}
+                          tag="h1"
+                        />
                       </div>
                       <div className="hero__rte body-medium block-padding">
-                        <EntityField
-                          displayName="Description"
-                          fieldId={props.description.data.text.field}
-                          constantValueEnabled={
-                            props.description.data.text.constantValueEnabled
-                          }
-                        >
-                          <StyledTextComponent
-                            kind="richText"
-                            {...props.description}
-                          />
-                        </EntityField>
+                        <TransformedText
+                          kind="richText"
+                          {...props.description}
+                        />
                       </div>
                       <div className="hero__button-group">
                         {ctaRows.map((row, index) => {
@@ -717,73 +650,75 @@ const CasualDiningNewHeroComponent: PuckComponent<CasualDiningNewHeroProps> = (
   );
 };
 
-export const CasualDiningHero: YextComponentConfig<CasualDiningNewHeroFieldProps> =
-  {
-    label: msg("components.heroLabel", "Hero"),
-    fields,
-    defaultProps: {
-      section: {
-        visibleOnLivePage: true,
-        overlayColor: defaultOverlayColor,
+export const CasualDiningHero: YextComponentConfig<
+  CasualDiningNewHeroFieldProps,
+  typeof fields
+> = {
+  label: msg("components.heroLabel", "Hero"),
+  fields,
+  defaultProps: {
+    section: {
+      visibleOnLivePage: true,
+      overlayColor: defaultOverlayColor,
+    },
+    background: {
+      image: {
+        field: "",
+        constantValue: {
+          url: "https://a.mktgcdn.com/p/vQqhmnexQfZueJGyh5M_j5W4EcTkTyZlW93eIoqjjvQ/1900x1267.jpg",
+          width: 1900,
+          height: 1267,
+          alternateText: "Guest dining in a moody restaurant setting",
+        },
+        constantValueEnabled: true,
       },
-      background: {
-        image: {
+      aspectRatio: 0,
+      imageConstrain: "filled",
+    },
+    geomodifier: {
+      ...geomodifierConfig.defaultProps,
+      data: {
+        text: {
+          field: "geomodifier",
+          constantValue: {
+            defaultValue: "",
+            hasLocalizedValue: "true" as const,
+          },
+          constantValueEnabled: false,
+        },
+      },
+    } as StyledPlainTextProps,
+    heading: {
+      ...headingConfig.defaultProps,
+      data: {
+        text: {
           field: "",
           constantValue: {
-            url: "https://a.mktgcdn.com/p/vQqhmnexQfZueJGyh5M_j5W4EcTkTyZlW93eIoqjjvQ/1900x1267.jpg",
-            width: 1900,
-            height: 1267,
-            alternateText: "Guest dining in a moody restaurant setting",
+            defaultValue: "Order Online from [[name]] Restaurant",
+            hasLocalizedValue: "true" as const,
           },
           constantValueEnabled: true,
         },
-        aspectRatio: 0,
-        imageConstrain: "filled",
       },
-      geomodifier: {
-        ...geomodifierConfig.defaultProps,
-        data: {
-          text: {
-            field: "geomodifier",
-            constantValue: {
-              defaultValue: "",
-              hasLocalizedValue: "true" as const,
-            },
-            constantValueEnabled: false,
+    } as StyledPlainTextProps,
+    description: {
+      ...descriptionConfig.defaultProps,
+      data: {
+        text: {
+          field: "",
+          constantValue: {
+            defaultValue:
+              "[[name]] is an upscale burger restaurant located in [[address.city]], [[address.region]]. We offer dine-in, takeout, delivery, curbside pickup, weekend brunch, and weekday happy hour.",
+            hasLocalizedValue: "true" as const,
           },
+          constantValueEnabled: true,
         },
-      } as StyledPlainTextProps,
-      heading: {
-        ...headingConfig.defaultProps,
-        data: {
-          text: {
-            field: "",
-            constantValue: {
-              defaultValue: "Order Online from [[name]] Restaurant",
-              hasLocalizedValue: "true" as const,
-            },
-            constantValueEnabled: true,
-          },
-        },
-      } as StyledPlainTextProps,
-      description: {
-        ...descriptionConfig.defaultProps,
-        data: {
-          text: {
-            field: "",
-            constantValue: {
-              defaultValue:
-                "[[name]] is an upscale burger restaurant located in [[address.city]], [[address.region]]. We offer dine-in, takeout, delivery, curbside pickup, weekend brunch, and weekday happy hour.",
-              hasLocalizedValue: "true" as const,
-            },
-            constantValueEnabled: true,
-          },
-        },
-      } as StyledRichTextProps,
-      ctas: defaultCtas,
-    },
-    render: (props) => <CasualDiningNewHeroComponent {...props} />,
-  };
+      },
+    } as StyledRichTextProps,
+    ctas: defaultCtas,
+  },
+  render: (props) => <CasualDiningNewHeroComponent {...props} />,
+};
 
 export const config: SectionConfig = {
   id: "CasualDiningHero",

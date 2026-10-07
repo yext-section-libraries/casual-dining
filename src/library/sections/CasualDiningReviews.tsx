@@ -1,15 +1,12 @@
 import "../shared/typography.css";
 import { StyledTextComponent } from "../shared/typography";
-import type { SectionConfig } from "@yext/visual-editor";
-import { msg } from "@yext/visual-editor";
-
-import * as React from "react";
-import { AnalyticsScopeProvider } from "@yext/pages-components";
-import { type PuckComponent } from "@puckeditor/core";
+import { createTextConfig, TransformedText } from "../shared/transformedText";
 import {
+  type YextFieldMap,
+  type YextTransformedProps,
+  type SectionConfig,
+  msg,
   Background,
-  createStyledTextConfig,
-  EntityField,
   getAggregateRating,
   getAnalyticsScopeHash,
   getSurfaceColorStyle,
@@ -19,8 +16,12 @@ import {
   type StyledPlainTextProps,
   type ThemeColor,
   type YextComponentConfig,
-  type YextFields,
 } from "@yext/visual-editor";
+
+import React from "react";
+import { AnalyticsScopeProvider } from "@yext/pages-components";
+import { type PuckComponent } from "@puckeditor/core";
+
 import { CapturedStyleRoot, createTextField } from "../shared/sectionHelpers";
 
 const capturedStyles = String.raw`:root {
@@ -326,41 +327,17 @@ type CasualDiningReviewsProps = {
   };
 };
 
-const headingConfig = createStyledTextConfig({
-  kind: "plain",
-  label: msg("fields.heading", "Heading"),
-  includeColor: true,
-});
+const headingConfig = createTextConfig("plain");
 
-const subheadingConfig = createStyledTextConfig({
-  kind: "plain",
-  label: msg("fields.subheading", "Subheading"),
-  includeColor: true,
-});
+const subheadingConfig = createTextConfig("plain");
 
-const summaryTextConfig = createStyledTextConfig({
-  kind: "plain",
-  label: msg("fields.summaryText", "Summary Text"),
-  includeColor: true,
-});
+const summaryTextConfig = createTextConfig("plain");
 
-const summaryRatingConfig = createStyledTextConfig({
-  kind: "plain",
-  label: msg("fields.summaryRating", "Summary Rating"),
-  includeColor: true,
-});
+const summaryRatingConfig = createTextConfig("plain");
 
-const cardHeaderConfig = createStyledTextConfig({
-  kind: "plain",
-  label: msg("fields.cardHeader", "Card Header"),
-  includeColor: true,
-});
+const cardHeaderConfig = createTextConfig("plain");
 
-const cardContentConfig = createStyledTextConfig({
-  kind: "plain",
-  label: msg("fields.cardContent", "Card Content"),
-  includeColor: true,
-});
+const cardContentConfig = createTextConfig("plain");
 
 const toFiniteNumber = (value: unknown): number | null => {
   if (typeof value === "number" && Number.isFinite(value)) {
@@ -396,7 +373,7 @@ const formatReviewCountLabel = (value: unknown): string => {
   return `${roundedValue} ${roundedValue === 1 ? "Review" : "Reviews"}`;
 };
 
-const fields: YextFields<CasualDiningReviewsProps> = {
+const fields = {
   section: {
     label: msg("fields.section", "Section"),
     type: "object",
@@ -505,7 +482,7 @@ const fields: YextFields<CasualDiningReviewsProps> = {
       },
     },
   },
-};
+} satisfies YextFieldMap<CasualDiningReviewsProps>;
 
 const defaultProps = {
   section: {
@@ -566,9 +543,9 @@ const sampleReviews: Review[] = [
   },
 ];
 
-const CasualDiningReviewsComponent: PuckComponent<CasualDiningReviewsProps> = (
-  props,
-) => {
+const CasualDiningReviewsComponent: PuckComponent<
+  YextTransformedProps<CasualDiningReviewsProps, typeof fields>
+> = (props) => {
   const streamDocument = useDocument<StreamDocumentWithReviews>();
   const isEditing = Boolean(props.puck?.isEditing);
   const aggregateRating = getAggregateRating(streamDocument);
@@ -632,19 +609,7 @@ const CasualDiningReviewsComponent: PuckComponent<CasualDiningReviewsProps> = (
             <div className="wrapper--full-padded">
               <div className="reviews__intro">
                 <div className="heading-large">
-                  <EntityField
-                    displayName="Heading"
-                    fieldId={props.heading.data.text.field}
-                    constantValueEnabled={
-                      props.heading.data.text.constantValueEnabled
-                    }
-                  >
-                    <StyledTextComponent
-                      kind="plain"
-                      {...props.heading}
-                      tag="h2"
-                    />
-                  </EntityField>
+                  <TransformedText kind="plain" {...props.heading} tag="h2" />
                 </div>
                 {displayedAverageRating && displayedStars ? (
                   <div
@@ -692,19 +657,7 @@ const CasualDiningReviewsComponent: PuckComponent<CasualDiningReviewsProps> = (
                   </div>
                 ) : null}
                 <div className="reviews__label">
-                  <EntityField
-                    displayName="Subheading"
-                    fieldId={props.subheading.data.text.field}
-                    constantValueEnabled={
-                      props.subheading.data.text.constantValueEnabled
-                    }
-                  >
-                    <StyledTextComponent
-                      kind="plain"
-                      {...props.subheading}
-                      tag="p"
-                    />
-                  </EntityField>
+                  <TransformedText kind="plain" {...props.subheading} tag="p" />
                 </div>
               </div>
               <div className="reviews__grid grid grid--reviews">
@@ -787,13 +740,15 @@ const CasualDiningReviewsComponent: PuckComponent<CasualDiningReviewsProps> = (
   );
 };
 
-export const CasualDiningReviews: YextComponentConfig<CasualDiningReviewsProps> =
-  {
-    label: msg("components.reviewsLabel", "Reviews"),
-    fields,
-    defaultProps,
-    render: (props) => <CasualDiningReviewsComponent {...props} />,
-  };
+export const CasualDiningReviews: YextComponentConfig<
+  CasualDiningReviewsProps,
+  typeof fields
+> = {
+  label: msg("components.reviewsLabel", "Reviews"),
+  fields,
+  defaultProps,
+  render: (props) => <CasualDiningReviewsComponent {...props} />,
+};
 
 export const config: SectionConfig = {
   id: "CasualDiningReviews",

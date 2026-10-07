@@ -1,20 +1,18 @@
 import "../shared/typography.css";
-import { StyledTextComponent } from "../shared/typography";
-import type { SectionConfig } from "@yext/visual-editor";
-import { msg } from "@yext/visual-editor";
-
-import * as React from "react";
-import { AnalyticsScopeProvider } from "@yext/pages-components";
+import type { PuckComponent } from "@puckeditor/core";
+import type { ImageType, ComplexImageType } from "@yext/pages-components";
 import {
+  type TranslatableAssetImage,
+  type YextFieldMap,
+  type YextTransformedProps,
+  type SectionConfig,
+  msg,
   Background,
   ComprehensiveCTA,
-  createStyledTextConfig,
-  EntityField,
   Image,
   getAnalyticsScopeHash,
   getSurfaceColorStyle,
   getThemeColorCssValue,
-  resolveComponentData,
   useDocument,
   VisibilityWrapper,
   type ComprehensiveCTAValue,
@@ -24,13 +22,17 @@ import {
   type ThemeColor,
   type YextComponentConfig,
   type YextEntityField,
-  type YextFields,
 } from "@yext/visual-editor";
+import { createTextConfig, TransformedText } from "../shared/transformedText";
+
+import React from "react";
+import { AnalyticsScopeProvider } from "@yext/pages-components";
+
 import {
   aspectRatioOptions,
   CapturedStyleRoot,
+  hasImageSource,
 } from "../shared/sectionHelpers";
-import { useTranslation } from "react-i18next";
 
 const themeVars: React.CSSProperties = {
   ["--COLOR-BG" as string]: "var(--palette-tertiary)",
@@ -251,7 +253,9 @@ type CasualDiningPromoProps = {
   title: StyledPlainTextProps;
   description: StyledRichTextProps;
   image: {
-    image: YextEntityField<any>;
+    image: YextEntityField<
+      ImageType | ComplexImageType | TranslatableAssetImage
+    >;
     aspectRatio: number;
     imageConstrain: "fixed" | "filled";
     styles?: StyledImageValue;
@@ -267,24 +271,16 @@ type RuntimeProps = CasualDiningPromoProps & {
   };
 };
 
-const titleConfig = createStyledTextConfig({
-  kind: "plain",
-  label: msg("fields.title", "Title"),
-  includeColor: true,
-});
+const titleConfig = createTextConfig("plain");
 
-const descriptionConfig = createStyledTextConfig({
-  kind: "richText",
-  label: msg("fields.description", "Description"),
-  includeColor: true,
-});
+const descriptionConfig = createTextConfig("richText");
 
 const defaultOverlayColor: ThemeColor = {
   selectedColor: "palette-secondary",
   contrastingColor: "palette-secondary-contrast",
 };
 
-const fields: YextFields<CasualDiningPromoProps> = {
+const fields = {
   section: {
     label: msg("fields.section", "Section"),
     type: "object",
@@ -320,6 +316,7 @@ const fields: YextFields<CasualDiningPromoProps> = {
     objectFields: {
       image: {
         type: "entityField",
+        transform: true,
         label: msg("fields.image", "Image"),
         filter: {
           types: ["type.image"],
@@ -347,25 +344,21 @@ const fields: YextFields<CasualDiningPromoProps> = {
   primaryCta: {
     label: msg("fields.primaryCTA", "Primary CTA"),
     type: "comprehensiveCTA",
+    transform: true,
   },
   secondaryCta: {
     label: msg("fields.secondaryCTA", "Secondary CTA"),
     type: "comprehensiveCTA",
+    transform: true,
   },
-};
+} satisfies YextFieldMap<CasualDiningPromoProps>;
 
-const CasualDiningPromoComponent = (props: RuntimeProps) => {
+const CasualDiningPromoComponent: PuckComponent<
+  YextTransformedProps<RuntimeProps, typeof fields>
+> = (props) => {
   const streamDocument = useDocument<any>();
-  const { i18n } = useTranslation();
-  const locale = i18n.language;
-  const resolvedImage = resolveComponentData(
-    props.image.image,
-    locale,
-    streamDocument,
-  ) as { url?: string; image?: { url?: string } } | undefined;
-  const resolvedImageUrl =
-    resolvedImage?.url ?? resolvedImage?.image?.url ?? "";
-  const showImage = Boolean(resolvedImage && resolvedImageUrl);
+  const image = props.image.image;
+  const showImage = hasImageSource(image);
   const overlayColor = props.section.overlayColor ?? defaultOverlayColor;
   const promoSurfaceBackground: ThemeColor = showImage
     ? overlayColor
@@ -416,20 +409,13 @@ const CasualDiningPromoComponent = (props: RuntimeProps) => {
           >
             <div className="promo-banner__media">
               {showImage ? (
-                <EntityField
-                  displayName="Image"
-                  fieldId={props.image.image.field}
-                  constantValueEnabled={props.image.image.constantValueEnabled}
-                  fullHeight
-                >
-                  <div style={imageWrapperStyle}>
-                    <Image
-                      image={resolvedImage as any}
-                      className="promo-banner__image"
-                      style={imageStyle}
-                    />
-                  </div>
-                </EntityField>
+                <div style={imageWrapperStyle}>
+                  <Image
+                    image={image}
+                    className="promo-banner__image"
+                    style={imageStyle}
+                  />
+                </div>
               ) : null}
             </div>
             <Background
@@ -440,63 +426,24 @@ const CasualDiningPromoComponent = (props: RuntimeProps) => {
             >
               <div className="promo-banner__inner wrapper--full">
                 <div className="promo-banner__title">
-                  <EntityField
-                    displayName="Title"
-                    fieldId={props.title.data.text.field}
-                    constantValueEnabled={
-                      props.title.data.text.constantValueEnabled
-                    }
-                  >
-                    <StyledTextComponent
-                      kind="plain"
-                      {...props.title}
-                      tag="h2"
-                    />
-                  </EntityField>
+                  <TransformedText kind="plain" {...props.title} tag="h2" />
                 </div>
                 <div className="promo-banner__description">
-                  <EntityField
-                    displayName="Description"
-                    fieldId={props.description.data.text.field}
-                    constantValueEnabled={
-                      props.description.data.text.constantValueEnabled
-                    }
-                  >
-                    <StyledTextComponent
-                      kind="richText"
-                      {...props.description}
-                    />
-                  </EntityField>
+                  <TransformedText kind="richText" {...props.description} />
                 </div>
                 <div className="promo-banner__actions">
-                  <EntityField
-                    displayName="Primary CTA"
-                    fieldId={props.primaryCta.data?.cta.field}
-                    constantValueEnabled={
-                      props.primaryCta.data?.cta.constantValueEnabled
-                    }
-                  >
-                    <ComprehensiveCTA
-                      value={{
-                        data: props.primaryCta.data,
-                        styles: props.primaryCta.styles,
-                      }}
-                    />
-                  </EntityField>
-                  <EntityField
-                    displayName="Secondary CTA"
-                    fieldId={props.secondaryCta.data?.cta.field}
-                    constantValueEnabled={
-                      props.secondaryCta.data?.cta.constantValueEnabled
-                    }
-                  >
-                    <ComprehensiveCTA
-                      value={{
-                        data: props.secondaryCta.data,
-                        styles: props.secondaryCta.styles,
-                      }}
-                    />
-                  </EntityField>
+                  <ComprehensiveCTA
+                    value={{
+                      data: props.primaryCta.data,
+                      styles: props.primaryCta.styles,
+                    }}
+                  />
+                  <ComprehensiveCTA
+                    value={{
+                      data: props.secondaryCta.data,
+                      styles: props.secondaryCta.styles,
+                    }}
+                  />
                 </div>
               </div>
             </Background>
@@ -507,7 +454,10 @@ const CasualDiningPromoComponent = (props: RuntimeProps) => {
   );
 };
 
-export const CasualDiningPromo: YextComponentConfig<CasualDiningPromoProps> = {
+export const CasualDiningPromo: YextComponentConfig<
+  CasualDiningPromoProps,
+  typeof fields
+> = {
   label: msg("components.promoLabel", "Promo"),
   fields,
   defaultProps: {
@@ -631,9 +581,7 @@ export const CasualDiningPromo: YextComponentConfig<CasualDiningPromoProps> = {
       },
     },
   },
-  render: (props) => (
-    <CasualDiningPromoComponent {...(props as RuntimeProps)} />
-  ),
+  render: (props) => <CasualDiningPromoComponent {...props} />,
 };
 
 export const config: SectionConfig = {

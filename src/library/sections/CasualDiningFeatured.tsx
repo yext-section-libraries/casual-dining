@@ -1,19 +1,13 @@
 import "../shared/typography.css";
-import { StyledTextComponent } from "../shared/typography";
-import type { SectionConfig } from "@yext/visual-editor";
-import { msg } from "@yext/visual-editor";
-
-import * as React from "react";
-import { AnalyticsScopeProvider } from "@yext/pages-components";
-import { type ComplexImageType, type ImageType } from "@yext/pages-components";
-import { type PuckComponent } from "@puckeditor/core";
-import { getDefaultRTF } from "@yext/visual-editor";
+import { createTextConfig, TransformedText } from "../shared/transformedText";
 import {
+  type YextFieldMap,
+  type YextTransformedProps,
+  type SectionConfig,
+  msg,
   Background,
   ComprehensiveCTA,
   createItemSource,
-  createStyledTextConfig,
-  EntityField,
   Image,
   getAnalyticsScopeHash,
   getSurfaceColorStyle,
@@ -29,8 +23,13 @@ import {
   type TranslatableString,
   type YextComponentConfig,
   type YextEntityField,
-  type YextFields,
 } from "@yext/visual-editor";
+
+import React from "react";
+import { AnalyticsScopeProvider } from "@yext/pages-components";
+import { type ComplexImageType, type ImageType } from "@yext/pages-components";
+import { type PuckComponent } from "@puckeditor/core";
+
 import {
   aspectRatioOptions,
   CapturedStyleRoot,
@@ -451,31 +450,15 @@ const featuredCardsSource = createItemSource<FeaturedCardFields>({
   })),
 });
 
-const headingConfig = createStyledTextConfig({
-  kind: "plain",
-  label: msg("fields.heading", "Heading"),
-  includeColor: true,
-});
+const headingConfig = createTextConfig("plain");
 
-const descriptionConfig = createStyledTextConfig({
-  kind: "richText",
-  label: msg("fields.description", "Description"),
-  includeColor: true,
-});
+const descriptionConfig = createTextConfig("richText");
 
-const cardTitleConfig = createStyledTextConfig({
-  kind: "plain",
-  label: msg("fields.title", "Title"),
-  includeColor: true,
-});
+const cardTitleConfig = createTextConfig("plain");
 
-const cardDescriptionConfig = createStyledTextConfig({
-  kind: "richText",
-  label: msg("fields.description", "Description"),
-  includeColor: true,
-});
+const cardDescriptionConfig = createTextConfig("richText");
 
-const fields: YextFields<CasualDiningFeaturedFieldProps> = {
+const fields = {
   section: {
     label: msg("fields.section", "Section"),
     type: "object",
@@ -513,12 +496,13 @@ const fields: YextFields<CasualDiningFeaturedFieldProps> = {
   sectionCta: {
     label: msg("fields.sectionCta", "Section CTA"),
     type: "comprehensiveCTA",
+    transform: true,
   },
   cards: {
     label: msg("fields.cards", "Cards"),
     type: "object",
     objectFields: {
-      data: featuredCardsSource.field,
+      data: { ...featuredCardsSource.field, transform: true },
       styles: {
         label: msg("fields.styles", "Styles"),
         type: "object",
@@ -570,7 +554,7 @@ const fields: YextFields<CasualDiningFeaturedFieldProps> = {
       },
     },
   },
-};
+} satisfies YextFieldMap<CasualDiningFeaturedFieldProps>;
 
 const defaultCardStyles: FeaturedCardStyles = {
   image: {
@@ -589,16 +573,11 @@ const defaultCardStyles: FeaturedCardStyles = {
 };
 
 const CasualDiningFeaturedComponent: PuckComponent<
-  CasualDiningFeaturedProps
+  YextTransformedProps<CasualDiningFeaturedProps, typeof fields>
 > = (props) => {
   const streamDocument = useDocument<{ locale?: string }>();
   const isEditing = Boolean(props.puck?.isEditing);
-  const cards = props.cards ?? {
-    data: featuredCardsSource.defaultValue,
-    styles: defaultCardStyles,
-  };
-  const cardData = featuredCardsSource.resolveItems(cards.data, streamDocument);
-  const cardStyles = cards.styles ?? defaultCardStyles;
+  const cardStyles = props.cards.styles ?? defaultCardStyles;
   const cardImageStyles = cardStyles.image?.styles;
   const sectionSurfaceStyle = getSurfaceColorStyle(
     props.section?.backgroundColor,
@@ -635,148 +614,98 @@ const CasualDiningFeaturedComponent: PuckComponent<
               <div className="grid__heading-holder grid__heading-holder--inline">
                 <div className="grid__heading-text">
                   <div className="grid__heading heading-small">
-                    <EntityField
-                      displayName="Heading"
-                      fieldId={props.heading.data.text.field}
-                      constantValueEnabled={
-                        props.heading.data.text.constantValueEnabled
-                      }
-                    >
-                      <StyledTextComponent
-                        kind="plain"
-                        {...props.heading}
-                        tag="h2"
-                      />
-                    </EntityField>
+                    <TransformedText kind="plain" {...props.heading} tag="h2" />
                   </div>
                   <div className="grid__description body-medium">
-                    <EntityField
-                      displayName="Description"
-                      fieldId={props.description.data.text.field}
-                      constantValueEnabled={
-                        props.description.data.text.constantValueEnabled
-                      }
-                    >
-                      <StyledTextComponent
-                        kind="richText"
-                        {...props.description}
-                      />
-                    </EntityField>
+                    <TransformedText kind="richText" {...props.description} />
                   </div>
                 </div>
                 <div className="grid__heading-actions">
-                  <EntityField
-                    displayName="Section CTA"
-                    fieldId={props.sectionCta.data.cta.field}
-                    constantValueEnabled={
-                      props.sectionCta.data.cta.constantValueEnabled
-                    }
-                  >
-                    <ComprehensiveCTA
-                      value={{
-                        data: props.sectionCta.data,
-                        styles: props.sectionCta.styles,
-                      }}
-                    />
-                  </EntityField>
+                  <ComprehensiveCTA
+                    value={{
+                      data: props.sectionCta.data,
+                      styles: props.sectionCta.styles,
+                    }}
+                  />
                 </div>
               </div>
               <div className="grid__items-holder">
-                <EntityField
-                  displayName="Cards"
-                  fieldId={cards.data.field}
-                  constantValueEnabled={cards.data.constantValueEnabled}
-                >
-                  <div className="grid grid--products">
-                    {cardData.map((item, index) => {
-                      const image = item.image;
-                      const imageToRender =
-                        image &&
-                        typeof image === "object" &&
-                        "url" in image &&
-                        image.url
-                          ? image
-                          : undefined;
+                <div className="grid grid--products">
+                  {props.cards.data.map((item, index) => {
+                    const image = item.image;
+                    const imageToRender =
+                      image &&
+                      typeof image === "object" &&
+                      "url" in image &&
+                      image.url
+                        ? image
+                        : undefined;
 
-                      return (
-                        <article
-                          key={index}
-                          className={`product-item product-item--centered product-item--outer-text product-item--card${imageToRender ? "" : " product-item--no-image"}`}
-                          style={cardSurfaceStyle}
-                        >
-                          {imageToRender ? (
-                            <div
-                              className="product-item__image"
-                              style={{
-                                aspectRatio:
-                                  cardStyles.image?.aspectRatio > 0
-                                    ? cardStyles.image.aspectRatio
-                                    : undefined,
-                              }}
-                            >
-                              <div className="product-item__bg">
-                                <figure className="image-wrapper image-wrapper--cover">
-                                  <Image
-                                    image={imageToRender}
-                                    className="product-packshot"
-                                    style={{
-                                      display: "block",
-                                      width: "100%",
-                                      height:
-                                        cardStyles.image?.aspectRatio > 0
-                                          ? "100%"
-                                          : "auto",
-                                      objectFit:
-                                        cardStyles.image?.imageConstrain ===
-                                        "filled"
-                                          ? "cover"
-                                          : "contain",
-                                      borderRadius:
-                                        cardImageStyles?.borderRadius ===
-                                        "default"
-                                          ? undefined
-                                          : cardImageStyles?.borderRadius,
-                                    }}
-                                  />
-                                </figure>
-                              </div>
-                            </div>
-                          ) : null}
-                          <div className="product-item__info">
-                            <div className="product-item__title">
-                              <StyledTextComponent
-                                kind="plain"
-                                {...cardStyles.title}
-                                data={{
-                                  text: {
-                                    field: "",
-                                    constantValue: item.title ?? "",
-                                    constantValueEnabled: true,
-                                  },
-                                }}
-                                tag="h3"
-                              />
-                            </div>
-                            <div className="product-item__caption">
-                              <StyledTextComponent
-                                kind="richText"
-                                {...cardStyles.description}
-                                data={{
-                                  text: {
-                                    field: "",
-                                    constantValue:
-                                      item.description ?? getDefaultRTF(""),
-                                    constantValueEnabled: true,
-                                  },
-                                }}
-                              />
+                    return (
+                      <article
+                        key={index}
+                        className={`product-item product-item--centered product-item--outer-text product-item--card${imageToRender ? "" : " product-item--no-image"}`}
+                        style={cardSurfaceStyle}
+                      >
+                        {imageToRender ? (
+                          <div
+                            className="product-item__image"
+                            style={{
+                              aspectRatio:
+                                cardStyles.image?.aspectRatio > 0
+                                  ? cardStyles.image.aspectRatio
+                                  : undefined,
+                            }}
+                          >
+                            <div className="product-item__bg">
+                              <figure className="image-wrapper image-wrapper--cover">
+                                <Image
+                                  image={imageToRender}
+                                  className="product-packshot"
+                                  style={{
+                                    display: "block",
+                                    width: "100%",
+                                    height:
+                                      cardStyles.image?.aspectRatio > 0
+                                        ? "100%"
+                                        : "auto",
+                                    objectFit:
+                                      cardStyles.image?.imageConstrain ===
+                                      "filled"
+                                        ? "cover"
+                                        : "contain",
+                                    borderRadius:
+                                      cardImageStyles?.borderRadius ===
+                                      "default"
+                                        ? undefined
+                                        : cardImageStyles?.borderRadius,
+                                  }}
+                                />
+                              </figure>
                             </div>
                           </div>
-                        </article>
-                      );
-                    })}
-                  </div>
-                </EntityField>
+                        ) : null}
+                        <div className="product-item__info">
+                          <div className="product-item__title">
+                            <TransformedText
+                              kind="plain"
+                              {...cardStyles.title}
+                              data={{ text: item.title }}
+                              tag="h3"
+                            />
+                          </div>
+                          <div className="product-item__caption">
+                            <TransformedText
+                              kind="richText"
+                              {...cardStyles.description}
+                              data={{ text: item.description }}
+                            />
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </Background>
@@ -786,69 +715,71 @@ const CasualDiningFeaturedComponent: PuckComponent<
   );
 };
 
-export const CasualDiningFeatured: YextComponentConfig<CasualDiningFeaturedFieldProps> =
-  {
-    label: msg("components.featuredLabel", "Featured Items"),
-    fields,
-    defaultProps: {
-      section: {
-        visibleOnLivePage: true,
-        backgroundColor: {
-          selectedColor: "palette-secondary",
-          contrastingColor: "palette-secondary-contrast",
-        },
-        cardBackgroundColor: {
-          selectedColor: "white",
-          contrastingColor: "black",
-        },
+export const CasualDiningFeatured: YextComponentConfig<
+  CasualDiningFeaturedFieldProps,
+  typeof fields
+> = {
+  label: msg("components.featuredLabel", "Featured Items"),
+  fields,
+  defaultProps: {
+    section: {
+      visibleOnLivePage: true,
+      backgroundColor: {
+        selectedColor: "palette-secondary",
+        contrastingColor: "palette-secondary-contrast",
       },
-      heading: {
-        ...headingConfig.defaultProps,
-        data: {
-          text: createTextField("Featured menu items"),
-        },
-      } as StyledPlainTextProps,
-      description: {
-        ...descriptionConfig.defaultProps,
-        data: {
-          text: createRtfField(
-            "House favorites for brunch, lunch, happy hour, and late takeout.",
-          ),
-        },
-      } as StyledRichTextProps,
-      sectionCta: {
-        data: {
-          actionType: "link",
-          cta: {
-            field: "",
-            selectedType: "textAndLink",
-            constantValue: {
-              label: {
-                defaultValue: "VIEW FULL MENU",
-                hasLocalizedValue: "true" as const,
-              },
-              link: {
-                defaultValue: "#",
-                hasLocalizedValue: "true" as const,
-              },
-              openInNewTab: false,
-              ctaType: "textAndLink",
-            },
-            constantValueEnabled: true,
-          },
-          openInNewTab: false,
-        },
-        styles: {
-          variant: "primary",
-        },
-      },
-      cards: {
-        data: featuredCardsSource.defaultValue,
-        styles: defaultCardStyles,
+      cardBackgroundColor: {
+        selectedColor: "white",
+        contrastingColor: "black",
       },
     },
-    render: (props) => <CasualDiningFeaturedComponent {...props} />,
-  };
+    heading: {
+      ...headingConfig.defaultProps,
+      data: {
+        text: createTextField("Featured menu items"),
+      },
+    } as StyledPlainTextProps,
+    description: {
+      ...descriptionConfig.defaultProps,
+      data: {
+        text: createRtfField(
+          "House favorites for brunch, lunch, happy hour, and late takeout.",
+        ),
+      },
+    } as StyledRichTextProps,
+    sectionCta: {
+      data: {
+        actionType: "link",
+        cta: {
+          field: "",
+          selectedType: "textAndLink",
+          constantValue: {
+            label: {
+              defaultValue: "VIEW FULL MENU",
+              hasLocalizedValue: "true" as const,
+            },
+            link: {
+              defaultValue: "#",
+              hasLocalizedValue: "true" as const,
+            },
+            openInNewTab: false,
+            ctaType: "textAndLink",
+          },
+          constantValueEnabled: true,
+        },
+        openInNewTab: false,
+      },
+      styles: {
+        variant: "primary",
+      },
+    },
+    cards: {
+      data: featuredCardsSource.defaultValue,
+      styles: defaultCardStyles,
+    },
+  },
+  render: (props) => <CasualDiningFeaturedComponent {...props} />,
+};
 
 export const config: SectionConfig = {
   id: "CasualDiningFeatured",

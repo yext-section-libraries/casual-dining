@@ -6,22 +6,18 @@ import { msg } from "@yext/visual-editor";
 
 import { PuckComponent } from "@puckeditor/core";
 import { CircleSlash2 } from "lucide-react";
-import { useTranslation } from "react-i18next";
 import {
-  EntityField,
   MaybeRTF,
   PageSection,
   type StyledTextValue,
-  type RichText,
   type ThemeColor,
   type TranslatableRichText,
   VisibilityWrapper,
   type YextComponentConfig,
   type YextEntityField,
-  type YextFields,
+  type YextFieldMap,
+  type YextTransformedProps,
   backgroundColors,
-  resolveYextEntityField,
-  useDocument,
 } from "@yext/visual-editor";
 import { createRtfField, defaultTextStyles } from "../shared/sectionHelpers";
 
@@ -40,24 +36,8 @@ type CasualDiningBannerProps = {
   };
 };
 
-const isRichTextEmpty = (value: unknown): boolean => {
-  if (!value) {
-    return true;
-  }
-
-  if (typeof value === "string") {
-    return value.trim() === "";
-  }
-
-  if (typeof value === "object" && "html" in value) {
-    const html = (value as { html?: unknown }).html;
-    return typeof html !== "string" || html.trim() === "";
-  }
-
-  return false;
-};
-
-const CasualDiningBannerFields: YextFields<CasualDiningBannerProps> = {
+// `satisfies` keeps transform: true literal for YextTransformedProps.
+const CasualDiningBannerFields = {
   data: {
     label: msg("fields.bannerText", "Banner Text"),
     type: "object",
@@ -65,6 +45,7 @@ const CasualDiningBannerFields: YextFields<CasualDiningBannerProps> = {
       text: {
         label: msg("fields.text", "Text"),
         type: "entityField",
+        transform: true,
         filter: {
           types: ["type.rich_text_v2"],
         },
@@ -114,25 +95,17 @@ const CasualDiningBannerFields: YextFields<CasualDiningBannerProps> = {
       },
     },
   },
-};
+} satisfies YextFieldMap<CasualDiningBannerProps>;
 
-const CasualDiningBannerComponent: PuckComponent<CasualDiningBannerProps> = ({
+const CasualDiningBannerComponent: PuckComponent<
+  YextTransformedProps<CasualDiningBannerProps, typeof CasualDiningBannerFields>
+> = ({
   data,
   styles,
   section,
   puck,
 }) => {
-  const { i18n } = useTranslation();
-  const streamDocument = useDocument();
-  const isMappedField =
-    !data.text.constantValueEnabled && Boolean(data.text.field);
-
-  if (
-    isMappedField &&
-    isRichTextEmpty(
-      resolveYextEntityField(streamDocument, data.text, i18n.language),
-    )
-  ) {
+  if (!data.text) {
     if (!puck.isEditing) {
       return <></>;
     }
@@ -149,8 +122,8 @@ const CasualDiningBannerComponent: PuckComponent<CasualDiningBannerProps> = ({
             <Body className="text-gray-500" variant="sm">
               Section hidden for this page
             </Body>
-            <Body className="text-gray-500" variant="sm">
-              The mapped banner field is empty
+            <Body className="font-normal text-gray-500" variant="sm">
+              The banner field is empty
             </Body>
           </div>
         </div>
@@ -162,16 +135,6 @@ const CasualDiningBannerComponent: PuckComponent<CasualDiningBannerProps> = ({
     ...resolveTextStyles(data.styles),
     color: data.fontColor ?? section.backgroundColor.contrastingColor,
   };
-  const resolvedText = resolveYextEntityField(
-    streamDocument,
-    data.text,
-    i18n.language,
-  ) as string | RichText | undefined;
-
-  if (!resolvedText) {
-    return <></>;
-  }
-
   return (
     <PageSection
       background={section.backgroundColor}
@@ -184,17 +147,11 @@ const CasualDiningBannerComponent: PuckComponent<CasualDiningBannerProps> = ({
       }`}
       verticalPadding="sm"
     >
-      <EntityField
-        constantValueEnabled={data.text.constantValueEnabled}
-        displayName="Banner Text"
-        fieldId={data.text.field}
-      >
-        <MaybeRTF
-          data={resolvedText}
-          style={resolveBodyStyles(data.styles)}
-          richTextStyleOverrides={richTextStyleOverrides}
-        />
-      </EntityField>
+      <MaybeRTF
+        data={data.text}
+        style={resolveBodyStyles(data.styles)}
+        richTextStyleOverrides={richTextStyleOverrides}
+      />
     </PageSection>
   );
 };
@@ -202,32 +159,34 @@ const CasualDiningBannerComponent: PuckComponent<CasualDiningBannerProps> = ({
 /**
  * Displays a full-width, editor-configurable rich-text banner.
  */
-export const CasualDiningBanner: YextComponentConfig<CasualDiningBannerProps> =
-  {
-    label: msg("components.bannerLabel", "Banner"),
-    fields: CasualDiningBannerFields,
-    defaultProps: {
-      data: {
-        text: createRtfField("Banner Text"),
-        styles: defaultTextStyles,
-      },
-      styles: {
-        textAlignment: "center",
-      },
-      section: {
-        backgroundColor: backgroundColors.color1.value,
-        visibleOnLivePage: true,
-      },
+export const CasualDiningBanner: YextComponentConfig<
+  CasualDiningBannerProps,
+  typeof CasualDiningBannerFields
+> = {
+  label: msg("components.bannerLabel", "Banner"),
+  fields: CasualDiningBannerFields,
+  defaultProps: {
+    data: {
+      text: createRtfField("Banner Text"),
+      styles: defaultTextStyles,
     },
-    render: (props) => (
-      <VisibilityWrapper
-        isEditing={props.puck.isEditing}
-        liveVisibility={props.section.visibleOnLivePage}
-      >
-        <CasualDiningBannerComponent {...props} />
-      </VisibilityWrapper>
-    ),
-  };
+    styles: {
+      textAlignment: "center",
+    },
+    section: {
+      backgroundColor: backgroundColors.color1.value,
+      visibleOnLivePage: true,
+    },
+  },
+  render: (props) => (
+    <VisibilityWrapper
+      isEditing={props.puck.isEditing}
+      liveVisibility={props.section.visibleOnLivePage}
+    >
+      <CasualDiningBannerComponent {...props} />
+    </VisibilityWrapper>
+  ),
+};
 
 export const config: SectionConfig = {
   id: "CasualDiningBanner",
