@@ -8,9 +8,7 @@ import {
   msg,
   Background,
   Image,
-  getSurfaceColorStyle,
   getAnalyticsScopeHash,
-  useDocument,
   VisibilityWrapper,
   type StyledImageValue,
   type StyledPlainTextProps,
@@ -354,6 +352,8 @@ const fields = {
         label: msg("fields.backgroundColor", "Background Color"),
         type: "basicSelector",
         options: "BACKGROUND_COLOR",
+        transform: true,
+        format: "surface",
       },
     },
   },
@@ -395,6 +395,7 @@ const fields = {
       styles: {
         label: msg("fields.imageStyles", "Image Styles"),
         type: "styledImage",
+        transform: true,
       },
     },
   },
@@ -417,10 +418,7 @@ const defaultContent: StyledRichTextProps = {
 const CasualDiningStoryComponent: PuckComponent<
   YextTransformedProps<CasualDiningStoryProps, typeof fields>
 > = (props) => {
-  const streamDocument = useDocument();
-  const sectionImageStyles = props.sectionImage?.styles ?? {
-    borderRadius: "default",
-  };
+  const sectionImageStyles = props.sectionImage?.styles;
   const image = props.sectionImage?.image;
   const hasImage = hasImageSource(image);
   const sectionImageWrapperStyle: React.CSSProperties = {
@@ -431,13 +429,10 @@ const CasualDiningStoryComponent: PuckComponent<
     height: "auto",
     overflow:
       props.sectionImage.imageConstrain === "filled" ||
-      sectionImageStyles.borderRadius !== "default"
+      sectionImageStyles?.borderRadius
         ? "hidden"
         : undefined,
-    borderRadius:
-      sectionImageStyles.borderRadius === "default"
-        ? undefined
-        : sectionImageStyles.borderRadius,
+    ...(sectionImageStyles as React.CSSProperties),
   };
   const sectionImageStyle: React.CSSProperties = {
     display: "block",
@@ -446,13 +441,6 @@ const CasualDiningStoryComponent: PuckComponent<
     objectFit:
       props.sectionImage.imageConstrain === "filled" ? "cover" : "contain",
   };
-  const sectionSurfaceStyle = getSurfaceColorStyle(
-    props.section.backgroundColor,
-    streamDocument,
-    {
-      fallbackBackgroundColor: "var(--colors-palette-tertiary)",
-    },
-  );
 
   return (
     <AnalyticsScopeProvider
@@ -468,7 +456,6 @@ const CasualDiningStoryComponent: PuckComponent<
             background={props.section.backgroundColor}
             className="index-image-text section-padding text-left color-scheme-5"
             id="visit"
-            style={sectionSurfaceStyle}
           >
             <div
               className={`brick__section brick__section--reversed wrapper--full${hasImage ? "" : " brick__section--text-only"}`}

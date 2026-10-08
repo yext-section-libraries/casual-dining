@@ -11,9 +11,6 @@ import {
   ComprehensiveCTA,
   Image,
   getAnalyticsScopeHash,
-  getSurfaceColorStyle,
-  getThemeColorCssValue,
-  useDocument,
   VisibilityWrapper,
   type ComprehensiveCTAValue,
   type StyledImageValue,
@@ -297,6 +294,8 @@ const fields = {
         label: msg("fields.overlayColor", "Overlay Color"),
         type: "basicSelector",
         options: "BACKGROUND_COLOR",
+        transform: true,
+        format: "surface",
       },
     },
   },
@@ -338,6 +337,7 @@ const fields = {
       styles: {
         label: msg("fields.imageStyles", "Image Styles"),
         type: "styledImage",
+        transform: true,
       },
     },
   },
@@ -356,35 +356,25 @@ const fields = {
 const CasualDiningPromoComponent: PuckComponent<
   YextTransformedProps<RuntimeProps, typeof fields>
 > = (props) => {
-  const streamDocument = useDocument<any>();
   const image = props.image.image;
   const showImage = hasImageSource(image);
-  const overlayColor = props.section.overlayColor ?? defaultOverlayColor;
-  const promoSurfaceBackground: ThemeColor = showImage
-    ? overlayColor
+  const promoSurfaceBackground = showImage
+    ? props.section.overlayColor ?? defaultOverlayColor
     : {
         selectedColor: "black",
         contrastingColor: "white",
       };
-  const sectionSurfaceStyle = getSurfaceColorStyle(
-    promoSurfaceBackground,
-    streamDocument,
-  );
   const overlayColorCss =
-    getThemeColorCssValue(overlayColor) ??
-    getThemeColorCssValue(defaultOverlayColor);
+    props.section.overlayColor?.backgroundColor ?? "var(--colors-palette-secondary)";
   const overlayBackground = showImage
     ? `linear-gradient(180deg, color-mix(in srgb, ${overlayColorCss} 30%, transparent) 0%, color-mix(in srgb, ${overlayColorCss} 42%, transparent) 34%, color-mix(in srgb, ${overlayColorCss} 62%, transparent) 100%), linear-gradient(90deg, color-mix(in srgb, ${overlayColorCss} 36%, transparent) 0%, color-mix(in srgb, ${overlayColorCss} 22%, transparent) 48%, color-mix(in srgb, ${overlayColorCss} 46%, transparent) 100%)`
     : undefined;
   const imageStyle: React.CSSProperties = {
+    ...(props.image.styles as React.CSSProperties),
     display: "block",
     width: "100%",
     height: "100%",
     objectFit: "cover",
-    borderRadius:
-      props.image.styles?.borderRadius === "default"
-        ? undefined
-        : props.image.styles?.borderRadius,
   };
   const imageWrapperStyle: React.CSSProperties = {
     height: "100%",
@@ -405,7 +395,6 @@ const CasualDiningPromoComponent: PuckComponent<
             background={promoSurfaceBackground}
             className="promo-banner color-scheme-1"
             id="promo-truffle-mac"
-            style={sectionSurfaceStyle}
           >
             <div className="promo-banner__media">
               {showImage ? (
@@ -420,7 +409,7 @@ const CasualDiningPromoComponent: PuckComponent<
             </div>
             <Background
               as="div"
-              background={showImage ? overlayColor : promoSurfaceBackground}
+              background={promoSurfaceBackground}
               className="promo-banner__content"
               style={{ background: overlayBackground }}
             >

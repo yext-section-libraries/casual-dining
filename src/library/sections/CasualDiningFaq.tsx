@@ -7,9 +7,7 @@ import {
   msg,
   Background,
   createItemSource,
-  getSurfaceColorStyle,
   getAnalyticsScopeHash,
-  useDocument,
   VisibilityWrapper,
   type StyledPlainTextProps,
   type StyledRichTextProps,
@@ -348,6 +346,8 @@ const fields = {
         label: msg("fields.backgroundColor", "Background Color"),
         type: "basicSelector",
         options: "BACKGROUND_COLOR",
+        transform: true,
+        format: "surface",
       },
     },
   },
@@ -388,12 +388,7 @@ const fields = {
 const CasualDiningFaqComponent: PuckComponent<
   YextTransformedProps<CasualDiningFaqProps, typeof fields>
 > = (props) => {
-  const streamDocument = useDocument<any>();
   const [openIndex, setOpenIndex] = React.useState(0);
-  const sectionSurfaceStyle = getSurfaceColorStyle(
-    props.section.backgroundColor,
-    streamDocument,
-  );
 
   return (
     <AnalyticsScopeProvider
@@ -409,7 +404,6 @@ const CasualDiningFaqComponent: PuckComponent<
             background={props.section.backgroundColor}
             className="faq-shell section-padding color-scheme-1"
             id="faq"
-            style={sectionSurfaceStyle}
           >
             <div className="wrapper">
               <div className="faq-shell__intro">

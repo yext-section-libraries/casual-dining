@@ -1,4 +1,3 @@
-import { resolveTextStyles } from "../shared/typography";
 import "../shared/typography.css";
 import type { SectionConfig } from "@yext/visual-editor";
 import { msg } from "@yext/visual-editor";
@@ -8,8 +7,6 @@ import { type PuckComponent } from "@puckeditor/core";
 import { Link } from "@yext/pages-components";
 import {
   Background,
-  getSurfaceColorStyle,
-  getThemeColorCssValue,
   pt,
   resolveBreadcrumbs,
   useDocument,
@@ -18,7 +15,8 @@ import {
   type ThemeColor,
   type StyledTextValue,
   type YextComponentConfig,
-  type YextFields,
+  type YextFieldMap,
+  type YextTransformedProps,
 } from "@yext/visual-editor";
 
 type CasualDiningBreadcrumbsProps = {
@@ -33,7 +31,7 @@ type CasualDiningBreadcrumbsProps = {
   };
 };
 
-const fields: YextFields<CasualDiningBreadcrumbsProps> = {
+const fields = {
   section: {
     label: msg("fields.section", "Section"),
     type: "object",
@@ -50,6 +48,8 @@ const fields: YextFields<CasualDiningBreadcrumbsProps> = {
         label: msg("fields.backgroundColor", "Background Color"),
         type: "basicSelector",
         options: "BACKGROUND_COLOR",
+        transform: true,
+        format: "surface",
       },
     },
   },
@@ -68,18 +68,20 @@ const fields: YextFields<CasualDiningBreadcrumbsProps> = {
       styles: {
         label: msg("fields.textStyles", "Text Styles"),
         type: "styledText",
+        transform: true,
       },
       fontColor: {
         label: msg("fields.fontColor", "Font Color"),
         type: "basicSelector",
         options: "SITE_COLOR",
+        transform: true,
       },
     },
   },
-};
+} satisfies YextFieldMap<CasualDiningBreadcrumbsProps>;
 
 const CasualDiningBreadcrumbsComponent: PuckComponent<
-  CasualDiningBreadcrumbsProps
+  YextTransformedProps<CasualDiningBreadcrumbsProps, typeof fields>
 > = (props) => {
   const streamDocument = useDocument();
   const { relativePrefixToRoot } = useTemplateProps();
@@ -88,14 +90,9 @@ const CasualDiningBreadcrumbsComponent: PuckComponent<
     props.includeCurrentLocation || breadcrumbs.length <= 1
     ? breadcrumbs
     : breadcrumbs.slice(0, -1);
-  const sectionSurfaceStyle = getSurfaceColorStyle(
-    props.section.backgroundColor,
-    streamDocument,
-    { fallbackBackgroundColor: "var(--colors-palette-secondary)" },
-  );
   const breadcrumbLinkStyle: React.CSSProperties = {
-    color: getThemeColorCssValue(props.breadcrumbLinks.fontColor),
-    ...resolveTextStyles(props.breadcrumbLinks.styles),
+    color: props.breadcrumbLinks.fontColor,
+    ...(props.breadcrumbLinks.styles as React.CSSProperties),
   };
 
   if (!breadcrumbs.length) {
@@ -124,7 +121,6 @@ const CasualDiningBreadcrumbsComponent: PuckComponent<
         as="nav"
         background={props.section.backgroundColor}
         aria-label="Breadcrumb"
-        style={sectionSurfaceStyle}
       >
         <ol
           className="mx-auto flex w-full max-w-[1440px] flex-wrap items-center gap-x-2 gap-y-1 px-4 py-3 sm:px-8"
@@ -166,8 +162,10 @@ const CasualDiningBreadcrumbsComponent: PuckComponent<
   );
 };
 
-export const CasualDiningBreadcrumbs: YextComponentConfig<CasualDiningBreadcrumbsProps> =
-  {
+export const CasualDiningBreadcrumbs: YextComponentConfig<
+  CasualDiningBreadcrumbsProps,
+  typeof fields
+> = {
     label: msg("components.breadcrumbs", "Breadcrumbs"),
     fields,
     defaultProps: {
@@ -191,7 +189,7 @@ export const CasualDiningBreadcrumbs: YextComponentConfig<CasualDiningBreadcrumb
       },
     },
     render: CasualDiningBreadcrumbsComponent,
-  };
+};
 
 export const config: SectionConfig = {
   id: "CasualDiningBreadcrumbs",

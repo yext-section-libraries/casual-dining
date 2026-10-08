@@ -1,14 +1,15 @@
-import { Body } from "../shared/typography";
-import { resolveBodyStyles, resolveTextStyles } from "../shared/typography";
+import { Body, resolveBodyStyles } from "../shared/typography";
 import "../shared/typography.css";
 import type { SectionConfig } from "@yext/visual-editor";
 import { msg } from "@yext/visual-editor";
 
 import { PuckComponent } from "@puckeditor/core";
 import { CircleSlash2 } from "lucide-react";
+import type { CSSProperties } from "react";
 import {
   MaybeRTF,
   PageSection,
+  type RichTextStyleOverrides,
   type StyledTextValue,
   type ThemeColor,
   type TranslatableRichText,
@@ -53,11 +54,13 @@ const CasualDiningBannerFields = {
       styles: {
         label: msg("fields.textStyles", "Text Styles"),
         type: "styledText",
+        transform: true,
       },
       fontColor: {
         label: msg("fields.textColor", "Text Color"),
         type: "basicSelector",
         options: "SITE_COLOR",
+        transform: true,
       },
     },
   },
@@ -84,6 +87,8 @@ const CasualDiningBannerFields = {
         label: msg("fields.backgroundColor", "Background Color"),
         type: "basicSelector",
         options: "BACKGROUND_COLOR",
+        transform: true,
+        format: "surface",
       },
       visibleOnLivePage: {
         label: msg("fields.visibleOnLivePage", "Visible on Live Page"),
@@ -131,10 +136,6 @@ const CasualDiningBannerComponent: PuckComponent<
     );
   }
 
-  const richTextStyleOverrides = {
-    ...resolveTextStyles(data.styles),
-    color: data.fontColor ?? section.backgroundColor.contrastingColor,
-  };
   return (
     <PageSection
       background={section.backgroundColor}
@@ -149,8 +150,11 @@ const CasualDiningBannerComponent: PuckComponent<
     >
       <MaybeRTF
         data={data.text}
-        style={resolveBodyStyles(data.styles)}
-        richTextStyleOverrides={richTextStyleOverrides}
+        style={resolveBodyStyles(data.styles as CSSProperties)}
+        richTextStyleOverrides={{
+          ...(data.styles as CSSProperties),
+          color: data.fontColor ?? section.backgroundColor?.color,
+        } as RichTextStyleOverrides}
       />
     </PageSection>
   );

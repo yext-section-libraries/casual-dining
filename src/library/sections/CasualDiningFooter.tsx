@@ -11,8 +11,6 @@ import {
   type ComprehensiveCTAValue,
   Image,
   getAnalyticsScopeHash,
-  getSurfaceColorStyle,
-  useDocument,
   VisibilityWrapper,
   type StyledImageValue,
   type StyledPlainTextProps,
@@ -468,11 +466,15 @@ const fields = {
         label: msg("fields.backgroundColor", "Background Color"),
         type: "basicSelector",
         options: "BACKGROUND_COLOR",
+        transform: true,
+        format: "surface",
       },
       footerBackgroundColor: {
         label: msg("fields.footerBackgroundColor", "Footer Background Color"),
         type: "basicSelector",
         options: "BACKGROUND_COLOR",
+        transform: true,
+        format: "surface",
       },
     },
   },
@@ -516,6 +518,7 @@ const fields = {
           styles: {
             label: msg("fields.imageStyles", "Image Styles"),
             type: "styledImage",
+            transform: true,
           },
         },
       },
@@ -930,23 +933,12 @@ const defaultProps: CasualDiningFooterProps = {
 const CasualDiningFooterComponent: PuckComponent<
   YextTransformedProps<CasualDiningFooterProps, typeof fields>
 > = (props) => {
-  const streamDocument = useDocument();
   const isEditing = Boolean(props.puck?.isEditing);
   const brandImageStyles = props.brand.image.styles;
   const brandImage = props.brand.image.image;
-  const sectionSurfaceStyle = getSurfaceColorStyle(
-    props.section?.backgroundColor,
-    streamDocument,
-  );
-  const sectionTextColor = sectionSurfaceStyle?.color;
-  const footerBottomSurfaceStyle = getSurfaceColorStyle(
-    props.section?.footerBackgroundColor,
-    streamDocument,
-    {
-      fallbackTextColor: sectionTextColor,
-    },
-  );
-  const footerBottomTextColor = footerBottomSurfaceStyle?.color;
+  const sectionTextColor = props.section.backgroundColor?.color;
+  const footerBottomTextColor =
+    props.section.footerBackgroundColor?.color ?? sectionTextColor;
 
   return (
     <AnalyticsScopeProvider
@@ -963,7 +955,6 @@ const CasualDiningFooterComponent: PuckComponent<
             className="footer-sections"
             id="footer"
             style={{
-              ...sectionSurfaceStyle,
               ["--footer-text" as string]: sectionTextColor,
             }}
           >
@@ -976,6 +967,7 @@ const CasualDiningFooterComponent: PuckComponent<
                         <Image
                           image={brandImage!}
                           style={{
+                            ...(brandImageStyles as React.CSSProperties),
                             display: "block",
                             margin: "0 auto",
                             width: "auto",
@@ -988,10 +980,6 @@ const CasualDiningFooterComponent: PuckComponent<
                               props.brand?.image?.imageConstrain === "filled"
                                 ? "cover"
                                 : "contain",
-                            borderRadius:
-                              brandImageStyles.borderRadius === "default"
-                                ? undefined
-                                : brandImageStyles.borderRadius,
                           }}
                         />
                       </div>
@@ -1105,7 +1093,10 @@ const CasualDiningFooterComponent: PuckComponent<
 
             <section
               className="supporting-menu section-padding color-scheme-footer"
-              style={footerBottomSurfaceStyle}
+              style={{
+                backgroundColor: props.section.footerBackgroundColor?.backgroundColor,
+                color: footerBottomTextColor,
+              }}
             >
               <div className="supporting-menu__inner wrapper--full-padded">
                 <div className="supporting-menu__item supporting-menu__item--copyright">

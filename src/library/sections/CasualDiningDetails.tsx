@@ -8,9 +8,7 @@ import {
   msg,
   Background,
   ComprehensiveCTA,
-  getThemeColorCssValue,
   getAnalyticsScopeHash,
-  getSurfaceColorStyle,
   useDocument,
   VisibilityWrapper,
   type ComprehensiveCTAValue,
@@ -422,6 +420,8 @@ const fields = {
         label: msg("fields.backgroundColor", "Background Color"),
         type: "basicSelector",
         options: "BACKGROUND_COLOR",
+        transform: true,
+        format: "surface",
       },
     },
   },
@@ -713,11 +713,7 @@ const CasualDiningDetailsComponent: PuckComponent<
     comingSoon?: boolean;
     additionalHoursText?: string;
   }>();
-  const sectionSurfaceStyle = getSurfaceColorStyle(
-    props.section.backgroundColor,
-    streamDocument,
-  );
-  const sectionTextColor = sectionSurfaceStyle?.color;
+  const sectionTextColor = props.section.backgroundColor?.color;
   const address = props.address.address;
   const hours = props.hours.data.hours;
   const additionalHoursText = streamDocument?.additionalHoursText?.trim();
@@ -728,10 +724,9 @@ const CasualDiningDetailsComponent: PuckComponent<
     timeFormatLocale: i18n.language,
   };
   const bodyTextStyle = {
-    color:
-      getThemeColorCssValue(props.body.fontOptions.color) ?? sectionTextColor,
-    ...resolveBodyStyles(props.body.fontOptions),
-  } satisfies React.CSSProperties;
+    ...resolveBodyStyles(props.body.fontOptions as React.CSSProperties),
+    color: props.body.fontOptions.color ?? sectionTextColor,
+  } as React.CSSProperties;
   const hoursAlignmentStyle =
     props.hours.settings.alignment === "items-center"
       ? { marginInline: "auto", textAlign: "center" as const }
@@ -764,7 +759,6 @@ const CasualDiningDetailsComponent: PuckComponent<
             background={props.section.backgroundColor}
             className="core-info section-padding color-scheme-1"
             id="core-info"
-            style={sectionSurfaceStyle}
           >
             <div className="wrapper">
               <div className="core-info__intro">

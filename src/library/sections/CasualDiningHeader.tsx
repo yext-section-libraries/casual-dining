@@ -1,5 +1,4 @@
 import "../shared/typography.css";
-import { resolveTextStyles } from "../shared/typography";
 import {
   type YextFieldMap,
   type YextTransformedProps,
@@ -9,7 +8,6 @@ import {
   ComprehensiveCTA,
   type ComprehensiveCTAValue,
   Image,
-  type StreamDocument,
   type StyledImageValue,
   type StyledLinkValue,
   type ThemeColor,
@@ -19,11 +17,7 @@ import {
   type YextComponentConfig,
   type YextEntityField,
   getAnalyticsScopeHash,
-  getSurfaceColorStyle,
-  getThemeColorCssValue,
   normalizeLink,
-  normalizeThemeColorToken,
-  useDocument,
 } from "@yext/visual-editor";
 
 import React from "react";
@@ -145,41 +139,6 @@ const defaultUtilityIconImage: SharedHeaderAction["iconImage"] = {
   },
 };
 
-const hasExplicitThemeColor = (color?: ThemeColor): color is ThemeColor => {
-  return Boolean(normalizeThemeColorToken(color));
-};
-
-const resolveBorderRadius = (value?: string): string | undefined => {
-  if (!value || value === "default") {
-    return undefined;
-  }
-
-  return value;
-};
-
-const getTextStyles = ({
-  color,
-  styles,
-}: {
-  color?: ThemeColor;
-  styles?: Pick<
-    StyledLinkValue,
-    | "fontFamily"
-    | "fontSize"
-    | "fontWeight"
-    | "fontStyle"
-    | "textTransform"
-    | "letterSpacing"
-  >;
-}): React.CSSProperties => {
-  return {
-    color: getThemeColorCssValue(color),
-    ...resolveTextStyles(styles),
-    letterSpacing:
-      styles?.letterSpacing === "default" ? undefined : styles?.letterSpacing,
-  };
-};
-
 const normalizeResolvedLink = ({
   link,
   linkType,
@@ -254,11 +213,14 @@ const CasualDiningHeaderFields = {
         label: msg("fields.backgroundColor", "Background Color"),
         type: "basicSelector",
         options: "BACKGROUND_COLOR",
+        transform: true,
+        format: "surface",
       },
       dividerColor: {
         label: msg("fields.dividerColor", "Divider Color"),
         type: "basicSelector",
         options: "SITE_COLOR",
+        transform: true,
       },
     },
   },
@@ -324,10 +286,12 @@ const CasualDiningHeaderFields = {
         label: msg("fields.fontColor", "Font Color"),
         type: "basicSelector",
         options: "SITE_COLOR",
+        transform: true,
       },
       styles: {
         label: msg("fields.linkStyles", "Link Styles"),
         type: "styledLink",
+        transform: true,
         showIncludeCaretField: false,
       },
     },
@@ -382,6 +346,7 @@ const CasualDiningHeaderFields = {
               styles: {
                 label: msg("fields.imageStyles", "Image Styles"),
                 type: "styledImage",
+                transform: true,
               },
             },
           },
@@ -527,6 +492,7 @@ const CasualDiningHeaderFields = {
       styles: {
         label: msg("fields.imageStyles", "Image Styles"),
         type: "styledImage",
+        transform: true,
       },
     },
   },
@@ -537,7 +503,6 @@ const CasualDiningHeaderComponent: PuckComponent<
 > = (props) => {
   const { t } = useTranslation();
   const analytics = useAnalytics();
-  const streamDocument = useDocument<StreamDocument>();
   const [menuOpen, setMenuOpen] = React.useState(false);
 
   const logoImage = props.logoImage.image;
@@ -551,30 +516,23 @@ const CasualDiningHeaderComponent: PuckComponent<
   const showCta = props.cta.show;
   const showLogo = props.logoImage.show;
 
-  const headerSurfaceStyle = getSurfaceColorStyle(
-    props.section.backgroundColor,
-    streamDocument,
-  );
-  const navigationColor = hasExplicitThemeColor(props.navigation.fontColor)
-    ? props.navigation.fontColor
-    : undefined;
-  const dividerColorValue = getThemeColorCssValue(props.section.dividerColor);
-  const dividerStyle = dividerColorValue
-    ? ({ borderColor: dividerColorValue } as React.CSSProperties)
+  const navigationColor = props.navigation.fontColor;
+  const dividerStyle = props.section.dividerColor
+    ? ({ borderColor: props.section.dividerColor } as React.CSSProperties)
     : undefined;
 
-  const navigationTextStyles = getTextStyles({
+  const navigationTextStyles = {
     color: navigationColor,
-    styles: props.navigation.styles,
-  });
+    ...(props.navigation.styles as React.CSSProperties),
+  };
 
   const logoWrapperStyle: React.CSSProperties = {
+    ...(props.logoImage.styles as React.CSSProperties),
     height: "50px",
     width:
       props.logoImage.aspectRatio > 0
         ? `${50 * props.logoImage.aspectRatio}px`
         : "50px",
-    borderRadius: resolveBorderRadius(props.logoImage.styles?.borderRadius),
     overflow: "hidden",
   };
 
@@ -633,10 +591,7 @@ const CasualDiningHeaderComponent: PuckComponent<
     iconImageProps,
   }: {
     iconImage?: ImageType | ComplexImageType | TranslatableAssetImage;
-    iconImageProps: YextTransformedProps<
-      CasualDiningHeaderProps,
-      typeof CasualDiningHeaderFields
-    >["utilities"]["items"][number]["iconImage"];
+    iconImageProps: (typeof utilityLinks)[number]["iconImageProps"];
   }) => {
     if (!hasImageSource(iconImage)) {
       return <SharedHeaderDefaultUtilityIcon />;
@@ -657,9 +612,9 @@ const CasualDiningHeaderComponent: PuckComponent<
       return <SharedHeaderDefaultUtilityIcon />;
     }
     const wrapperStyle: React.CSSProperties = {
+      ...(iconImageProps.styles as React.CSSProperties),
       width: `${iconHeight * iconAspectRatio}px`,
       height: `${iconHeight}px`,
-      borderRadius: resolveBorderRadius(iconImageProps.styles?.borderRadius),
       overflow: "hidden",
       flexShrink: 0,
     };
@@ -700,7 +655,7 @@ const CasualDiningHeaderComponent: PuckComponent<
               aria-label={item.label}
               className="inline-flex h-8 shrink-0 items-center justify-center rounded-full transition-opacity hover:opacity-80"
               style={{
-                color: getThemeColorCssValue(navigationColor),
+                color: navigationColor,
               }}
             >
               <span className="flex h-full items-center justify-center">
@@ -861,12 +816,7 @@ const CasualDiningHeaderComponent: PuckComponent<
         as="header"
         background={props.section.backgroundColor}
         className="relative"
-        style={{
-          ...headerSurfaceStyle,
-          ...(getThemeColorCssValue(navigationColor)
-            ? { color: getThemeColorCssValue(navigationColor) }
-            : {}),
-        }}
+        style={navigationColor ? { color: navigationColor } : undefined}
       >
         <div className="hidden lg:block">{desktopVariantContent}</div>
 
@@ -896,7 +846,7 @@ const CasualDiningHeaderComponent: PuckComponent<
             }
             className="inline-flex h-10 w-10 items-center justify-center rounded-full"
             style={{
-              color: getThemeColorCssValue(navigationColor),
+              color: navigationColor,
             }}
           >
             <svg
@@ -922,7 +872,10 @@ const CasualDiningHeaderComponent: PuckComponent<
         {menuOpen ? (
           <div
             className="absolute inset-x-0 top-full z-20 max-h-[calc(100vh-82px)] overflow-y-auto px-6 py-6 md:px-8 lg:hidden"
-            style={headerSurfaceStyle}
+            style={{
+              backgroundColor: props.section.backgroundColor?.backgroundColor,
+              color: props.section.backgroundColor?.color,
+            }}
           >
             <div className="space-y-6">
               {navigationLinks.length > 0
@@ -982,7 +935,7 @@ const CasualDiningHeaderComponent: PuckComponent<
                           aria-label={item.label}
                           className="inline-flex h-8 shrink-0 items-center justify-center rounded-full transition-opacity hover:opacity-80"
                           style={{
-                            color: getThemeColorCssValue(navigationColor),
+                            color: navigationColor,
                           }}
                         >
                           <span className="flex h-full items-center justify-center">

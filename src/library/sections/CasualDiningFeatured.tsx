@@ -10,8 +10,6 @@ import {
   createItemSource,
   Image,
   getAnalyticsScopeHash,
-  getSurfaceColorStyle,
-  useDocument,
   VisibilityWrapper,
   type ComprehensiveCTAValue,
   type StyledImageValue,
@@ -475,11 +473,15 @@ const fields = {
         label: msg("fields.backgroundColor", "Background Color"),
         type: "basicSelector",
         options: "BACKGROUND_COLOR",
+        transform: true,
+        format: "surface",
       },
       cardBackgroundColor: {
         label: msg("fields.cardBackgroundColor", "Card Background Color"),
         type: "basicSelector",
         options: "BACKGROUND_COLOR",
+        transform: true,
+        format: "surface",
       },
     },
   },
@@ -533,6 +535,7 @@ const fields = {
               styles: {
                 label: msg("fields.imageStyles", "Image Styles"),
                 type: "styledImage",
+                transform: true,
               },
             },
           },
@@ -575,24 +578,9 @@ const defaultCardStyles: FeaturedCardStyles = {
 const CasualDiningFeaturedComponent: PuckComponent<
   YextTransformedProps<CasualDiningFeaturedProps, typeof fields>
 > = (props) => {
-  const streamDocument = useDocument<{ locale?: string }>();
   const isEditing = Boolean(props.puck?.isEditing);
   const cardStyles = props.cards.styles ?? defaultCardStyles;
   const cardImageStyles = cardStyles.image?.styles;
-  const sectionSurfaceStyle = getSurfaceColorStyle(
-    props.section?.backgroundColor,
-    streamDocument,
-    {
-      fallbackBackgroundColor: "var(--colors-palette-secondary)",
-    },
-  );
-  const cardSurfaceStyle = getSurfaceColorStyle(
-    props.section?.cardBackgroundColor,
-    streamDocument,
-    {
-      fallbackTextColor: sectionSurfaceStyle?.color,
-    },
-  );
 
   return (
     <AnalyticsScopeProvider
@@ -608,7 +596,6 @@ const CasualDiningFeaturedComponent: PuckComponent<
             background={props.section?.backgroundColor}
             className="index-products section-padding color-scheme-1"
             id="featured-menu"
-            style={sectionSurfaceStyle}
           >
             <div className="grid-container wrapper">
               <div className="grid__heading-holder grid__heading-holder--inline">
@@ -645,7 +632,10 @@ const CasualDiningFeaturedComponent: PuckComponent<
                       <article
                         key={index}
                         className={`product-item product-item--centered product-item--outer-text product-item--card${imageToRender ? "" : " product-item--no-image"}`}
-                        style={cardSurfaceStyle}
+                        style={{
+                          backgroundColor: props.section.cardBackgroundColor?.backgroundColor,
+                          color: props.section.cardBackgroundColor?.color ?? props.section.backgroundColor?.color,
+                        }}
                       >
                         {imageToRender ? (
                           <div
@@ -663,6 +653,7 @@ const CasualDiningFeaturedComponent: PuckComponent<
                                   image={imageToRender}
                                   className="product-packshot"
                                   style={{
+                                    ...(cardImageStyles as React.CSSProperties),
                                     display: "block",
                                     width: "100%",
                                     height:
@@ -674,11 +665,6 @@ const CasualDiningFeaturedComponent: PuckComponent<
                                       "filled"
                                         ? "cover"
                                         : "contain",
-                                    borderRadius:
-                                      cardImageStyles?.borderRadius ===
-                                      "default"
-                                        ? undefined
-                                        : cardImageStyles?.borderRadius,
                                   }}
                                 />
                               </figure>

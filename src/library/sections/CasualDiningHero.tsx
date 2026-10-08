@@ -10,9 +10,6 @@ import {
   EntityField,
   Image,
   getAnalyticsScopeHash,
-  getSurfaceColorStyle,
-  getThemeColorCssValue,
-  useDocument,
   VisibilityWrapper,
   type ComprehensiveCTAValue,
   type StyledPlainTextProps,
@@ -290,6 +287,8 @@ const fields = {
         label: msg("fields.overlayColor", "Overlay Color"),
         type: "basicSelector",
         options: "BACKGROUND_COLOR",
+        transform: true,
+        format: "surface",
       },
     },
   },
@@ -511,25 +510,18 @@ const defaultCtas: HeroCtaRow[] = [
 const CasualDiningNewHeroComponent: PuckComponent<
   YextTransformedProps<CasualDiningNewHeroProps, typeof fields>
 > = (props) => {
-  const streamDocument = useDocument<{ locale?: string }>();
   const isEditing = Boolean(props.puck?.isEditing);
   const backgroundImage = props.background.image;
   const ctaRows = props.ctas ?? defaultCtas;
   const showBackgroundImage = hasImageSource(backgroundImage);
-  const overlayColor = props.section.overlayColor ?? defaultOverlayColor;
-  const heroSurfaceBackground: ThemeColor = showBackgroundImage
-    ? overlayColor
+  const heroSurfaceBackground = showBackgroundImage
+    ? props.section.overlayColor ?? defaultOverlayColor
     : {
         selectedColor: "white",
         contrastingColor: "palette-quaternary",
       };
-  const heroSurfaceStyle = getSurfaceColorStyle(
-    heroSurfaceBackground,
-    streamDocument,
-  );
   const overlayColorCss =
-    getThemeColorCssValue(overlayColor) ??
-    getThemeColorCssValue(defaultOverlayColor);
+    props.section.overlayColor?.backgroundColor ?? "var(--colors-palette-secondary)";
   const overlayBackground = showBackgroundImage
     ? `linear-gradient(180deg, color-mix(in srgb, ${overlayColorCss} 30%, transparent) 0%, color-mix(in srgb, ${overlayColorCss} 42%, transparent) 34%, color-mix(in srgb, ${overlayColorCss} 62%, transparent) 100%), linear-gradient(90deg, color-mix(in srgb, ${overlayColorCss} 36%, transparent) 0%, color-mix(in srgb, ${overlayColorCss} 22%, transparent) 48%, color-mix(in srgb, ${overlayColorCss} 46%, transparent) 100%)`
     : undefined;
@@ -547,15 +539,13 @@ const CasualDiningNewHeroComponent: PuckComponent<
             as="section"
             background={heroSurfaceBackground}
             className="index-hero"
-            style={heroSurfaceStyle}
           >
             <div className="frame">
               <div className="hero__video frame__item">
                 <div
                   className="video-background screen-height-full--mobile"
                   style={{
-                    backgroundColor:
-                      getThemeColorCssValue(heroSurfaceBackground) ?? "inherit",
+                    backgroundColor: showBackgroundImage ? overlayColorCss : "white",
                   }}
                 >
                   {showBackgroundImage ? (
@@ -580,9 +570,7 @@ const CasualDiningNewHeroComponent: PuckComponent<
                   ) : null}
                   <Background
                     as="div"
-                    background={
-                      showBackgroundImage ? overlayColor : heroSurfaceBackground
-                    }
+                    background={heroSurfaceBackground}
                     className="hero__content__wrapper content-align--bottom-left"
                     style={{ background: overlayBackground }}
                   >

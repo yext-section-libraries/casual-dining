@@ -1,5 +1,4 @@
 import "../shared/typography.css";
-import { StyledTextComponent } from "../shared/typography";
 import { createTextConfig, TransformedText } from "../shared/transformedText";
 import {
   type YextFieldMap,
@@ -9,8 +8,6 @@ import {
   Background,
   getAggregateRating,
   getAnalyticsScopeHash,
-  getSurfaceColorStyle,
-  getThemeColorCssValue,
   useDocument,
   VisibilityWrapper,
   type StyledPlainTextProps,
@@ -390,11 +387,15 @@ const fields = {
         label: msg("fields.backgroundColor", "Background Color"),
         type: "basicSelector",
         options: "BACKGROUND_COLOR",
+        transform: true,
+        format: "surface",
       },
       cardBackgroundColor: {
         label: msg("fields.cardBackgroundColor", "Card Background Color"),
         type: "basicSelector",
         options: "BACKGROUND_COLOR",
+        transform: true,
+        format: "surface",
       },
     },
   },
@@ -421,6 +422,7 @@ const fields = {
         label: msg("fields.starColor", "Star Color"),
         type: "basicSelector",
         options: "SITE_COLOR",
+        transform: true,
       },
       fontOptions: {
         ...summaryTextConfig.fields!.fontOptions,
@@ -461,6 +463,7 @@ const fields = {
         label: msg("fields.starColor", "Star Color"),
         type: "basicSelector",
         options: "SITE_COLOR",
+        transform: true,
       },
     },
   },
@@ -559,23 +562,10 @@ const CasualDiningReviewsComponent: PuckComponent<
   const displayedReviews = (
     hasReviews ? reviews : isEditing ? sampleReviews : []
   ).slice(0, maxReviews);
-  const sectionSurfaceStyle = getSurfaceColorStyle(
-    props.section.backgroundColor,
-    streamDocument,
-  );
-  const sectionTextColor = sectionSurfaceStyle?.color;
-  const summaryStarColor =
-    getThemeColorCssValue(props.summary?.starColor) ?? sectionTextColor;
-  const reviewCardStyle = getSurfaceColorStyle(
-    props.section.cardBackgroundColor,
-    streamDocument,
-    {
-      fallbackTextColor: sectionTextColor,
-    },
-  );
-  const cardTextColor = reviewCardStyle?.color;
-  const cardStarColor =
-    getThemeColorCssValue(props.cardStyling?.starColor) ?? cardTextColor;
+  const sectionTextColor = props.section.backgroundColor?.color;
+  const summaryStarColor = props.summary?.starColor ?? sectionTextColor;
+  const cardTextColor = props.section.cardBackgroundColor?.color ?? sectionTextColor;
+  const cardStarColor = props.cardStyling?.starColor ?? cardTextColor;
   const displayedAverageRating = formatAverageRating(
     hasReviews ? aggregateRating.averageRating : isEditing ? 4.5 : null,
   );
@@ -604,7 +594,6 @@ const CasualDiningReviewsComponent: PuckComponent<
             background={props.section.backgroundColor}
             className="reviews reviews--section text-left reviews--have-images color-scheme-1"
             id="reviews"
-            style={sectionSurfaceStyle}
           >
             <div className="wrapper--full-padded">
               <div className="reviews__intro">
@@ -617,12 +606,10 @@ const CasualDiningReviewsComponent: PuckComponent<
                     aria-label={`${displayedAverageRating} stars out of 5${displayedReviewCountLabel ? ` from ${displayedReviewCountLabel}` : ""}`}
                   >
                     <div className="reviews__rating-score">
-                      <StyledTextComponent
+                      <TransformedText
                         kind="plain"
                         fontOptions={props.summary.rating.fontOptions}
-                        data={{
-                          text: createTextField(displayedAverageRating),
-                        }}
+                        data={{ text: displayedAverageRating }}
                         tag="p"
                       />
                     </div>
@@ -643,12 +630,10 @@ const CasualDiningReviewsComponent: PuckComponent<
                           |
                         </span>
                         <div className="reviews__rating-text body-medium">
-                          <StyledTextComponent
+                          <TransformedText
                             kind="plain"
                             fontOptions={props.summary.fontOptions}
-                            data={{
-                              text: createTextField(displayedReviewCountLabel),
-                            }}
+                            data={{ text: displayedReviewCountLabel }}
                             tag="p"
                           />
                         </div>
@@ -669,22 +654,21 @@ const CasualDiningReviewsComponent: PuckComponent<
                     >
                       <div
                         className="review review--first-party"
-                        style={reviewCardStyle}
+                        style={{
+                          backgroundColor: props.section.cardBackgroundColor?.backgroundColor,
+                          color: cardTextColor,
+                        }}
                       >
                         <div className="review__content review__content--first-party">
                           <div className="review__author review__author--first-party">
                             <div className="review__author__content">
                               <div className="review__author__name">
-                                <StyledTextComponent
+                                <TransformedText
                                   kind="plain"
                                   fontOptions={
                                     props.cardStyling.header.fontOptions
                                   }
-                                  data={{
-                                    text: createTextField(
-                                      review.authorName ?? "",
-                                    ),
-                                  }}
+                                  data={{ text: review.authorName ?? "" }}
                                   tag="div"
                                 />
                               </div>
@@ -699,29 +683,23 @@ const CasualDiningReviewsComponent: PuckComponent<
                             </div>
                           </div>
                           <blockquote className="review__quote-block review__quote-block--first-party body-medium">
-                            <StyledTextComponent
+                            <TransformedText
                               kind="plain"
                               fontOptions={
                                 props.cardStyling.content.fontOptions
                               }
-                              data={{
-                                text: createTextField(review.content ?? ""),
-                              }}
+                              data={{ text: review.content ?? "" }}
                               tag="p"
                             />
                           </blockquote>
                           {review.comments?.[0]?.content ? (
                             <div className="review__comments">
-                              <StyledTextComponent
+                              <TransformedText
                                 kind="plain"
                                 fontOptions={
                                   props.cardStyling.content.fontOptions
                                 }
-                                data={{
-                                  text: createTextField(
-                                    review.comments[0].content,
-                                  ),
-                                }}
+                                data={{ text: review.comments[0].content }}
                                 tag="p"
                               />
                             </div>

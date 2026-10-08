@@ -11,7 +11,6 @@ import {
   Heading,
   ThemeOptions,
   getAnalyticsScopeHash,
-  getSurfaceColorStyle,
   mapboxStaticMapStyleOptions,
   MapboxStaticMapComponent,
   useDocument,
@@ -421,11 +420,15 @@ const fields = {
         label: msg("fields.backgroundColor", "Background Color"),
         type: "basicSelector",
         options: "BACKGROUND_COLOR",
+        transform: true,
+        format: "surface",
       },
       cardBackgroundColor: {
         label: msg("fields.cardBackgroundColor", "Card Background Color"),
         type: "basicSelector",
         options: "BACKGROUND_COLOR",
+        transform: true,
+        format: "surface",
       },
     },
   },
@@ -638,22 +641,6 @@ const CasualDiningLocationsComponent: PuckComponent<
   // Nearby editor test data is now provided by visual-editor, so this component
   // reads directly from the query response instead of maintaining local samples.
   const nearbyLocationItems = nearbyLocationsQuery.data?.response.docs ?? [];
-  const sectionSurfaceStyle = getSurfaceColorStyle(
-    props.section.backgroundColor,
-    streamDocument,
-    {
-      fallbackBackgroundColor: "var(--colors-palette-secondary)",
-    },
-  );
-  const sectionTextColor = sectionSurfaceStyle?.color;
-  const cardSurfaceStyle = getSurfaceColorStyle(
-    props.section.cardBackgroundColor,
-    streamDocument,
-    {
-      fallbackTextColor: sectionTextColor,
-    },
-  );
-  const cardTextColor = cardSurfaceStyle?.color;
   const showLocationsSection = isEditing || nearbyLocationItems.length > 0;
 
   if (!showLocationsSection && !isEditing) {
@@ -674,7 +661,6 @@ const CasualDiningLocationsComponent: PuckComponent<
             background={props.section.backgroundColor}
             className="location-map location-map--full-bleed color-scheme-1"
             id="location-map"
-            style={sectionSurfaceStyle}
           >
             <div className="location-map__frame">
               <EntityField
@@ -701,7 +687,6 @@ const CasualDiningLocationsComponent: PuckComponent<
               background={props.section.backgroundColor}
               className="index-products section-padding color-scheme-1"
               id="locations"
-              style={sectionSurfaceStyle}
             >
               <div className="grid-container wrapper">
                 {nearbyLocationItems.length > 0 ? (
@@ -740,10 +725,6 @@ const CasualDiningLocationsComponent: PuckComponent<
                             key={index}
                             background={props.section.cardBackgroundColor}
                             className="location-card"
-                            style={{
-                              ...cardSurfaceStyle,
-                              color: cardTextColor,
-                            }}
                           >
                             {distanceText ? (
                               <Body
