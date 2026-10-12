@@ -471,17 +471,13 @@ const fields = {
       },
       backgroundColor: {
         label: msg("fields.backgroundColor", "Background Color"),
-        type: "basicSelector",
+        type: "themeColor",
         options: "BACKGROUND_COLOR",
-        transform: true,
-        format: "surface",
       },
       cardBackgroundColor: {
         label: msg("fields.cardBackgroundColor", "Card Background Color"),
-        type: "basicSelector",
+        type: "themeColor",
         options: "BACKGROUND_COLOR",
-        transform: true,
-        format: "surface",
       },
     },
   },
@@ -633,8 +629,8 @@ const CasualDiningFeaturedComponent: PuckComponent<
                         key={index}
                         className={`product-item product-item--centered product-item--outer-text product-item--card${imageToRender ? "" : " product-item--no-image"}`}
                         style={{
-                          backgroundColor: props.section.cardBackgroundColor?.backgroundColor,
-                          color: props.section.cardBackgroundColor?.color ?? props.section.backgroundColor?.color,
+                          backgroundColor: props.section.cardBackgroundColor?.selectedColorCss,
+                          color: props.section.cardBackgroundColor?.contrastingColorCss ?? props.section.backgroundColor?.contrastingColorCss,
                         }}
                       >
                         {imageToRender ? (

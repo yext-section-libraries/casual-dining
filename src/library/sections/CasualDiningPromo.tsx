@@ -292,10 +292,8 @@ const fields = {
       },
       overlayColor: {
         label: msg("fields.overlayColor", "Overlay Color"),
-        type: "basicSelector",
+        type: "themeColor",
         options: "BACKGROUND_COLOR",
-        transform: true,
-        format: "surface",
       },
     },
   },
@@ -365,7 +363,7 @@ const CasualDiningPromoComponent: PuckComponent<
         contrastingColor: "white",
       };
   const overlayColorCss =
-    props.section.overlayColor?.backgroundColor ?? "var(--colors-palette-secondary)";
+    props.section.overlayColor?.selectedColorCss ?? "var(--colors-palette-secondary)";
   const overlayBackground = showImage
     ? `linear-gradient(180deg, color-mix(in srgb, ${overlayColorCss} 30%, transparent) 0%, color-mix(in srgb, ${overlayColorCss} 42%, transparent) 34%, color-mix(in srgb, ${overlayColorCss} 62%, transparent) 100%), linear-gradient(90deg, color-mix(in srgb, ${overlayColorCss} 36%, transparent) 0%, color-mix(in srgb, ${overlayColorCss} 22%, transparent) 48%, color-mix(in srgb, ${overlayColorCss} 46%, transparent) 100%)`
     : undefined;

@@ -418,17 +418,13 @@ const fields = {
       },
       backgroundColor: {
         label: msg("fields.backgroundColor", "Background Color"),
-        type: "basicSelector",
+        type: "themeColor",
         options: "BACKGROUND_COLOR",
-        transform: true,
-        format: "surface",
       },
       cardBackgroundColor: {
         label: msg("fields.cardBackgroundColor", "Card Background Color"),
-        type: "basicSelector",
+        type: "themeColor",
         options: "BACKGROUND_COLOR",
-        transform: true,
-        format: "surface",
       },
     },
   },
@@ -491,7 +487,7 @@ const fields = {
           },
           color: {
             label: msg("fields.fontColor", "Font Color"),
-            type: "basicSelector",
+            type: "themeColor",
             options: "SITE_COLOR",
           },
         },
@@ -513,7 +509,7 @@ const fields = {
           },
           color: {
             label: msg("fields.fontColor", "Font Color"),
-            type: "basicSelector",
+            type: "themeColor",
             options: "SITE_COLOR",
           },
         },
@@ -529,7 +525,7 @@ const fields = {
           },
           color: {
             label: msg("fields.fontColor", "Font Color"),
-            type: "basicSelector",
+            type: "themeColor",
             options: "SITE_COLOR",
           },
         },
@@ -552,7 +548,7 @@ const fields = {
           },
           color: {
             label: msg("fields.fontColor", "Font Color"),
-            type: "basicSelector",
+            type: "themeColor",
             options: "SITE_COLOR",
           },
         },

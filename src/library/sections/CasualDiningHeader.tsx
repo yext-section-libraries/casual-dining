@@ -211,16 +211,13 @@ const CasualDiningHeaderFields = {
       },
       backgroundColor: {
         label: msg("fields.backgroundColor", "Background Color"),
-        type: "basicSelector",
+        type: "themeColor",
         options: "BACKGROUND_COLOR",
-        transform: true,
-        format: "surface",
       },
       dividerColor: {
         label: msg("fields.dividerColor", "Divider Color"),
-        type: "basicSelector",
+        type: "themeColor",
         options: "SITE_COLOR",
-        transform: true,
       },
     },
   },
@@ -284,9 +281,8 @@ const CasualDiningHeaderFields = {
       },
       fontColor: {
         label: msg("fields.fontColor", "Font Color"),
-        type: "basicSelector",
+        type: "themeColor",
         options: "SITE_COLOR",
-        transform: true,
       },
       styles: {
         label: msg("fields.linkStyles", "Link Styles"),
@@ -516,9 +512,9 @@ const CasualDiningHeaderComponent: PuckComponent<
   const showCta = props.cta.show;
   const showLogo = props.logoImage.show;
 
-  const navigationColor = props.navigation.fontColor;
+  const navigationColor = props.navigation.fontColor?.selectedColorCss;
   const dividerStyle = props.section.dividerColor
-    ? ({ borderColor: props.section.dividerColor } as React.CSSProperties)
+    ? { borderColor: props.section.dividerColor.selectedColorCss }
     : undefined;
 
   const navigationTextStyles = {
@@ -873,8 +869,8 @@ const CasualDiningHeaderComponent: PuckComponent<
           <div
             className="absolute inset-x-0 top-full z-20 max-h-[calc(100vh-82px)] overflow-y-auto px-6 py-6 md:px-8 lg:hidden"
             style={{
-              backgroundColor: props.section.backgroundColor?.backgroundColor,
-              color: props.section.backgroundColor?.color,
+              backgroundColor: props.section.backgroundColor?.selectedColorCss,
+              color: props.section.backgroundColor?.contrastingColorCss,
             }}
           >
             <div className="space-y-6">

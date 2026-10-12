@@ -350,10 +350,8 @@ const fields = {
       },
       backgroundColor: {
         label: msg("fields.backgroundColor", "Background Color"),
-        type: "basicSelector",
+        type: "themeColor",
         options: "BACKGROUND_COLOR",
-        transform: true,
-        format: "surface",
       },
     },
   },

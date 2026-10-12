@@ -385,17 +385,13 @@ const fields = {
       },
       backgroundColor: {
         label: msg("fields.backgroundColor", "Background Color"),
-        type: "basicSelector",
+        type: "themeColor",
         options: "BACKGROUND_COLOR",
-        transform: true,
-        format: "surface",
       },
       cardBackgroundColor: {
         label: msg("fields.cardBackgroundColor", "Card Background Color"),
-        type: "basicSelector",
+        type: "themeColor",
         options: "BACKGROUND_COLOR",
-        transform: true,
-        format: "surface",
       },
     },
   },
@@ -420,9 +416,8 @@ const fields = {
       },
       starColor: {
         label: msg("fields.starColor", "Star Color"),
-        type: "basicSelector",
+        type: "themeColor",
         options: "SITE_COLOR",
-        transform: true,
       },
       fontOptions: {
         ...summaryTextConfig.fields!.fontOptions,
@@ -461,9 +456,8 @@ const fields = {
       },
       starColor: {
         label: msg("fields.starColor", "Star Color"),
-        type: "basicSelector",
+        type: "themeColor",
         options: "SITE_COLOR",
-        transform: true,
       },
     },
   },
@@ -562,10 +556,10 @@ const CasualDiningReviewsComponent: PuckComponent<
   const displayedReviews = (
     hasReviews ? reviews : isEditing ? sampleReviews : []
   ).slice(0, maxReviews);
-  const sectionTextColor = props.section.backgroundColor?.color;
-  const summaryStarColor = props.summary?.starColor ?? sectionTextColor;
-  const cardTextColor = props.section.cardBackgroundColor?.color ?? sectionTextColor;
-  const cardStarColor = props.cardStyling?.starColor ?? cardTextColor;
+  const sectionTextColor = props.section.backgroundColor?.contrastingColorCss;
+  const summaryStarColor = props.summary?.starColor?.selectedColorCss ?? sectionTextColor;
+  const cardTextColor = props.section.cardBackgroundColor?.contrastingColorCss ?? sectionTextColor;
+  const cardStarColor = props.cardStyling?.starColor?.selectedColorCss ?? cardTextColor;
   const displayedAverageRating = formatAverageRating(
     hasReviews ? aggregateRating.averageRating : isEditing ? 4.5 : null,
   );
@@ -655,7 +649,7 @@ const CasualDiningReviewsComponent: PuckComponent<
                       <div
                         className="review review--first-party"
                         style={{
-                          backgroundColor: props.section.cardBackgroundColor?.backgroundColor,
+                          backgroundColor: props.section.cardBackgroundColor?.selectedColorCss,
                           color: cardTextColor,
                         }}
                       >

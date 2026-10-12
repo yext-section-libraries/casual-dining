@@ -58,9 +58,8 @@ const CasualDiningBannerFields = {
       },
       fontColor: {
         label: msg("fields.textColor", "Text Color"),
-        type: "basicSelector",
+        type: "themeColor",
         options: "SITE_COLOR",
-        transform: true,
       },
     },
   },
@@ -85,10 +84,8 @@ const CasualDiningBannerFields = {
     objectFields: {
       backgroundColor: {
         label: msg("fields.backgroundColor", "Background Color"),
-        type: "basicSelector",
+        type: "themeColor",
         options: "BACKGROUND_COLOR",
-        transform: true,
-        format: "surface",
       },
       visibleOnLivePage: {
         label: msg("fields.visibleOnLivePage", "Visible on Live Page"),
@@ -153,7 +150,7 @@ const CasualDiningBannerComponent: PuckComponent<
         style={resolveBodyStyles(data.styles as CSSProperties)}
         richTextStyleOverrides={{
           ...(data.styles as CSSProperties),
-          color: data.fontColor ?? section.backgroundColor?.color,
+          color: data.fontColor?.selectedColorCss ?? section.backgroundColor?.contrastingColorCss,
         } as RichTextStyleOverrides}
       />
     </PageSection>

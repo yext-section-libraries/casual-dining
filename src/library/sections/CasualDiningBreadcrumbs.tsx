@@ -46,10 +46,8 @@ const fields = {
       },
       backgroundColor: {
         label: msg("fields.backgroundColor", "Background Color"),
-        type: "basicSelector",
+        type: "themeColor",
         options: "BACKGROUND_COLOR",
-        transform: true,
-        format: "surface",
       },
     },
   },
@@ -72,9 +70,8 @@ const fields = {
       },
       fontColor: {
         label: msg("fields.fontColor", "Font Color"),
-        type: "basicSelector",
+        type: "themeColor",
         options: "SITE_COLOR",
-        transform: true,
       },
     },
   },
@@ -91,7 +88,7 @@ const CasualDiningBreadcrumbsComponent: PuckComponent<
     ? breadcrumbs
     : breadcrumbs.slice(0, -1);
   const breadcrumbLinkStyle: React.CSSProperties = {
-    color: props.breadcrumbLinks.fontColor,
+    color: props.breadcrumbLinks.fontColor?.selectedColorCss,
     ...(props.breadcrumbLinks.styles as React.CSSProperties),
   };
 

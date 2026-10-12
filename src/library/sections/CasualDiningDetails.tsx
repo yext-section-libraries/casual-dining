@@ -418,10 +418,8 @@ const fields = {
       },
       backgroundColor: {
         label: msg("fields.backgroundColor", "Background Color"),
-        type: "basicSelector",
+        type: "themeColor",
         options: "BACKGROUND_COLOR",
-        transform: true,
-        format: "surface",
       },
     },
   },
@@ -713,7 +711,7 @@ const CasualDiningDetailsComponent: PuckComponent<
     comingSoon?: boolean;
     additionalHoursText?: string;
   }>();
-  const sectionTextColor = props.section.backgroundColor?.color;
+  const sectionTextColor = props.section.backgroundColor?.contrastingColorCss;
   const address = props.address.address;
   const hours = props.hours.data.hours;
   const additionalHoursText = streamDocument?.additionalHoursText?.trim();

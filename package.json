@@ -43,7 +43,7 @@
     "@vitejs/plugin-react": "^4.2.1",
     "@yext/pages": "1.3.3",
     "@yext/pages-components": "2.2.0",
-    "@yext/visual-editor": "file:/Users/jwartofsky/pages/visual-editor/packages/visual-editor/visual-editor-pack-20261008153756.tgz",
+    "@yext/visual-editor": "file:/Users/jwartofsky/pages/visual-editor/packages/visual-editor/visual-editor-pack-20261009143546.tgz",
     "autoprefixer": "^10.4.8",
     "i18next": "^26.4.2",
     "oxlint": "1.2.0",
