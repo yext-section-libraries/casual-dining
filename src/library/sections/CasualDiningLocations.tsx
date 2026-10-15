@@ -1,12 +1,9 @@
 import "../shared/typography.css";
-import type { SectionConfig } from "@yext/visual-editor";
-import { msg } from "@yext/visual-editor";
-
-import * as React from "react";
-import { Address, AnalyticsScopeProvider } from "@yext/pages-components";
-import { type PuckComponent } from "@puckeditor/core";
-import { useTranslation } from "react-i18next";
 import {
+  type YextFieldMap,
+  type YextTransformedProps,
+  type SectionConfig,
+  msg,
   Background,
   Body,
   CTA,
@@ -14,10 +11,8 @@ import {
   Heading,
   ThemeOptions,
   getAnalyticsScopeHash,
-  getSurfaceColorStyle,
   mapboxStaticMapStyleOptions,
   MapboxStaticMapComponent,
-  resolveComponentData,
   useDocument,
   useNearbyLocations,
   VisibilityWrapper,
@@ -28,11 +23,16 @@ import {
   type TranslatableString,
   type YextEntityField,
   type YextComponentConfig,
-  type YextFields,
   resolveUrlTemplate,
   mergeMeta,
   useTemplateProps,
 } from "@yext/visual-editor";
+
+import React from "react";
+import { Address, AnalyticsScopeProvider } from "@yext/pages-components";
+import { type PuckComponent } from "@puckeditor/core";
+import { useTranslation } from "react-i18next";
+
 import { CapturedStyleRoot } from "../shared/sectionHelpers";
 
 const capturedStyles = String.raw`:root {
@@ -403,7 +403,7 @@ type CasualDiningLocationsFieldProps = Omit<
   "id" | "puck"
 >;
 
-const fields: YextFields<CasualDiningLocationsFieldProps> = {
+const fields = {
   section: {
     label: msg("fields.section", "Section"),
     type: "object",
@@ -418,12 +418,12 @@ const fields: YextFields<CasualDiningLocationsFieldProps> = {
       },
       backgroundColor: {
         label: msg("fields.backgroundColor", "Background Color"),
-        type: "basicSelector",
+        type: "themeColor",
         options: "BACKGROUND_COLOR",
       },
       cardBackgroundColor: {
         label: msg("fields.cardBackgroundColor", "Card Background Color"),
-        type: "basicSelector",
+        type: "themeColor",
         options: "BACKGROUND_COLOR",
       },
     },
@@ -471,6 +471,7 @@ const fields: YextFields<CasualDiningLocationsFieldProps> = {
       text: {
         label: msg("fields.text", "Text"),
         type: "entityField",
+        transform: true,
         filter: {
           types: ["type.string"],
         },
@@ -486,7 +487,7 @@ const fields: YextFields<CasualDiningLocationsFieldProps> = {
           },
           color: {
             label: msg("fields.fontColor", "Font Color"),
-            type: "basicSelector",
+            type: "themeColor",
             options: "SITE_COLOR",
           },
         },
@@ -508,7 +509,7 @@ const fields: YextFields<CasualDiningLocationsFieldProps> = {
           },
           color: {
             label: msg("fields.fontColor", "Font Color"),
-            type: "basicSelector",
+            type: "themeColor",
             options: "SITE_COLOR",
           },
         },
@@ -524,7 +525,7 @@ const fields: YextFields<CasualDiningLocationsFieldProps> = {
           },
           color: {
             label: msg("fields.fontColor", "Font Color"),
-            type: "basicSelector",
+            type: "themeColor",
             options: "SITE_COLOR",
           },
         },
@@ -547,14 +548,14 @@ const fields: YextFields<CasualDiningLocationsFieldProps> = {
           },
           color: {
             label: msg("fields.fontColor", "Font Color"),
-            type: "basicSelector",
+            type: "themeColor",
             options: "SITE_COLOR",
           },
         },
       },
     },
   },
-};
+} satisfies YextFieldMap<CasualDiningLocationsFieldProps>;
 
 const defaultProps: CasualDiningLocationsFieldProps = {
   section: {
@@ -606,7 +607,7 @@ const defaultProps: CasualDiningLocationsFieldProps = {
 };
 
 const CasualDiningLocationsComponent: PuckComponent<
-  CasualDiningLocationsProps
+  YextTransformedProps<CasualDiningLocationsProps, typeof fields>
 > = (props) => {
   const { t } = useTranslation();
   const { relativePrefixToRoot } = useTemplateProps();
@@ -636,30 +637,6 @@ const CasualDiningLocationsComponent: PuckComponent<
   // Nearby editor test data is now provided by visual-editor, so this component
   // reads directly from the query response instead of maintaining local samples.
   const nearbyLocationItems = nearbyLocationsQuery.data?.response.docs ?? [];
-  const resolvedHeadingText =
-    (
-      resolveComponentData as (
-        value: YextEntityField<TranslatableString>,
-        locale: string | undefined,
-        streamDocument: unknown,
-      ) => string | undefined
-    )(props.heading.text, streamDocument?.locale, streamDocument) ?? "";
-  const sectionSurfaceStyle = getSurfaceColorStyle(
-    props.section.backgroundColor,
-    streamDocument,
-    {
-      fallbackBackgroundColor: "var(--colors-palette-secondary)",
-    },
-  );
-  const sectionTextColor = sectionSurfaceStyle?.color;
-  const cardSurfaceStyle = getSurfaceColorStyle(
-    props.section.cardBackgroundColor,
-    streamDocument,
-    {
-      fallbackTextColor: sectionTextColor,
-    },
-  );
-  const cardTextColor = cardSurfaceStyle?.color;
   const showLocationsSection = isEditing || nearbyLocationItems.length > 0;
 
   if (!showLocationsSection && !isEditing) {
@@ -680,7 +657,6 @@ const CasualDiningLocationsComponent: PuckComponent<
             background={props.section.backgroundColor}
             className="location-map location-map--full-bleed color-scheme-1"
             id="location-map"
-            style={sectionSurfaceStyle}
           >
             <div className="location-map__frame">
               <EntityField
@@ -707,7 +683,6 @@ const CasualDiningLocationsComponent: PuckComponent<
               background={props.section.backgroundColor}
               className="index-products section-padding color-scheme-1"
               id="locations"
-              style={sectionSurfaceStyle}
             >
               <div className="grid-container wrapper">
                 {nearbyLocationItems.length > 0 ? (
@@ -715,21 +690,13 @@ const CasualDiningLocationsComponent: PuckComponent<
                     <div className="grid__heading-holder grid__heading-holder--inline">
                       <div className="grid__heading-text">
                         <div className="grid__heading">
-                          <EntityField
-                            displayName="Heading"
-                            fieldId={props.heading.text.field}
-                            constantValueEnabled={
-                              props.heading.text.constantValueEnabled
-                            }
+                          <Heading
+                            level={props.heading.styles.level}
+                            color={props.heading.styles.color}
+                            style={{ margin: 0 }}
                           >
-                            <Heading
-                              level={props.heading.styles.level}
-                              color={props.heading.styles.color}
-                              style={{ margin: 0 }}
-                            >
-                              {resolvedHeadingText}
-                            </Heading>
-                          </EntityField>
+                            {props.heading.text}
+                          </Heading>
                         </div>
                       </div>
                     </div>
@@ -754,10 +721,6 @@ const CasualDiningLocationsComponent: PuckComponent<
                             key={index}
                             background={props.section.cardBackgroundColor}
                             className="location-card"
-                            style={{
-                              ...cardSurfaceStyle,
-                              color: cardTextColor,
-                            }}
                           >
                             {distanceText ? (
                               <Body
@@ -831,13 +794,15 @@ const CasualDiningLocationsComponent: PuckComponent<
   );
 };
 
-export const CasualDiningLocations: YextComponentConfig<CasualDiningLocationsFieldProps> =
-  {
-    label: msg("components.locationsLabel", "Nearby Locations"),
-    fields,
-    defaultProps,
-    render: (props) => <CasualDiningLocationsComponent {...props} />,
-  };
+export const CasualDiningLocations: YextComponentConfig<
+  CasualDiningLocationsFieldProps,
+  typeof fields
+> = {
+  label: msg("components.locationsLabel", "Nearby Locations"),
+  fields,
+  defaultProps,
+  render: (props) => <CasualDiningLocationsComponent {...props} />,
+};
 
 export const config: SectionConfig = {
   id: "CasualDiningLocations",

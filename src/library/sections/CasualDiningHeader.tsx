@@ -1,9 +1,26 @@
-import { resolveTextStyles } from "../shared/typography";
 import "../shared/typography.css";
-import type { SectionConfig } from "@yext/visual-editor";
-import { msg } from "@yext/visual-editor";
+import {
+  type YextFieldMap,
+  type YextTransformedProps,
+  type SectionConfig,
+  msg,
+  Background,
+  ComprehensiveCTA,
+  type ComprehensiveCTAValue,
+  Image,
+  type StyledImageValue,
+  type StyledLinkValue,
+  type ThemeColor,
+  type TranslatableAssetImage,
+  type TranslatableString,
+  VisibilityWrapper,
+  type YextComponentConfig,
+  type YextEntityField,
+  getAnalyticsScopeHash,
+  normalizeLink,
+} from "@yext/visual-editor";
 
-import * as React from "react";
+import React from "react";
 import { PuckComponent } from "@puckeditor/core";
 import { useTranslation } from "react-i18next";
 import {
@@ -14,30 +31,7 @@ import {
   type LinkType,
   useAnalytics,
 } from "@yext/pages-components";
-import {
-  Background,
-  ComprehensiveCTA,
-  type ComprehensiveCTAValue,
-  EntityField,
-  Image,
-  type StreamDocument,
-  type StyledImageValue,
-  type StyledLinkValue,
-  type ThemeColor,
-  type TranslatableAssetImage,
-  type TranslatableString,
-  VisibilityWrapper,
-  type YextComponentConfig,
-  type YextEntityField,
-  type YextFields,
-  getAnalyticsScopeHash,
-  getSurfaceColorStyle,
-  getThemeColorCssValue,
-  normalizeLink,
-  normalizeThemeColorToken,
-  resolveComponentData,
-  useDocument,
-} from "@yext/visual-editor";
+
 import {
   aspectRatioOptions,
   defaultButtonStyles,
@@ -145,53 +139,6 @@ const defaultUtilityIconImage: SharedHeaderAction["iconImage"] = {
   },
 };
 
-const hasExplicitThemeColor = (color?: ThemeColor): color is ThemeColor => {
-  return Boolean(normalizeThemeColorToken(color));
-};
-
-const resolveBorderRadius = (value?: string): string | undefined => {
-  if (!value || value === "default") {
-    return undefined;
-  }
-
-  return value;
-};
-
-const getTextStyles = ({
-  color,
-  styles,
-}: {
-  color?: ThemeColor;
-  styles?: Pick<
-    StyledLinkValue,
-    | "fontFamily"
-    | "fontSize"
-    | "fontWeight"
-    | "fontStyle"
-    | "textTransform"
-    | "letterSpacing"
-  >;
-}): React.CSSProperties => {
-  return {
-    color: getThemeColorCssValue(color),
-    ...resolveTextStyles(styles),
-    letterSpacing:
-      styles?.letterSpacing === "default" ? undefined : styles?.letterSpacing,
-  };
-};
-
-const resolveString = (
-  value: TranslatableString | undefined,
-  locale: string,
-  streamDocument: StreamDocument,
-): string => {
-  if (!value) {
-    return "";
-  }
-
-  return resolveComponentData(value, locale, streamDocument) || "";
-};
-
 const normalizeResolvedLink = ({
   link,
   linkType,
@@ -224,7 +171,7 @@ const SharedHeaderDefaultUtilityIcon = () => (
   </svg>
 );
 
-const CasualDiningHeaderFields: YextFields<CasualDiningHeaderProps> = {
+const CasualDiningHeaderFields = {
   variant: {
     label: msg("fields.variant", "Variant"),
     type: "select",
@@ -264,12 +211,12 @@ const CasualDiningHeaderFields: YextFields<CasualDiningHeaderProps> = {
       },
       backgroundColor: {
         label: msg("fields.backgroundColor", "Background Color"),
-        type: "basicSelector",
+        type: "themeColor",
         options: "BACKGROUND_COLOR",
       },
       dividerColor: {
         label: msg("fields.dividerColor", "Divider Color"),
-        type: "basicSelector",
+        type: "themeColor",
         options: "SITE_COLOR",
       },
     },
@@ -293,10 +240,12 @@ const CasualDiningHeaderFields: YextFields<CasualDiningHeaderProps> = {
           label: {
             label: msg("fields.label", "Label"),
             type: "translatableString",
+            transform: true,
           },
           link: {
             label: msg("fields.link", "Link"),
             type: "translatableString",
+            transform: true,
           },
           linkType: {
             label: msg("fields.linkType", "Link Type"),
@@ -332,12 +281,13 @@ const CasualDiningHeaderFields: YextFields<CasualDiningHeaderProps> = {
       },
       fontColor: {
         label: msg("fields.fontColor", "Font Color"),
-        type: "basicSelector",
+        type: "themeColor",
         options: "SITE_COLOR",
       },
       styles: {
         label: msg("fields.linkStyles", "Link Styles"),
         type: "styledLink",
+        transform: true,
         showIncludeCaretField: false,
       },
     },
@@ -364,6 +314,7 @@ const CasualDiningHeaderFields: YextFields<CasualDiningHeaderProps> = {
             objectFields: {
               image: {
                 type: "entityField",
+                transform: true,
                 label: msg("fields.image", "Image"),
                 filter: {
                   types: ["type.image"],
@@ -391,16 +342,19 @@ const CasualDiningHeaderFields: YextFields<CasualDiningHeaderProps> = {
               styles: {
                 label: msg("fields.imageStyles", "Image Styles"),
                 type: "styledImage",
+                transform: true,
               },
             },
           },
           label: {
             label: msg("fields.label", "Label"),
             type: "translatableString",
+            transform: true,
           },
           link: {
             label: msg("fields.link", "Link"),
             type: "translatableString",
+            transform: true,
           },
           linkType: {
             label: msg("fields.linkType", "Link Type"),
@@ -456,6 +410,7 @@ const CasualDiningHeaderFields: YextFields<CasualDiningHeaderProps> = {
           cta: {
             label: msg("fields.cta", "CTA"),
             type: "comprehensiveCTA",
+            transform: true,
           },
         },
         defaultItemProps: {
@@ -503,6 +458,7 @@ const CasualDiningHeaderFields: YextFields<CasualDiningHeaderProps> = {
       },
       image: {
         type: "entityField",
+        transform: true,
         label: msg("fields.image", "Image"),
         filter: {
           types: ["type.image"],
@@ -511,6 +467,7 @@ const CasualDiningHeaderFields: YextFields<CasualDiningHeaderProps> = {
       url: {
         label: msg("fields.url", "URL"),
         type: "entityField",
+        transform: true,
         filter: {
           types: ["type.string"],
         },
@@ -531,30 +488,21 @@ const CasualDiningHeaderFields: YextFields<CasualDiningHeaderProps> = {
       styles: {
         label: msg("fields.imageStyles", "Image Styles"),
         type: "styledImage",
+        transform: true,
       },
     },
   },
-};
+} satisfies YextFieldMap<CasualDiningHeaderProps>;
 
-const CasualDiningHeaderComponent: PuckComponent<CasualDiningHeaderProps> = (
-  props,
-) => {
-  const { t, i18n } = useTranslation();
+const CasualDiningHeaderComponent: PuckComponent<
+  YextTransformedProps<CasualDiningHeaderProps, typeof CasualDiningHeaderFields>
+> = (props) => {
+  const { t } = useTranslation();
   const analytics = useAnalytics();
-  const streamDocument = useDocument<StreamDocument>();
-  const locale = i18n.language;
   const [menuOpen, setMenuOpen] = React.useState(false);
 
-  const resolvedLogoImage = resolveComponentData(
-    props.logoImage.image,
-    locale,
-    streamDocument,
-  ) as ImageType | ComplexImageType | TranslatableAssetImage | undefined;
-  const resolvedLogoUrl = (
-    resolveComponentData(props.logoImage.url, locale, streamDocument) || ""
-  )
-    .toString()
-    .trim();
+  const logoImage = props.logoImage.image;
+  const resolvedLogoUrl = props.logoImage.url?.trim();
   const logoUrl = resolvedLogoUrl
     ? normalizeLink(resolvedLogoUrl, "URL")
     : undefined;
@@ -564,30 +512,23 @@ const CasualDiningHeaderComponent: PuckComponent<CasualDiningHeaderProps> = (
   const showCta = props.cta.show;
   const showLogo = props.logoImage.show;
 
-  const headerSurfaceStyle = getSurfaceColorStyle(
-    props.section.backgroundColor,
-    streamDocument,
-  );
-  const navigationColor = hasExplicitThemeColor(props.navigation.fontColor)
-    ? props.navigation.fontColor
-    : undefined;
-  const dividerColorValue = getThemeColorCssValue(props.section.dividerColor);
-  const dividerStyle = dividerColorValue
-    ? ({ borderColor: dividerColorValue } as React.CSSProperties)
+  const navigationColor = props.navigation.fontColor?.selectedColorCss;
+  const dividerStyle = props.section.dividerColor
+    ? { borderColor: props.section.dividerColor.selectedColorCss }
     : undefined;
 
-  const navigationTextStyles = getTextStyles({
+  const navigationTextStyles = {
     color: navigationColor,
-    styles: props.navigation.styles,
-  });
+    ...(props.navigation.styles as React.CSSProperties),
+  };
 
   const logoWrapperStyle: React.CSSProperties = {
+    ...(props.logoImage.styles as React.CSSProperties),
     height: "50px",
     width:
       props.logoImage.aspectRatio > 0
         ? `${50 * props.logoImage.aspectRatio}px`
         : "50px",
-    borderRadius: resolveBorderRadius(props.logoImage.styles?.borderRadius),
     overflow: "hidden",
   };
 
@@ -600,17 +541,15 @@ const CasualDiningHeaderComponent: PuckComponent<CasualDiningHeaderProps> = (
 
   const navigationLinks = (props.navigation.links ?? [])
     .map((item, index) => {
-      const label = resolveString(item.label, locale, streamDocument);
-      const resolvedLink = resolveString(item.link, locale, streamDocument);
       const link = normalizeResolvedLink({
-        link: resolvedLink,
+        link: item.link,
         linkType: item.linkType,
         shouldNormalize: item.normalizeLink,
       });
 
       return {
         eventName: `headerLink${index}`,
-        label,
+        label: item.label,
         link,
         linkType: item.linkType,
         openInNewTab: item.openInNewTab,
@@ -620,24 +559,17 @@ const CasualDiningHeaderComponent: PuckComponent<CasualDiningHeaderProps> = (
 
   const utilityLinks = (props.utilities.items ?? [])
     .map((item, index) => {
-      const label = resolveString(item.label, locale, streamDocument);
-      const resolvedLink = resolveString(item.link, locale, streamDocument);
       const link = normalizeResolvedLink({
-        link: resolvedLink,
+        link: item.link,
         linkType: item.linkType,
         shouldNormalize: item.normalizeLink,
       });
-      const resolvedIconImage = resolveComponentData(
-        item.iconImage.image,
-        locale,
-        streamDocument,
-      ) as ImageType | ComplexImageType | TranslatableAssetImage | undefined;
 
       return {
         eventName: `headerUtility${index}`,
-        iconImage: resolvedIconImage,
+        iconImage: item.iconImage.image,
         iconImageProps: item.iconImage,
-        label,
+        label: item.label,
         link,
         linkType: item.linkType,
         openInNewTab: item.openInNewTab,
@@ -645,15 +577,7 @@ const CasualDiningHeaderComponent: PuckComponent<CasualDiningHeaderProps> = (
     })
     .filter((item) => Boolean(item.label) && Boolean(item.link));
 
-  const ctaItems = (props.cta.items ?? []).map((item) => ({
-    ...item,
-    cta: item.cta
-      ? ({
-          data: item.cta.data,
-          styles: item.cta.styles,
-        } as Partial<ComprehensiveCTAValue>)
-      : undefined,
-  }));
+  const ctaItems = props.cta.items ?? [];
   const topBarCtaItem = ctaItems[0];
   const drawerCtaItems = topBarCtaItem ? ctaItems.slice(1) : ctaItems;
   const mobileDrawerCtaItems = ctaItems;
@@ -663,50 +587,30 @@ const CasualDiningHeaderComponent: PuckComponent<CasualDiningHeaderProps> = (
     iconImageProps,
   }: {
     iconImage?: ImageType | ComplexImageType | TranslatableAssetImage;
-    iconImageProps: SharedHeaderAction["iconImage"];
+    iconImageProps: (typeof utilityLinks)[number]["iconImageProps"];
   }) => {
     if (!hasImageSource(iconImage)) {
-      return (
-        <EntityField
-          displayName="Utility Icon"
-          fieldId={iconImageProps.image.field}
-          constantValueEnabled={iconImageProps.image.constantValueEnabled}
-        >
-          <SharedHeaderDefaultUtilityIcon />
-        </EntityField>
-      );
+      return <SharedHeaderDefaultUtilityIcon />;
     }
 
-    const resolvedIconImage = iconImage as
-      | ImageType
-      | ComplexImageType
-      | TranslatableAssetImage;
     const iconHeight = 32;
     const iconAspectRatio =
       iconImageProps.aspectRatio > 0 ? iconImageProps.aspectRatio : 1;
     const iconUrl =
-      "image" in resolvedIconImage
-        ? typeof resolvedIconImage.image?.url === "string"
-          ? resolvedIconImage.image.url
+      "image" in iconImage
+        ? typeof iconImage.image?.url === "string"
+          ? iconImage.image.url
           : undefined
-        : typeof resolvedIconImage.url === "string"
-          ? resolvedIconImage.url
+        : typeof iconImage.url === "string"
+          ? iconImage.url
           : undefined;
     if (!iconUrl) {
-      return (
-        <EntityField
-          displayName="Utility Icon"
-          fieldId={iconImageProps.image.field}
-          constantValueEnabled={iconImageProps.image.constantValueEnabled}
-        >
-          <SharedHeaderDefaultUtilityIcon />
-        </EntityField>
-      );
+      return <SharedHeaderDefaultUtilityIcon />;
     }
     const wrapperStyle: React.CSSProperties = {
+      ...(iconImageProps.styles as React.CSSProperties),
       width: `${iconHeight * iconAspectRatio}px`,
       height: `${iconHeight}px`,
-      borderRadius: resolveBorderRadius(iconImageProps.styles?.borderRadius),
       overflow: "hidden",
       flexShrink: 0,
     };
@@ -719,20 +623,14 @@ const CasualDiningHeaderComponent: PuckComponent<CasualDiningHeaderProps> = (
     };
 
     return (
-      <EntityField
-        displayName="Utility Icon"
-        fieldId={iconImageProps.image.field}
-        constantValueEnabled={iconImageProps.image.constantValueEnabled}
-      >
-        <div style={wrapperStyle}>
-          <img
-            alt=""
-            src={iconUrl}
-            className="h-full w-full"
-            style={imageStyle}
-          />
-        </div>
-      </EntityField>
+      <div style={wrapperStyle}>
+        <img
+          alt=""
+          src={iconUrl}
+          className="h-full w-full"
+          style={imageStyle}
+        />
+      </div>
     );
   };
 
@@ -753,7 +651,7 @@ const CasualDiningHeaderComponent: PuckComponent<CasualDiningHeaderProps> = (
               aria-label={item.label}
               className="inline-flex h-8 shrink-0 items-center justify-center rounded-full transition-opacity hover:opacity-80"
               style={{
-                color: getThemeColorCssValue(navigationColor),
+                color: navigationColor,
               }}
             >
               <span className="flex h-full items-center justify-center">
@@ -769,18 +667,11 @@ const CasualDiningHeaderComponent: PuckComponent<CasualDiningHeaderProps> = (
       {showCta ? (
         <div className="flex flex-wrap items-center justify-end gap-3">
           {ctaItems.map((item, index) => (
-            <EntityField
-              key={`desktop-cta-${index}`}
-              displayName="Header CTA"
-              fieldId={item.cta?.data?.cta.field}
-              constantValueEnabled={item.cta?.data?.cta.constantValueEnabled}
-            >
-              <ComprehensiveCTA
-                value={item.cta}
-                eventName={`headerCta${index}`}
-                className="inline-flex h-10 items-center justify-center px-5 transition-opacity hover:opacity-90"
-              />
-            </EntityField>
+            <ComprehensiveCTA key={`desktop-cta-${index}`}
+              value={{ data: item.cta.data, styles: item.cta.styles }}
+              eventName={`headerCta${index}`}
+              className="inline-flex h-10 items-center justify-center px-5 transition-opacity hover:opacity-90"
+            />
           ))}
         </div>
       ) : null}
@@ -820,53 +711,27 @@ const CasualDiningHeaderComponent: PuckComponent<CasualDiningHeaderProps> = (
   );
 
   const renderLogo = () => {
-    if (!showLogo || !hasImageSource(resolvedLogoImage)) {
+    if (!showLogo || !hasImageSource(logoImage)) {
       return null;
     }
 
     const logoContent = (
       <div style={logoWrapperStyle}>
-        <Image
-          image={
-            resolvedLogoImage as
-              | ImageType
-              | ComplexImageType
-              | TranslatableAssetImage
-          }
-          className="h-full w-full"
-          style={logoStyle}
-        />
+        <Image image={logoImage} className="h-full w-full" style={logoStyle} />
       </div>
     );
 
-    return (
-      <EntityField
-        displayName="Logo Link"
-        fieldId={props.logoImage.url.field}
-        constantValueEnabled={props.logoImage.url.constantValueEnabled}
+    return logoUrl ? (
+      <Link
+        cta={{ link: logoUrl, linkType: "URL" }}
+        eventName="headerLogo"
+        className="inline-flex transition-opacity hover:opacity-80"
+        aria-label="Logo"
       >
-        <EntityField
-          displayName="Logo Image"
-          fieldId={props.logoImage.image.field}
-          constantValueEnabled={props.logoImage.image.constantValueEnabled}
-        >
-          {logoUrl ? (
-            <Link
-              cta={{
-                link: logoUrl,
-                linkType: "URL",
-              }}
-              eventName="headerLogo"
-              className="inline-flex transition-opacity hover:opacity-80"
-              aria-label="Logo"
-            >
-              {logoContent}
-            </Link>
-          ) : (
-            logoContent
-          )}
-        </EntityField>
-      </EntityField>
+        {logoContent}
+      </Link>
+    ) : (
+      logoContent
     );
   };
 
@@ -947,12 +812,7 @@ const CasualDiningHeaderComponent: PuckComponent<CasualDiningHeaderProps> = (
         as="header"
         background={props.section.backgroundColor}
         className="relative"
-        style={{
-          ...headerSurfaceStyle,
-          ...(getThemeColorCssValue(navigationColor)
-            ? { color: getThemeColorCssValue(navigationColor) }
-            : {}),
-        }}
+        style={navigationColor ? { color: navigationColor } : undefined}
       >
         <div className="hidden lg:block">{desktopVariantContent}</div>
 
@@ -960,19 +820,11 @@ const CasualDiningHeaderComponent: PuckComponent<CasualDiningHeaderProps> = (
           <div className="min-w-0 flex-1">{logoElement}</div>
           {showCta && topBarCtaItem ? (
             <div className="hidden items-center gap-3 md:flex">
-              <EntityField
-                displayName="Header CTA"
-                fieldId={topBarCtaItem.cta?.data?.cta.field}
-                constantValueEnabled={
-                  topBarCtaItem.cta?.data?.cta.constantValueEnabled
-                }
-              >
-                <ComprehensiveCTA
-                  value={topBarCtaItem.cta}
-                  eventName="responsiveTopBarCta"
-                  className="inline-flex h-10 items-center justify-center px-5 transition-opacity hover:opacity-90"
-                />
-              </EntityField>
+              <ComprehensiveCTA
+                value={{ data: topBarCtaItem.cta.data, styles: topBarCtaItem.cta.styles }}
+                eventName="responsiveTopBarCta"
+                className="inline-flex h-10 items-center justify-center px-5 transition-opacity hover:opacity-90"
+              />
             </div>
           ) : null}
           <button
@@ -990,7 +842,7 @@ const CasualDiningHeaderComponent: PuckComponent<CasualDiningHeaderProps> = (
             }
             className="inline-flex h-10 w-10 items-center justify-center rounded-full"
             style={{
-              color: getThemeColorCssValue(navigationColor),
+              color: navigationColor,
             }}
           >
             <svg
@@ -1016,7 +868,10 @@ const CasualDiningHeaderComponent: PuckComponent<CasualDiningHeaderProps> = (
         {menuOpen ? (
           <div
             className="absolute inset-x-0 top-full z-20 max-h-[calc(100vh-82px)] overflow-y-auto px-6 py-6 md:px-8 lg:hidden"
-            style={headerSurfaceStyle}
+            style={{
+              backgroundColor: props.section.backgroundColor?.selectedColorCss,
+              color: props.section.backgroundColor?.contrastingColorCss,
+            }}
           >
             <div className="space-y-6">
               {navigationLinks.length > 0
@@ -1030,40 +885,22 @@ const CasualDiningHeaderComponent: PuckComponent<CasualDiningHeaderProps> = (
                   {showCta && drawerCtaItems.length > 0 ? (
                     <div className="hidden flex-col gap-3 md:flex">
                       {drawerCtaItems.map((item, index) => (
-                        <EntityField
-                          key={`tablet-cta-${index}`}
-                          displayName="Header CTA"
-                          fieldId={item.cta?.data?.cta.field}
-                          constantValueEnabled={
-                            item.cta?.data?.cta.constantValueEnabled
-                          }
-                        >
-                          <ComprehensiveCTA
-                            value={item.cta}
-                            eventName={`tabletOverlayCta${index}`}
-                            className="inline-flex h-10 w-full items-center justify-center px-5 transition-opacity hover:opacity-90"
-                          />
-                        </EntityField>
+                        <ComprehensiveCTA key={`tablet-cta-${index}`}
+                          value={{ data: item.cta.data, styles: item.cta.styles }}
+                          eventName={`tabletOverlayCta${index}`}
+                          className="inline-flex h-10 w-full items-center justify-center px-5 transition-opacity hover:opacity-90"
+                        />
                       ))}
                     </div>
                   ) : null}
                   {showCta && mobileDrawerCtaItems.length > 0 ? (
                     <div className="flex flex-col gap-3 md:hidden">
                       {mobileDrawerCtaItems.map((item, index) => (
-                        <EntityField
-                          key={`mobile-cta-${index}`}
-                          displayName="Header CTA"
-                          fieldId={item.cta?.data?.cta.field}
-                          constantValueEnabled={
-                            item.cta?.data?.cta.constantValueEnabled
-                          }
-                        >
-                          <ComprehensiveCTA
-                            value={item.cta}
-                            eventName={`mobileOverlayCta${index}`}
-                            className="inline-flex h-10 w-full items-center justify-center px-5 transition-opacity hover:opacity-90"
-                          />
-                        </EntityField>
+                        <ComprehensiveCTA key={`mobile-cta-${index}`}
+                          value={{ data: item.cta.data, styles: item.cta.styles }}
+                          eventName={`mobileOverlayCta${index}`}
+                          className="inline-flex h-10 w-full items-center justify-center px-5 transition-opacity hover:opacity-90"
+                        />
                       ))}
                     </div>
                   ) : null}
@@ -1094,7 +931,7 @@ const CasualDiningHeaderComponent: PuckComponent<CasualDiningHeaderProps> = (
                           aria-label={item.label}
                           className="inline-flex h-8 shrink-0 items-center justify-center rounded-full transition-opacity hover:opacity-80"
                           style={{
-                            color: getThemeColorCssValue(navigationColor),
+                            color: navigationColor,
                           }}
                         >
                           <span className="flex h-full items-center justify-center">
@@ -1117,140 +954,142 @@ const CasualDiningHeaderComponent: PuckComponent<CasualDiningHeaderProps> = (
   );
 };
 
-export const CasualDiningHeader: YextComponentConfig<CasualDiningHeaderProps> =
-  {
-    label: msg("components.header", "Header"),
-    fields: CasualDiningHeaderFields,
-    defaultProps: {
-      variant: "centerLogoSplitNav",
-      section: {
-        visibleOnLivePage: true,
-        backgroundColor: {
-          selectedColor: "palette-secondary",
-          contrastingColor: "palette-secondary-contrast",
+export const CasualDiningHeader: YextComponentConfig<
+  CasualDiningHeaderProps,
+  typeof CasualDiningHeaderFields
+> = {
+  label: msg("components.header", "Header"),
+  fields: CasualDiningHeaderFields,
+  defaultProps: {
+    variant: "centerLogoSplitNav",
+    section: {
+      visibleOnLivePage: true,
+      backgroundColor: {
+        selectedColor: "palette-secondary",
+        contrastingColor: "palette-secondary-contrast",
+      },
+      dividerColor: undefined,
+    },
+    navigation: {
+      show: true,
+      links: [
+        {
+          label: "Menu",
+          link: "#featured-menu",
+          linkType: "URL",
+          normalizeLink: false,
+          openInNewTab: false,
         },
-        dividerColor: undefined,
-      },
-      navigation: {
-        show: true,
-        links: [
-          {
-            label: "Menu",
-            link: "#featured-menu",
-            linkType: "URL",
-            normalizeLink: false,
-            openInNewTab: false,
-          },
-          {
-            label: "FAQ",
-            link: "#faq",
-            linkType: "URL",
-            normalizeLink: false,
-            openInNewTab: false,
-          },
-          {
-            label: "Contact",
-            link: "#footer",
-            linkType: "URL",
-            normalizeLink: false,
-            openInNewTab: false,
-          },
-        ],
-        styles: defaultLinkStyles,
-      },
-      utilities: {
-        show: true,
-        items: [
-          {
-            iconImage: defaultUtilityIconImage,
-            label: "Facebook",
-            link: "#",
-            linkType: "URL",
-            normalizeLink: false,
-            openInNewTab: false,
-          },
-          {
-            iconImage: defaultUtilityIconImage,
-            label: "Instagram",
-            link: "#",
-            linkType: "URL",
-            normalizeLink: false,
-            openInNewTab: false,
-          },
-          {
-            iconImage: defaultUtilityIconImage,
-            label: "Yelp",
-            link: "#",
-            linkType: "URL",
-            normalizeLink: false,
-            openInNewTab: false,
-          },
-        ],
-      },
-      cta: {
-        show: true,
-        items: [
-          {
-            cta: {
-              data: {
-                actionType: "link",
-                cta: {
-                  field: "",
-                  constantValueEnabled: true,
-                  constantValue: {
-                    ctaType: "textAndLink",
-                    label: { defaultValue: "CTA Label" },
-                    link: { defaultValue: "#" },
-                    linkType: "URL",
-                  },
-                  selectedType: "textAndLink",
+        {
+          label: "FAQ",
+          link: "#faq",
+          linkType: "URL",
+          normalizeLink: false,
+          openInNewTab: false,
+        },
+        {
+          label: "Contact",
+          link: "#footer",
+          linkType: "URL",
+          normalizeLink: false,
+          openInNewTab: false,
+        },
+      ],
+      styles: defaultLinkStyles,
+    },
+    utilities: {
+      show: true,
+      items: [
+        {
+          iconImage: defaultUtilityIconImage,
+          label: "Facebook",
+          link: "#",
+          linkType: "URL",
+          normalizeLink: false,
+          openInNewTab: false,
+        },
+        {
+          iconImage: defaultUtilityIconImage,
+          label: "Instagram",
+          link: "#",
+          linkType: "URL",
+          normalizeLink: false,
+          openInNewTab: false,
+        },
+        {
+          iconImage: defaultUtilityIconImage,
+          label: "Yelp",
+          link: "#",
+          linkType: "URL",
+          normalizeLink: false,
+          openInNewTab: false,
+        },
+      ],
+    },
+    cta: {
+      show: true,
+      items: [
+        {
+          cta: {
+            data: {
+              actionType: "link",
+              cta: {
+                field: "",
+                constantValueEnabled: true,
+                constantValue: {
+                  ctaType: "textAndLink",
+                  label: { defaultValue: "CTA Label" },
+                  link: { defaultValue: "#" },
+                  linkType: "URL",
                 },
-                openInNewTab: false,
+                selectedType: "textAndLink",
               },
-              styles: {
-                variant: "primary",
-                color: {
-                  selectedColor: "palette-primary",
-                  contrastingColor: "palette-primary-contrast",
-                },
-                button: defaultButtonStyles,
+              openInNewTab: false,
+            },
+            styles: {
+              variant: "primary",
+              color: {
+                selectedColor: "palette-primary",
+                contrastingColor: "palette-primary-contrast",
               },
+              button: defaultButtonStyles,
             },
           },
-        ],
-      },
-      logoImage: {
-        show: true,
-        image: {
-          field: "",
-          constantValueEnabled: true,
-          constantValue: {
-            url: "https://a.mktgcdn.com/p/OLT2KExDEKhKlCmIobyRRHN6MFUS77fVs5gIt_FTnBI/450x450.jpg",
-            width: 100,
-            height: 100,
-            alternateText: "Brand logo",
-          },
         },
-        url: {
-          field: "",
-          constantValue: {
-            defaultValue: "",
-          },
-          constantValueEnabled: true,
-        },
-        aspectRatio: 1,
-        imageConstrain: "fixed",
-        styles: defaultImageStyles,
-      },
+      ],
     },
-    render: (props) => (
-      <AnalyticsScopeProvider
-        name={`CasualDiningHeader${getAnalyticsScopeHash(props.id)}`}
-      >
-        <CasualDiningHeaderComponent {...props} />
-      </AnalyticsScopeProvider>
-    ),
-  };
+    logoImage: {
+      show: true,
+      image: {
+        field: "",
+        constantValueEnabled: true,
+        constantValue: {
+          url: "https://a.mktgcdn.com/p/OLT2KExDEKhKlCmIobyRRHN6MFUS77fVs5gIt_FTnBI/450x450.jpg",
+          width: 100,
+          height: 100,
+          alternateText: "Brand logo",
+        },
+      },
+      url: {
+        field: "",
+        constantValue: {
+          defaultValue: "",
+        },
+        constantValueEnabled: true,
+      },
+      aspectRatio: 1,
+      imageConstrain: "fixed",
+      styles: defaultImageStyles,
+    },
+  },
+  render: (props) => (
+    <AnalyticsScopeProvider
+      name={`CasualDiningHeader${getAnalyticsScopeHash(props.id)}`}
+    >
+      <CasualDiningHeaderComponent {...props} />
+    </AnalyticsScopeProvider>
+  ),
+};
 
 export const config: SectionConfig = {
   id: "CasualDiningHeader",

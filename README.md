@@ -14,6 +14,24 @@ layout, and one Locator layout.
 - `npm run add-directory-locator`: Adds the necessary files for a directory and locator to the repo.
 - `npm run convert-template`: Converts a legacy template to section library format.
 
+## Render field transforms
+
+Page-level `entityField` and `translatableString` fields opt in with `transform: true`.
+Use `satisfies YextFieldMap<Props>` for the field schema and
+`YextComponentConfig<Props, typeof fields>` for the component config. Render props
+use `YextTransformedProps<Props, typeof fields>`: strings, images, addresses,
+phones, hours, and booleans arrive resolved; rich-text fields return resolved data
+that is passed to `MaybeRTF` through its `data` prop.
+`shared/transformedText.tsx` shares the text schema and typography across sections.
+Authored defaults and saved layout data keep their existing shapes.
+
+CTAs, repeated sources, child-scoped directory fields, search-result fields,
+static-map coordinates, and Banner's empty-content handling remain unchanged.
+The root Puck dependency must match VE's render-transform canary.
+
+Run the render regression checks with
+`node --import tsx --test tests/transformedText.test.tsx`.
+
 ## Section Library structure
 
 ```text
