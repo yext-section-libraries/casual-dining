@@ -126,6 +126,7 @@
     "logoImage": "Logobilde",
     "longitude": "Lengdegrad",
     "map": "Kart",
+    "mapStartingZoom": "Kartets startzoom",
     "mapboxMapStyle": "Mapbox-kartstil",
     "mapStyle": "Kartstil",
     "maxReviews": "Maksimum · Anmeldelser",
